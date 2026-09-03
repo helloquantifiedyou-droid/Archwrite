@@ -634,7 +634,7 @@ const BANNED_WORDS = [
   'coexist', 'built around', 'itself', 'embedded', 'overhead',
   'therefore', 'but rather', 'unfolds', 'govern', 'consistent',
   'plane', 'considered', 'demand', 'genuine', 'genuinely',
-  'gamechanger', 'commanding', 'reads as part', 'reads as', 'the result', 'compete for attention', 'restrained vocabulary',
+  'gamechanger', 'commanding', 'reads as part', 'reads as', 'the result', 'the result is', 'compete for attention', 'restrained vocabulary',
   'labyrinth', 'enigma', 'nestled', 'remnant', 'indelible', 'metamorphosis',
   'a testament to', 'sounds unheard', 'sights unseen', 'shows up', 'woven', 'sensibility'
 ];
@@ -1717,8 +1717,8 @@ const STORY_FIELDS = [
   { id:'stylist', label:'Styling', placeholder:'' },
   { id:'photography', label:'Photography credit', placeholder:'', creditsOnly:true },
   { id:'location', label:'Location', placeholder:'Neighborhood, City' },
-  { id:'clientNames', label:'Client', placeholder:'Leave blank to keep them unnamed', hideForResidence:true },
-  { id:'homeowners', label:'Homeowners', placeholder:'Describe the homeowners – their family unit, what they do, and any details that might be helpful. You can also choose to include their names.', type:'textarea', residenceOnly:true },
+  { id:'clientNames', label:'Client', placeholder:'Leave blank to keep them unnamed', hideForArchitectureResidence:true },
+  { id:'homeowners', label:'Homeowners', placeholder:'Describe the homeowners – their family unit, what they do, and any details that might be helpful. You can also choose to include their names.', type:'textarea', residenceOnly:true, architectureOnly:true },
   { id:'clientStory', label:'Client story / background', placeholder:"Who are they, and what shaped the brief? e.g. their profession, how they found the property, their personal style or priorities.", type:'textarea' },
   { id:'size', label:'Square footage / size', placeholder:'' },
   { id:'lotSize', label:'Lot size', placeholder:'', creditsOnly:true, architectureOnly:true, residenceOnly:true },
@@ -1753,6 +1753,7 @@ function shouldShowStoryField(f){
   const isArchitecture = storyState.category === 'architecture';
   if(f.residenceOnly && !isResidence) return false;
   if(f.hideForResidence && isResidence) return false;
+  if(f.hideForArchitectureResidence && isResidence && isArchitecture) return false;
   if(f.architectureOnly && !isArchitecture) return false;
   if(f.interiorOnly && isArchitecture) return false;
   return true;
@@ -2254,10 +2255,10 @@ function renderStoryForm(){
       html += `<div class="photo-thumb"><img src="${storyPhotoUrls[idx]||''}" alt=""><button data-delphoto="${idx}" title="Remove">✕</button></div>`;
     });
     html += `</div>`;
-    html += `<div class="guidance" style="margin:6px 0 0;">${storyState.photos.length} / 10 photos added</div>`;
+    html += `<div class="guidance" style="margin:12px 0 20px;">${storyState.photos.length} / 10 photos added</div>`;
   }
 
-  html += `<div class="hint-banner">Fill in the core details below — no need to write full sentences. The tool writes the full project story from these facts (and any photos you add) when you click "Generate Project Story."</div>`;
+  html += `<div class="hint-banner" style="margin-top:16px;">Fill in the core details below — no need to write full sentences. The tool writes the full project story from these facts (and any photos you add) when you click "Generate Project Story."</div>`;
 
   html += `<div class="field-group">
     <label>Notes</label>
@@ -2286,11 +2287,11 @@ function renderStoryForm(){
   html += `<button class="btn small" id="addRoomBtn">+ Add Room / Space</button>`;
 
 
+  STORY_FIELDS.forEach(f=>{ if(f.renderAtEnd && shouldShowStoryField(f)) html += renderStoryCoreField(f); });
   html += `<div class="section-title">Edit instructions</div>
   <div class="field-group">
     <textarea id="storyEditInstructions" placeholder="Don't like the result? You can request edits here and click Regenerate.">${esc(storyState.editInstructions)}</textarea>
   </div>`;
-  STORY_FIELDS.forEach(f=>{ if(f.renderAtEnd && shouldShowStoryField(f)) html += renderStoryCoreField(f); });
   html += `<button class="btn primary small" id="storyGenerateBtn" style="margin:4px 0 16px;" ${storyState.aiLoading?'disabled':''}>${storyState.aiOutput ? '✨ Regenerate' : '✨ Generate Project Story'}</button>`;
   html += `<div class="ad-banner">PLACE YOUR AD HERE<a class="ad-banner-link" href="https://www.patreon.com/16724522/join" target="_blank" rel="noopener noreferrer">Purchase</a></div>`;
 
