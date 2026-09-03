@@ -53,7 +53,7 @@ module.exports = async (req, res) => {
       },
       body: JSON.stringify({
         model: MODEL,
-        max_tokens: max_tokens || 4096,
+        max_tokens: max_tokens || 8000,
         system,
         messages
       })

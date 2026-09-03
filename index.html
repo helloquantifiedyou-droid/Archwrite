@@ -1552,7 +1552,7 @@ ${examples}`;
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        max_tokens: 4096,
+        max_tokens: 8000,
         system: systemPrompt,
         messages: [{ role: 'user', content: `${revisionBlock}FACTS:\n\n${factsOutline}${state.notes.trim() ? `\n\nNOTES:\n\n${state.notes.trim()}` : ''}` }]
       })
@@ -2636,7 +2636,7 @@ ${examples}`;
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        max_tokens: 4096,
+        max_tokens: 8000,
         system: systemPrompt,
         messages: [{ role: 'user', content: userContent }]
       })
