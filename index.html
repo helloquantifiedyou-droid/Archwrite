@@ -565,6 +565,12 @@ function nid(){ return 'b' + (++uid); }
 function esc(s){
   return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
+// Anthropic responses can include non-text content blocks (e.g. thinking)
+// before the actual text — find the text block rather than assuming content[0].
+function extractResponseText(data){
+  const block = Array.isArray(data.content) ? data.content.find(c => c.type === 'text') : null;
+  return block ? block.text : '';
+}
 
 // ---------- CATEGORY + SUBTYPE CONFIG ----------
 const CATEGORIES = {
@@ -1564,7 +1570,7 @@ ${examples}`;
       throw new Error(`(${res.status}) ${msg}`);
     }
     const data = await res.json();
-    const text = (data.content && data.content[0] && data.content[0].text) || '';
+    const text = extractResponseText(data);
     if(!text.trim()){
       throw new Error(`Claude returned an empty response (stop reason: ${data.stop_reason || 'unknown'}). Try again, or simplify the details.`);
     }
@@ -2648,7 +2654,7 @@ ${examples}`;
       throw new Error(`(${res.status}) ${msg}`);
     }
     const data = await res.json();
-    const text = (data.content && data.content[0] && data.content[0].text) || '';
+    const text = extractResponseText(data);
     if(!text.trim()){
       throw new Error(`Claude returned an empty response (stop reason: ${data.stop_reason || 'unknown'}). Try again, or simplify the details and photos.`);
     }

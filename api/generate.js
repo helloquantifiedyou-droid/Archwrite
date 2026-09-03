@@ -54,6 +54,7 @@ module.exports = async (req, res) => {
       body: JSON.stringify({
         model: MODEL,
         max_tokens: max_tokens || 8000,
+        thinking: { type: 'disabled' },
         system,
         messages
       })
@@ -65,8 +66,10 @@ module.exports = async (req, res) => {
       res.status(upstream.status).json({ error: data.error?.message || 'Upstream error' });
       return;
     }
-    const text = data.content && data.content[0] && data.content[0].text;
-    if (!text || !text.trim()) {
+    // content can include non-text blocks (e.g. a leading "thinking" block) —
+    // find the actual text block rather than assuming content[0] is it.
+    const textBlock = Array.isArray(data.content) ? data.content.find(c => c.type === 'text') : null;
+    if (!textBlock || !textBlock.text || !textBlock.text.trim()) {
       console.warn('Empty completion from Anthropic', { stop_reason: data.stop_reason, content: data.content, usage: data.usage });
     }
     res.status(200).json(data);
