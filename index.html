@@ -31,6 +31,17 @@
     display:flex;
     flex-direction:column;
   }
+  .logo-bar{
+    padding:12px 24px;
+    border-bottom:1px solid var(--line);
+    background:var(--paper);
+    flex-shrink:0;
+  }
+  .logo-bar img{
+    height:22px;
+    width:auto;
+    display:block;
+  }
   header{
     padding:14px 24px;
     border-bottom:1px solid var(--line);
@@ -512,6 +523,10 @@
 </head>
 <body>
 
+<div class="logo-bar">
+  <img src="/logo.png" alt="ArchWrite">
+</div>
+
 <header>
   <h1>PR &amp; Story Writer</h1>
   <div class="tabs">
@@ -588,7 +603,7 @@ const BANNED_WORDS = [
   'coexist', 'built around', 'itself', 'embedded', 'overhead',
   'therefore', 'but rather', 'unfolds', 'govern', 'consistent',
   'plane', 'considered', 'demand', 'genuine', 'genuinely',
-  'gamechanger', 'commanding', 'reads as part', 'reads as', 'the result', 'compete for attention'
+  'gamechanger', 'commanding', 'reads as part', 'reads as', 'the result', 'compete for attention', 'restrained vocabulary'
 ];
 
 // Fixed "Project Facts" block — architecture only (see def.projectFacts below),
