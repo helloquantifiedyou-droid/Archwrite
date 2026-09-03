@@ -42,22 +42,7 @@
     width:auto;
     display:block;
   }
-  header{
-    padding:14px 24px;
-    border-bottom:1px solid var(--line);
-    background:var(--paper);
-    display:flex;
-    align-items:center;
-    gap:24px;
-    flex-shrink:0;
-  }
-  header h1{
-    font-size:16px;
-    margin:0;
-    letter-spacing:0.01em;
-    font-weight:900;
-  }
-  .tabs{display:flex;gap:4px;}
+  .tabs{display:flex;gap:4px;margin-bottom:18px;}
   .tab{
     padding:8px 16px;
     border-radius:6px;
@@ -531,12 +516,6 @@
   <img src="/logo.png" alt="ArchWrite">
 </div>
 
-<header>
-  <div class="tabs">
-    <div class="tab active" data-tab="press">Press Release</div>
-    <div class="tab" data-tab="story">Project Story</div>
-  </div>
-</header>
 
 <div class="hero">
   <div class="hero-main">
@@ -588,6 +567,26 @@ function esc(s){
 function extractResponseText(data){
   const block = Array.isArray(data.content) ? data.content.find(c => c.type === 'text') : null;
   return block ? block.text : '';
+}
+
+// The Press Release / Project Story tabs live inside each form pane now (right
+// above Category), not in a static header, so they get rebuilt on every render —
+// tabsHtml() is the single source for that markup and switchTab() is the only
+// place that changes which pane is showing.
+let activeTab = 'press';
+function tabsHtml(){
+  return `<div class="tabs">
+    <div class="tab ${activeTab==='press'?'active':''}" data-tab="press">Press Release</div>
+    <div class="tab ${activeTab==='story'?'active':''}" data-tab="story">Project Story</div>
+  </div>`;
+}
+function switchTab(tabName){
+  if(tabName === activeTab) return;
+  activeTab = tabName;
+  document.getElementById('pressLayout').hidden = tabName !== 'press';
+  document.getElementById('storyLayout').hidden = tabName !== 'story';
+  renderForm(); renderPreview(); renderToolbar();
+  renderStoryForm(); renderStoryPreview(); renderStoryToolbar();
 }
 
 // ---------- CATEGORY + SUBTYPE CONFIG ----------
@@ -934,6 +933,8 @@ const previewToolbar = document.getElementById('previewToolbar');
 function renderForm(){
   const def = SUBTYPE_DEFS[state.subtype];
   let html = '';
+
+  html += tabsHtml();
 
   html += `<div class="subtype-select-wrap">
     <label>Category</label>
@@ -2204,6 +2205,8 @@ function renderStoryCoreField(f){
 function renderStoryForm(){
   let html = '';
 
+  html += tabsHtml();
+
   html += `<div class="subtype-select-wrap">
     <label>Category</label>
     <select id="storyCategorySelect">
@@ -2716,15 +2719,14 @@ renderStoryPreview();
 renderStoryToolbar();
 
 // ---------- tabs ----------
-document.querySelectorAll('.tab').forEach(t=>{
-  t.addEventListener('click', ()=>{
-    if(t.classList.contains('disabled')) return;
-    const tabName = t.getAttribute('data-tab');
-    document.querySelectorAll('.tab').forEach(t2=>t2.classList.remove('active'));
-    t.classList.add('active');
-    document.getElementById('pressLayout').hidden = tabName !== 'press';
-    document.getElementById('storyLayout').hidden = tabName !== 'story';
-  });
+// Delegated: the tabs are rebuilt on every render (they live inside the form
+// panes now), so a one-time querySelectorAll binding would go stale the first
+// time either pane re-renders.
+document.body.addEventListener('click', (e)=>{
+  const tabEl = e.target.closest('.tab');
+  if(tabEl && !tabEl.classList.contains('disabled')){
+    switchTab(tabEl.getAttribute('data-tab'));
+  }
 });
 
 })();
