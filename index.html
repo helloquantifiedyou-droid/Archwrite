@@ -518,9 +518,28 @@
     color:var(--muted);
     margin:8px 0 0;
   }
+  #mobileNotice{display:none;}
+  @media (max-width: 768px){
+    body > *:not(#mobileNotice){display:none !important;}
+    #mobileNotice{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height:100vh;
+      padding:32px;
+      text-align:center;
+      font-family:"IBM Plex Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+      font-size:16px;
+      line-height:1.6;
+      color:var(--ink);
+      background:var(--paper);
+    }
+  }
 </style>
 </head>
 <body>
+
+<div id="mobileNotice">This site can currently only be accessed on desktops. Thank you for your understanding!</div>
 
 <div class="logo-bar">
   <img src="/logo.png" alt="ArchWrite">
