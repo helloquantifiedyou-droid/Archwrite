@@ -4,7 +4,11 @@
 // with the real key attached, then relays the response back.
 
 const MODEL = 'claude-sonnet-5';
-const MAX_BODY_BYTES = 2_000_000; // ~2MB — enough for prompt text + a few base64 photos
+// Vercel's Node serverless functions cap request bodies around 4.5MB before this
+// code even runs — this stays comfortably under that, on top of the frontend's
+// own pre-flight size check (which resizes photos and rejects an oversized batch
+// before sending), so this is a second line of defense, not the primary guard.
+const MAX_BODY_BYTES = 4_200_000;
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {

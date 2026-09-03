@@ -2492,12 +2492,33 @@ function renderStoryToolbar(){
   });
 }
 
-function fileToBase64(file){
+// Anthropic's vision models cap useful resolution around 1568px on the long
+// edge (larger images are downscaled server-side anyway), so resizing here
+// keeps upload payloads well under Vercel's ~4.5MB serverless request-body
+// limit — a handful of raw phone photos would blow past that uncompressed.
+const MAX_IMAGE_DIMENSION = 1400;
+const MAX_UPLOAD_BYTES = 3_500_000; // leaves headroom under Vercel's ~4.5MB serverless request-body cap
+function resizeImageToBase64(file){
   return new Promise((resolve, reject)=>{
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result.split(',')[1]);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let { width, height } = img;
+      if(width > MAX_IMAGE_DIMENSION || height > MAX_IMAGE_DIMENSION){
+        const scale = MAX_IMAGE_DIMENSION / Math.max(width, height);
+        width = Math.round(width * scale);
+        height = Math.round(height * scale);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+      resolve({ base64: dataUrl.split(',')[1], mediaType: 'image/jpeg' });
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error(`Could not read ${file.name}`)); };
+    img.src = url;
   });
 }
 
@@ -2593,10 +2614,19 @@ ${examples}`;
   try{
     const userContent = [];
     for(const file of storyState.photos){
-      const b64 = await fileToBase64(file);
-      userContent.push({ type:'image', source:{ type:'base64', media_type: file.type || 'image/jpeg', data: b64 } });
+      try{
+        const { base64, mediaType } = await resizeImageToBase64(file);
+        userContent.push({ type:'image', source:{ type:'base64', media_type: mediaType, data: base64 } });
+      }catch(imgErr){
+        console.warn('Skipping photo that could not be read:', imgErr);
+      }
     }
     userContent.push({ type:'text', text: `${revisionBlock}FACTS:\n\n${factsOutline}${storyState.notes.trim() ? `\n\nNOTES:\n\n${storyState.notes.trim()}` : ''}` });
+
+    const imageBytes = userContent.reduce((sum, c) => sum + (c.source ? c.source.data.length : 0), 0);
+    if(imageBytes > MAX_UPLOAD_BYTES){
+      throw new Error('These photos are too large combined — try removing a few or using smaller images, then generate again.');
+    }
 
     const res = await fetch('/api/generate', {
       method: 'POST',
