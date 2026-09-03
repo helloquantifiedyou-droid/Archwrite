@@ -1564,7 +1564,11 @@ ${examples}`;
       throw new Error(`(${res.status}) ${msg}`);
     }
     const data = await res.json();
-    state.aiOutput = (data.content && data.content[0] && data.content[0].text) || '';
+    const text = (data.content && data.content[0] && data.content[0].text) || '';
+    if(!text.trim()){
+      throw new Error(`Claude returned an empty response (stop reason: ${data.stop_reason || 'unknown'}). Try again, or simplify the details.`);
+    }
+    state.aiOutput = text;
     if(/^NEEDS_INPUT\b/i.test(state.aiOutput.trim())){
       state.aiNotice = state.aiOutput.trim().replace(/^NEEDS_INPUT\s*/i, '');
       state.aiOutput = previousOutput;
@@ -2644,7 +2648,11 @@ ${examples}`;
       throw new Error(`(${res.status}) ${msg}`);
     }
     const data = await res.json();
-    storyState.aiOutput = (data.content && data.content[0] && data.content[0].text) || '';
+    const text = (data.content && data.content[0] && data.content[0].text) || '';
+    if(!text.trim()){
+      throw new Error(`Claude returned an empty response (stop reason: ${data.stop_reason || 'unknown'}). Try again, or simplify the details and photos.`);
+    }
+    storyState.aiOutput = text;
     if(/^NEEDS_INPUT\b/i.test(storyState.aiOutput.trim())){
       storyState.aiNotice = storyState.aiOutput.trim().replace(/^NEEDS_INPUT\s*/i, '');
       storyState.aiOutput = previousOutput;

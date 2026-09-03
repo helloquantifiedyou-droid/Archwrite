@@ -11,19 +11,6 @@ const MODEL = 'claude-sonnet-5';
 const MAX_BODY_BYTES = 4_200_000;
 
 module.exports = async (req, res) => {
-  // TEMPORARY: visit this endpoint directly in a browser (GET, no POST needed)
-  // to see which env vars this function can actually see, without exposing any
-  // values. Remove this block once ANTHROPIC_API_KEY shows up correctly.
-  if (req.method === 'GET' && req.query && req.query.debug === '1') {
-    const relevantKeys = Object.keys(process.env).filter(k => !k.startsWith('VERCEL') && !k.startsWith('npm_') && !k.startsWith('NODE') && !k.startsWith('PATH') && !k.startsWith('HOME') && !k.startsWith('LANG'));
-    res.status(200).json({
-      hasAnthropicKey: !!process.env.ANTHROPIC_API_KEY,
-      anthropicKeyLength: process.env.ANTHROPIC_API_KEY ? process.env.ANTHROPIC_API_KEY.length : 0,
-      otherVisibleEnvVarNames: relevantKeys
-    });
-    return;
-  }
-
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method not allowed' });
     return;
@@ -74,8 +61,13 @@ module.exports = async (req, res) => {
 
     const data = await upstream.json();
     if (!upstream.ok) {
+      console.error('Anthropic API error', upstream.status, data.error);
       res.status(upstream.status).json({ error: data.error?.message || 'Upstream error' });
       return;
+    }
+    const text = data.content && data.content[0] && data.content[0].text;
+    if (!text || !text.trim()) {
+      console.warn('Empty completion from Anthropic', { stop_reason: data.stop_reason, content: data.content, usage: data.usage });
     }
     res.status(200).json(data);
   } catch (e) {
