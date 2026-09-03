@@ -1693,9 +1693,9 @@ const STORY_FIELDS = [
   { id:'projectName', label:'Project name', placeholder:'', required:true },
   { id:'designerFirm', label:'Interior design firm / designer', placeholder:'' },
   { id:'architectureFirm', label:'Architecture firm', placeholder:'', creditsOnly:true },
-  { id:'builder', label:'Builder / General Contractor', placeholder:'', creditsOnly:true, architectureOnly:true },
-  { id:'landscapeDesign', label:'Landscape design', placeholder:'', creditsOnly:true, architectureOnly:true },
-  { id:'stylist', label:'Styling', placeholder:'', creditsOnly:true },
+  { id:'builder', label:'Contracting', placeholder:'', creditsOnly:true, architectureOnly:true },
+  { id:'landscapeDesign', label:'Landscape design', placeholder:'', architectureOnly:true },
+  { id:'stylist', label:'Styling', placeholder:'' },
   { id:'photography', label:'Photography credit', placeholder:'', creditsOnly:true },
   { id:'location', label:'Location', placeholder:'Neighborhood, City' },
   { id:'clientNames', label:'Client', placeholder:'Leave blank to keep them unnamed', hideForResidence:true },
@@ -1703,7 +1703,7 @@ const STORY_FIELDS = [
   { id:'clientStory', label:'Client story / background', placeholder:"Who are they, and what shaped the brief? e.g. their profession, how they found the property, their personal style or priorities.", type:'textarea' },
   { id:'size', label:'Square footage / size', placeholder:'' },
   { id:'lotSize', label:'Lot size', placeholder:'', creditsOnly:true, architectureOnly:true, residenceOnly:true },
-  { id:'aduArea', label:'Accessory dwelling unit (ADU) area', placeholder:'', creditsOnly:true, architectureOnly:true, residenceOnly:true },
+  { id:'aduArea', label:'Accessory dwelling unit (ADU) area', placeholder:'', architectureOnly:true, residenceOnly:true },
   { id:'floorCount', label:'Floor count', placeholder:'' },
   { id:'bedrooms', label:'Bedrooms', placeholder:'', residenceOnly:true },
   { id:'bathrooms', label:'Bathrooms', placeholder:'', residenceOnly:true },
@@ -1716,17 +1716,12 @@ const STORY_FIELDS = [
 ];
 
 const STORY_CREDIT_FIELDS = [
-  { id:'designerFirm', creditLabel:'Interior Design' },
-  { id:'architectureFirm', creditLabel:'Architecture' },
-  { id:'builder', creditLabel:'Builder' },
-  { id:'landscapeDesign', creditLabel:'Landscape Design' },
-  { id:'stylist', creditLabel:'Styling' },
-  { id:'photography', creditLabel:'Photography' },
-  { id:'size', creditLabel:'Size' },
-  { id:'lotSize', creditLabel:'Lot Size' },
-  { id:'aduArea', creditLabel:'ADU Area' },
-  { id:'bedrooms', creditLabel:'Bedrooms' },
-  { id:'bathrooms', creditLabel:'Bathrooms' }
+  { id:'projectName', creditLabel:'Project name' },
+  { id:'lotSize', creditLabel:'Lot size' },
+  { id:'architectureFirm', creditLabel:'Architecture firm' },
+  { id:'designerFirm', creditLabel:'Interior design firm' },
+  { id:'builder', creditLabel:'Contracting' },
+  { id:'photography', creditLabel:'Photography' }
 ];
 
 // Some fields (Bedrooms/Bathrooms, Builder, Lot Size...) only apply to certain
@@ -2390,7 +2385,7 @@ function getStoryCreditsText(){
     .map(f=>{ const v=(storyState.fields[f.id]||'').trim(); return v ? `${f.creditLabel}: ${v}` : null; })
     .filter(Boolean);
   if(!lines.length) return '';
-  return 'PROJECT CREDITS\n\n' + lines.join('\n');
+  return 'PROJECT FACTS\n\n' + lines.join('\n');
 }
 
 function getStoryAboutText(){
@@ -2431,7 +2426,7 @@ function getStoryActiveHTML(){
     .map(f=>{ const v=(storyState.fields[f.id]||'').trim(); return v ? `<b>${esc(f.creditLabel)}:</b> ${esc(v)}` : null; })
     .filter(Boolean);
   if(creditLines.length){
-    html += `<p style="font-weight:700;margin:16px 0 8px;">PROJECT CREDITS</p>`;
+    html += `<p style="font-weight:700;margin:16px 0 8px;">PROJECT FACTS</p>`;
     html += `<p style="margin:0 0 12px;">${creditLines.join('<br>')}</p>`;
   }
   const aboutContent = (storyState.fields.aboutDesigner||'').trim();
@@ -2469,7 +2464,7 @@ function buildStoryOutputHTML(){
           .filter(storyCreditFieldVisible)
           .map(f=>{ const v=(storyState.fields[f.id]||'').trim(); return v ? `<strong>${esc(f.creditLabel)}:</strong> ${esc(v)}` : null; })
           .filter(Boolean);
-        inner += `<div class="about-heading">PROJECT CREDITS</div>`;
+        inner += `<div class="about-heading">PROJECT FACTS</div>`;
         inner += `<p>${creditLines.join('<br>')}</p>`;
       }
       const aboutContent = (storyState.fields.aboutDesigner||'').trim();
@@ -2654,7 +2649,7 @@ Rules:
 - Output structure: (1) a title for the project story, alone on its own line, as its own paragraph; (2) the body — flowing narrative paragraphs separated by blank lines, opening with the client/concept story where given, then moving through the rooms or spaces. Do not force one paragraph per room — follow the natural shape of the material, the way a real feature would (a paragraph may cover one room in depth or move through two related ones together). Do not add bold subheadings within the body.
 - Keep paragraphs SHORT: roughly 250-500 characters each (about 2-4 sentences) — noticeably shorter than a typical press-release paragraph. Break into a new paragraph whenever the focus shifts — a new room, a new material, a new beat of the client story — rather than letting one paragraph run long. The result should read as more, shorter paragraphs with frequent line breaks throughout, never a handful of dense ones.
 - Wrap every specific brand, maker, or artist name in double asterisks, e.g. "a sofa by **Roche Bobois**" — including the literal [BRAND] and [ARTIST] placeholder tokens, e.g. "a chair by **[BRAND]**". Bold only the name itself, never the surrounding words (correct: "a sofa by **Roche Bobois**"; wrong: "**a sofa by Roche Bobois**"). This is the one exception to "no markdown formatting" below.
-- Do NOT write your own credits block (Interior Design, Architecture, Builder, Landscape Design, Styling, Photography, Size, Lot Size, ADU Area, Bedrooms, Bathrooms) or "About the designer" section, even though some of those facts are given to you below — they're appended separately after your response, verbatim. Writing your own would create a duplicate.
+- Do NOT write your own "PROJECT FACTS" block (Project name, Lot size, Architecture firm, Interior design firm, Contracting, Photography) or "About the designer" section, even though some of those facts are given to you below — they're appended separately after your response, verbatim. Writing your own would create a duplicate.
 - If something in FACTS is missing or blank, simply don't mention it — never invent a placeholder.
 - You may also receive loose NOTES from the user — weave any relevant facts from the notes into the appropriate place, corrected and in full sentences. Ignore anything that's just the user thinking out loud.
 - Before finalizing, check every sentence against FACTS, NOTES, and what's genuinely visible in the photos: if a claim can't be traced back to one of those, cut it or rewrite the sentence without it.
