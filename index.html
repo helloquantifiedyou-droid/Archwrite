@@ -1,0 +1,2659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PR &amp; Story Writer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Droid+Sans:wght@400;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#111111;
+    --paper:#ffffff;
+    --panel:#ececec;
+    --canvas:#5B089E;
+    --line:#d4d4d4;
+    --accent:#111111;
+    --accent-soft:#4a4a4a;
+    --muted:#8c8c8c;
+    --danger:#b3261e;
+    --blank:#3f3f3f;
+    --body-text:#333333;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    color:var(--ink);
+    background:var(--panel);
+    display:flex;
+    flex-direction:column;
+  }
+  header{
+    padding:14px 24px;
+    border-bottom:1px solid var(--line);
+    background:var(--paper);
+    display:flex;
+    align-items:center;
+    gap:24px;
+    flex-shrink:0;
+  }
+  header h1{
+    font-size:16px;
+    margin:0;
+    letter-spacing:0.01em;
+    font-weight:900;
+  }
+  .tabs{display:flex;gap:4px;}
+  .tab{
+    padding:8px 16px;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:13px;
+    font-weight:700;
+    color:var(--muted);
+    border:1px solid transparent;
+  }
+  .tab.active{background:var(--panel);color:var(--ink);border-color:var(--line);}
+  .tab.disabled{opacity:0.45;cursor:default;}
+  .hero{
+    flex-shrink:0;
+    padding:22px 24px;
+    background:linear-gradient(135deg, #f9f5fd 0%, #ece0f8 100%);
+    border-bottom:1px solid var(--line);
+    display:flex;
+    align-items:stretch;
+    gap:24px;
+    flex-wrap:wrap;
+  }
+  .hero-main{flex:1 1 360px;min-width:280px;}
+  .hero-title{
+    font-family:"Droid Sans","Helvetica Neue",Arial,sans-serif;
+    font-weight:700;
+    font-size:26px;
+    line-height:1.2;
+    letter-spacing:-0.01em;
+    color:#2a0a44;
+    margin:0 0 8px;
+  }
+  .hero-subtitle{
+    font-family:"IBM Plex Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size:14px;
+    line-height:1.55;
+    color:#5a4468;
+    margin:0 0 16px;
+    max-width:44em;
+  }
+  .hero-badges{display:flex;flex-wrap:wrap;gap:8px;}
+  .hero-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:#ffffff;
+    border:1px solid #ddc7ef;
+    border-radius:999px;
+    padding:6px 12px;
+    font-family:"IBM Plex Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size:12px;
+    font-weight:600;
+    color:#4a1a68;
+  }
+  .hero-badge svg{flex-shrink:0;}
+  .hero-card{
+    flex:0 1 300px;
+    min-width:240px;
+    background:#ffffff;
+    border:1px solid #e2d3ef;
+    border-radius:12px;
+    padding:16px 18px;
+    box-shadow:0 4px 16px rgba(91,8,154,0.08);
+  }
+  .hero-card-eyebrow{
+    font-family:"IBM Plex Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:#8a6aa3;
+    margin:0 0 12px;
+  }
+  .hero-step{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    margin-bottom:10px;
+  }
+  .hero-step:last-child{margin-bottom:0;}
+  .hero-step-num{
+    flex-shrink:0;
+    width:20px;
+    height:20px;
+    border-radius:50%;
+    background:var(--canvas);
+    color:#ffffff;
+    font-family:"IBM Plex Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size:11px;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .hero-step-text{
+    font-family:"IBM Plex Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size:13px;
+    line-height:1.4;
+    color:#2a0a44;
+    padding-top:1px;
+  }
+  .layout{
+    flex:1;
+    display:flex;
+    min-height:0;
+  }
+  .layout[hidden]{display:none;}
+  .form-pane{
+    width:46%;
+    max-width:640px;
+    min-width:360px;
+    overflow-y:auto;
+    padding:20px 22px 80px;
+    border-right:1px solid var(--line);
+    background:var(--panel);
+  }
+  .preview-pane{
+    flex:1;
+    overflow-y:auto;
+    background:var(--canvas);
+  }
+  .preview-toolbar{
+    position:sticky;
+    top:0;
+    z-index:5;
+    display:flex;
+    gap:8px;
+    padding:12px 6%;
+    background:var(--canvas);
+    border-bottom:1px solid var(--line);
+  }
+  .preview-doc-scroll{
+    padding:32px 6% 70px;
+  }
+  .field-group{margin-bottom:16px;}
+  .field-row{display:flex;gap:10px;}
+  .field-row .field-group{flex:1;}
+  label{
+    display:block;
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--muted);
+    margin-bottom:4px;
+  }
+  input[type=text], textarea, select{
+    width:100%;
+    padding:8px 10px;
+    border:1px solid var(--line);
+    border-radius:0;
+    font-size:13.5px;
+    font-family:"IBM Plex Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+    background:#fff;
+    color:var(--ink);
+    resize:vertical;
+  }
+  input[type=text]::placeholder, textarea::placeholder{
+    font-family:"IBM Plex Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+  }
+  textarea{min-height:64px;line-height:1.4;}
+  textarea.notes-field{min-height:160px;}
+  input:focus, textarea:focus, select:focus{
+    outline:none;
+    border-color:var(--accent-soft);
+    box-shadow:0 0 0 3px rgba(17,17,17,0.08);
+  }
+  .guidance{
+    font-size:11.5px;
+    color:var(--muted);
+    margin:-2px 0 6px;
+    font-style:italic;
+  }
+  .required-mark{color:#e8820c;font-weight:700;}
+  .section-title{
+    font-size:12px;
+    font-weight:900;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    color:var(--ink);
+    margin:26px 0 10px;
+    padding-bottom:6px;
+    border-bottom:2px solid var(--ink);
+  }
+  .block-card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:14px;
+    margin-bottom:12px;
+    position:relative;
+  }
+  .block-card-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+  }
+  .block-type-label{
+    font-size:11px;
+    font-weight:900;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    color:var(--accent-soft);
+  }
+  .block-actions{display:flex;gap:6px;}
+  .icon-btn{
+    border:1px solid var(--line);
+    background:#fff;
+    border-radius:5px;
+    width:24px;height:24px;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    font-size:12px;
+    color:var(--muted);
+    line-height:1;
+  }
+  .icon-btn:hover{background:var(--panel);color:var(--ink);}
+  .icon-btn.danger:hover{color:var(--danger);border-color:var(--danger);}
+  .fact-row{display:flex;gap:8px;margin-bottom:6px;}
+  .fact-row input{flex:1;}
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:8px 14px;
+    border-radius:6px;
+    border:1px solid var(--line);
+    background:#fff;
+    font-size:12.5px;
+    font-weight:700;
+    cursor:pointer;
+    color:var(--ink);
+  }
+  .btn:hover{border-color:var(--accent-soft);}
+  .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .btn.primary:hover{background:#000;}
+  .btn.small{padding:5px 10px;font-size:11.5px;}
+  .btn:disabled{opacity:0.4;cursor:default;}
+  .btn:disabled:hover{border-color:var(--line);}
+  .add-block-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin:14px 0 30px;
+  }
+  .settings-box{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:12px 14px;
+    margin-bottom:12px;
+    font-size:12.5px;
+  }
+  .settings-box .row{display:flex;gap:8px;align-items:flex-end;margin-bottom:8px;}
+  .settings-box .row .field-group{flex:1;margin-bottom:0;}
+  .settings-note{font-size:11px;color:var(--muted);line-height:1.5;}
+  .ai-status{
+    font-size:12.5px;
+    color:var(--muted);
+    padding:10px 0;
+  }
+  .ai-status.error{color:var(--danger);}
+  .spinner{
+    display:inline-block;
+    width:12px;height:12px;
+    border:2px solid #ccc;
+    border-top-color:var(--ink);
+    border-radius:50%;
+    animation:spin 0.7s linear infinite;
+    vertical-align:-2px;
+    margin-right:6px;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .doc{
+    max-width:680px;
+    margin:0 auto;
+    background:var(--paper);
+    box-shadow:0 4px 24px rgba(0,0,0,0.08);
+    padding:56px 60px 70px;
+    min-height:600px;
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    color:var(--body-text);
+  }
+  #aiOutputRegion{
+    outline:none;
+    border-radius:6px;
+    margin:-6px -8px 0;
+    padding:6px 8px 0;
+  }
+  #aiOutputRegion:hover{background:rgba(128,128,128,0.07);}
+  #aiOutputRegion:focus{
+    background:rgba(128,128,128,0.05);
+    box-shadow:0 0 0 3px rgba(128,128,128,0.18);
+  }
+  .doc-headline{
+    font-family:"Droid Sans","Helvetica Neue",Arial,sans-serif;
+    font-size:12px;
+    font-weight:900;
+    font-style:normal;
+    line-height:1.4;
+    margin:0 0 22px;
+    text-align:center;
+    letter-spacing:-0.01em;
+    color:var(--ink);
+  }
+  .doc-summary{
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size:12px;
+    font-weight:400;
+    font-style:italic;
+    line-height:1.55;
+    margin:0 auto 22px;
+    max-width:88%;
+    text-align:center;
+    color:var(--body-text);
+  }
+  .doc p{
+    font-size:11px;
+    line-height:1.7;
+    margin:0 0 15px;
+    text-align:left;
+  }
+  .doc .lede-dateline{font-weight:900;}
+  .doc .subhead{
+    font-size:11px;
+    font-weight:900;
+    margin:24px 0 8px;
+  }
+  .doc .facts-heading, .doc .about-heading{
+    font-size:11px;
+    font-weight:900;
+    text-transform:uppercase;
+    letter-spacing:0.03em;
+    margin:22px 0 8px;
+  }
+  .doc ul.facts-list{
+    margin:0 0 15px;
+    padding-left:20px;
+    font-size:11px;
+  }
+  .doc ul.facts-list li{margin-bottom:4px;}
+  .doc .quote-block{
+    font-size:11px;
+    line-height:1.7;
+    margin:0 0 15px;
+  }
+  .doc .link-line{font-size:11px;margin:0 0 15px;}
+  .doc .link-line a{color:var(--accent-soft);}
+  .empty-note{color:var(--blank);font-style:normal;}
+  select{
+    appearance:none;
+    -webkit-appearance:none;
+    -moz-appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%23666666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='5 8 10 13 15 8'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:right 14px center;
+    background-size:13px;
+    padding-right:34px;
+  }
+  #categorySelect, #subtypeSelect, #storyCategorySelect, #storyProjectTypeSelect{
+    width:auto;
+    min-width:160px;
+    max-width:100%;
+  }
+  .subtype-select-wrap{margin-bottom:18px;}
+  .boilerplate-actions{display:flex;gap:6px;margin-top:6px;}
+  .hint-banner{
+    background:#fdf0dc;
+    border:1px solid #e8820c;
+    color:#7a4a0a;
+    font-size:12px;
+    padding:8px 10px;
+    border-radius:6px;
+    margin-bottom:16px;
+    line-height:1.5;
+  }
+  .ai-notice{
+    background:#fdf0dc;
+    border:1px solid #e8820c;
+    color:#7a4a0a;
+    border-radius:6px;
+    padding:14px 16px;
+    margin:0 0 22px;
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size:12.5px;
+    line-height:1.6;
+  }
+  .ai-notice-title{font-weight:700;margin-bottom:6px;}
+  .ai-notice ul{margin:0;padding-left:18px;}
+  .ai-notice li{margin-bottom:4px;}
+  .ad-banner{
+    background:#ffd400;
+    color:#111111;
+    text-align:center;
+    font-weight:900;
+    font-size:12px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    padding:20px 10px;
+    margin:12px -22px;
+    border:1px solid #d9b400;
+    border-left:none;
+    border-right:none;
+  }
+  .ad-banner-link{
+    display:block;
+    margin-top:8px;
+    font-size:12px;
+    font-weight:900;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    text-decoration:underline;
+    color:#111111;
+  }
+  .ad-banner-link:hover{opacity:0.7;}
+  .photo-grid{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 0;}
+  .photo-thumb{position:relative;width:64px;height:64px;border-radius:5px;overflow:hidden;border:1px solid var(--line);flex-shrink:0;}
+  .photo-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+  .photo-thumb button{
+    position:absolute;top:2px;right:2px;width:17px;height:17px;border-radius:50%;
+    background:rgba(0,0,0,0.65);color:#fff;border:none;font-size:10px;line-height:1;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;
+  }
+  .photo-thumb button:hover{background:var(--danger);}
+  #storyPhotoInput{
+    display:block;font-family:"IBM Plex Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size:12px;color:var(--muted);
+  }
+  .faq-list{margin-bottom:8px;}
+  .faq-item{
+    border-bottom:1px solid var(--line);
+    padding:10px 0;
+  }
+  .faq-item:first-child{border-top:1px solid var(--line);}
+  .faq-item summary{
+    cursor:pointer;
+    font-family:"IBM Plex Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink);
+    list-style:none;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+  }
+  .faq-item summary::-webkit-details-marker{display:none;}
+  .faq-item summary::after{
+    content:'+';
+    font-size:16px;
+    font-weight:400;
+    color:var(--muted);
+    flex-shrink:0;
+  }
+  .faq-item[open] summary::after{content:'–';}
+  .faq-item p{
+    font-family:"IBM Plex Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size:12.5px;
+    line-height:1.6;
+    color:var(--muted);
+    margin:8px 0 0;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>PR &amp; Story Writer</h1>
+  <div class="tabs">
+    <div class="tab active" data-tab="press">Press Release</div>
+    <div class="tab" data-tab="story">Project Story</div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-main">
+    <h2 class="hero-title">Free Press Release &amp; Story Writer</h2>
+    <p class="hero-subtitle">Fill in a few core details, pick your category, and get a publication-ready press release written in your own voice. No signup required.</p>
+    <div class="hero-badges">
+      <span class="hero-badge" style="color:#e8820c;"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span style="color:#4a1a68;">14 press release types</span></span>
+      <span class="hero-badge" style="color:#e8820c;"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6"/></svg><span style="color:#4a1a68;">8 project story templates</span></span>
+      <span class="hero-badge" style="color:#e8820c;"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-6"/></svg><span style="color:#4a1a68;">Free</span></span>
+      <span class="hero-badge" style="color:#e8820c;"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 10.5h20"/><path d="M4 21L20 3"/></svg><span style="color:#4a1a68;">No credit card required</span></span>
+    </div>
+  </div>
+  <div class="hero-card">
+    <div class="hero-card-eyebrow">How it works</div>
+    <div class="hero-step"><span class="hero-step-num">1</span><span class="hero-step-text">Pick your category and press release type</span></div>
+    <div class="hero-step"><span class="hero-step-num">2</span><span class="hero-step-text">Fill in the core facts — no need to write full sentences</span></div>
+    <div class="hero-step"><span class="hero-step-num">3</span><span class="hero-step-text">Generate a publication-ready press release in your voice</span></div>
+  </div>
+</div>
+
+<div class="layout" id="pressLayout">
+  <div class="form-pane" id="formPane"></div>
+  <div class="preview-pane" id="previewPane">
+    <div class="preview-toolbar" id="previewToolbar"></div>
+    <div class="preview-doc-scroll" id="docContainer"></div>
+  </div>
+</div>
+
+<div class="layout" id="storyLayout" hidden>
+  <div class="form-pane" id="storyFormPane"></div>
+  <div class="preview-pane" id="storyPreviewPane">
+    <div class="preview-toolbar" id="storyPreviewToolbar"></div>
+    <div class="preview-doc-scroll" id="storyDocContainer"></div>
+  </div>
+</div>
+
+<script src="examples.js"></script>
+<script>
+(function(){
+
+// ---------- utilities ----------
+let uid = 0;
+function nid(){ return 'b' + (++uid); }
+function esc(s){
+  return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ---------- CATEGORY + SUBTYPE CONFIG ----------
+const CATEGORIES = {
+  interiorDesign: { label: 'Interior Design' },
+  architecture: { label: 'Architecture' }
+};
+
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+// Overused AI/generic-PR words and phrases, banned from every generation.
+const BANNED_WORDS = [
+  'rather than', 'quiet', 'quietly', 'thoughtful', 'thoughtfully',
+  'balance', 'balanced', 'balances', 'innovative', 'elevate',
+  'careful', 'carefully', 'transformative', 'restraint', 'restrained',
+  'coexist', 'built around', 'itself', 'embedded', 'overhead',
+  'therefore', 'but rather', 'unfolds', 'govern', 'consistent',
+  'plane', 'considered', 'demand', 'genuine', 'genuinely',
+  'gamechanger', 'commanding', 'reads as part', 'reads as', 'the result', 'compete for attention'
+];
+
+// Fixed "Project Facts" block — architecture only (see def.projectFacts below),
+// rendered at the very end of the release, appended programmatically (never
+// written by the AI) the same way About/Boilerplate is.
+const PROJECT_FACTS_FIELDS = [
+  {id:'projName', label:'Project Name', placeholder:''},
+  {id:'projClient', label:'Client', placeholder:''},
+  {id:'projSize', label:'Size', placeholder:''},
+  {id:'projLocation', label:'Location', placeholder:''},
+  {id:'projTeam', label:'Project team', placeholder:'', type:'textarea'},
+  {id:'projCollaborators', label:'Collaborators', placeholder:'', type:'textarea'}
+];
+
+// Field schema is shared across categories per subtype (same core details needed);
+// only the assembled sentence phrasing differs per category (see TEMPLATES below).
+const SUBTYPE_DEFS = {
+
+  upcomingEvent: {
+    label: 'Event',
+    fields: [
+      {id:'eventStatus', label:'Event status', type:'select', options:['Upcoming','Completed'], default:'Upcoming'},
+      {id:'eventName', label:'Event / show name', placeholder:'', maxWidth:'320px'},
+      {id:'eventDates', label:'Event dates', placeholder:'', maxWidth:'220px'},
+      {id:'aboutEvent', label:'About the event', placeholder:'Feel free to copy and paste the official event description from the event website.', type:'textarea', required:true},
+      {id:'conceptName', label:'Concept / installation name', placeholder:'', interiorOnly:true},
+      {id:'inspiration', label:'Inspiration', placeholder:'', type:'textarea', interiorOnly:true},
+      {id:'keyElements', label:'Key materials or pieces', placeholder:'', type:'textarea', interiorOnly:true},
+      {id:'collaborators', label:'Collaborators / brands featured', placeholder:'', type:'textarea', interiorOnly:true},
+      {id:'visitAddress', label:'Visit address', placeholder:''},
+      {id:'designPortfolio', label:'Design portfolio', placeholder:'Copy and paste information for relevant related projects the company has completed or that are ongoing.', type:'textarea'},
+      {id:'pressKitUrl', label:'Press kit link (URL)', placeholder:'https://', renderAtEnd:true},
+      {id:'contact', label:'Media contact', placeholder:'Add full name', renderAtEnd:true},
+      {id:'contactEmail', label:'Media email', placeholder:'Add email', renderAtEnd:true}
+    ],
+    hasQuotes: true,
+    facts: [],
+    repeatables: [],
+    hasAbout: true
+  },
+
+  awardWin: {
+    label: 'Award Win',
+    fields: [
+      {id:'awardName', label:'Award name', placeholder:''},
+      {id:'awardCategory', label:'Award category', placeholder:''},
+      {id:'ceremonyLocation', label:'Ceremony location', placeholder:''},
+      {id:'ceremonyDate', label:'Ceremony date', placeholder:''},
+      {id:'winningProject', label:'Winning project', placeholder:'', type:'textarea'},
+      {id:'priorRecognition', label:'Prior recognition', placeholder:'', type:'textarea'},
+      {id:'awardHistory', label:'About the award', placeholder:'', type:'textarea'},
+      {id:'entryLinkUrl', label:'Award entry link (URL)', placeholder:'https://'},
+      {id:'designPortfolio', label:'Design portfolio', placeholder:'Copy and paste information for relevant related projects the company has completed or that are ongoing.', type:'textarea'},
+      {id:'pressKitUrl', label:'Press kit link (URL)', placeholder:'https://', renderAtEnd:true},
+      {id:'contact', label:'Media contact', placeholder:'Add full name', renderAtEnd:true},
+      {id:'contactEmail', label:'Media email', placeholder:'Add email', renderAtEnd:true}
+    ],
+    hasQuotes: true,
+    facts: [],
+    repeatables: [],
+    hasAbout: true
+  },
+
+  projectCompletion: {
+    label: 'Project Completion',
+    fields: [
+      {id:'projectName', label:'Project name', placeholder:''},
+      {id:'projectType', label:'Project type', placeholder:''},
+      {id:'location', label:'Location', placeholder:''},
+      {id:'keyFacts', label:'Key facts', placeholder:'', type:'textarea'},
+      {id:'relationshipContext', label:'Context', placeholder:'', type:'textarea'},
+      {id:'designApproach', label:'Summary of approach', placeholder:'', type:'textarea'},
+      {id:'designPortfolio', label:'Design portfolio', placeholder:'Copy and paste information for relevant related projects the company has completed or that are ongoing.', type:'textarea'},
+      {id:'pressKitUrl', label:'Press kit link (URL)', placeholder:'https://', renderAtEnd:true},
+      {id:'contact', label:'Media contact', placeholder:'Add full name', renderAtEnd:true},
+      {id:'contactEmail', label:'Media email', placeholder:'Add email', renderAtEnd:true}
+    ],
+    hasQuotes: true,
+    facts: [],
+    projectFacts: true,
+    repeatables: [
+      {
+        id:'spaces', itemLabel:'Space', addLabel:'+ Add Space',
+        itemFields: [
+          {id:'spaceName', label:'Space name', placeholder:''},
+          {id:'spaceDesignApproach', label:'Design approach', placeholder:'', type:'textarea'}
+        ]
+      },
+      {
+        id:'facade', itemLabel:'Facade', addLabel:'+ Add Facade', sectionTitle:'Facade',
+        itemFields: [
+          {id:'facadeMaterials', label:'Materials palette', placeholder:'What materials are used?', type:'textarea'},
+          {id:'facadeForm', label:'Form', placeholder:'What is the form of the structure?', type:'textarea'},
+          {id:'facadeDesignApproach', label:'Design approach', placeholder:'', type:'textarea'}
+        ]
+      }
+    ],
+    hasAbout: true
+  },
+
+  commissionWin: {
+    label: 'Commission Win',
+    fields: [
+      {id:'projectName', label:'Project name', placeholder:''},
+      {id:'location', label:'Location', placeholder:''},
+      {id:'scope', label:'Scope', placeholder:'', type:'textarea'},
+      {id:'client', label:'Client', placeholder:''},
+      {id:'context', label:'Context', placeholder:'', type:'textarea'},
+      {id:'similarProjects', label:'Similar upcoming or past projects', placeholder:'', type:'textarea', architectureOnly:true},
+      {id:'designPortfolio', label:'Design portfolio', placeholder:'Copy and paste information for relevant related projects the company has completed or that are ongoing.', type:'textarea'},
+      {id:'pressKitUrl', label:'Press kit link (URL)', placeholder:'https://', renderAtEnd:true},
+      {id:'contact', label:'Media contact', placeholder:'Add full name', renderAtEnd:true},
+      {id:'contactEmail', label:'Media email', placeholder:'Add email', renderAtEnd:true}
+    ],
+    hasQuotes: true,
+    facts: [],
+    projectFacts: true,
+    repeatables: [],
+    hasAbout: true
+  },
+
+  bookLaunch: {
+    label: 'Book Launch',
+    fields: [
+      {id:'bookTitle', label:'Book title', placeholder:''},
+      {id:'publisher', label:'Publisher', placeholder:''},
+      {id:'availability', label:'Availability', placeholder:'', type:'textarea'},
+      {id:'orderUrl', label:'Order link (URL)', placeholder:'https://'},
+      {id:'designPortfolio', label:'Design portfolio', placeholder:'Copy and paste information for relevant related projects the company has completed or that are ongoing.', type:'textarea'},
+      {id:'pressKitUrl', label:'Press kit link (URL)', placeholder:'https://', renderAtEnd:true},
+      {id:'contact', label:'Media contact', placeholder:'Add full name', renderAtEnd:true},
+      {id:'contactEmail', label:'Media email', placeholder:'Add email', renderAtEnd:true}
+    ],
+    hasQuotes: true,
+    facts: [],
+    repeatables: [],
+    hasAbout: false
+  },
+
+  renderingsUnveiled: {
+    label: 'Concept Reveal',
+    fields: [
+      {id:'projectName', label:'Project name', placeholder:''},
+      {id:'location', label:'Location', placeholder:''},
+      {id:'client', label:'Client', placeholder:''},
+      {id:'openingDate', label:'Opening date', placeholder:''},
+      {id:'scope', label:'Scope', placeholder:'', type:'textarea'},
+      {id:'designPortfolio', label:'Design portfolio', placeholder:'Copy and paste information for relevant related projects the company has completed or that are ongoing.', type:'textarea'},
+      {id:'pressKitUrl', label:'Press kit link (URL)', placeholder:'https://', renderAtEnd:true},
+      {id:'contact', label:'Media contact', placeholder:'Add full name', renderAtEnd:true},
+      {id:'contactEmail', label:'Media email', placeholder:'Add email', renderAtEnd:true}
+    ],
+    hasQuotes: true,
+    facts: [],
+    projectFacts: true,
+    repeatables: [
+      {
+        id:'features', itemLabel:'Design Feature', addLabel:'+ Add Design Feature',
+        itemFields: [
+          {id:'feature', label:'Feature', placeholder:''},
+          {id:'detail', label:'Detail', placeholder:'', type:'textarea'}
+        ]
+      }
+    ],
+    hasAbout: true
+  },
+
+  productLaunch: {
+    label: 'Product / Collection Launch',
+    fields: [
+      {id:'collectionName', label:'Collection name', placeholder:''},
+      {id:'launchDate', label:'Launch / availability date', placeholder:'e.g. Available starting 12 May 2026 — leave blank if unknown or same as the release date'},
+      {id:'availability', label:'Availability', placeholder:'Where and how to purchase, e.g. available through janedoestudio.com and select retailers', type:'textarea'},
+      {id:'overviewNote', label:'Collection overview', placeholder:'', type:'textarea'},
+      {id:'designPortfolio', label:'Design portfolio', placeholder:'Copy and paste information for relevant related projects the company has completed or that are ongoing.', type:'textarea'},
+      {id:'pressKitUrl', label:'Press kit link (URL)', placeholder:'https://', renderAtEnd:true},
+      {id:'contact', label:'Media contact', placeholder:'Add full name', renderAtEnd:true},
+      {id:'contactEmail', label:'Media email', placeholder:'Add email', renderAtEnd:true}
+    ],
+    hasQuotes: true,
+    facts: [],
+    repeatables: [
+      {
+        id:'products', itemLabel:'Product', addLabel:'+ Add Product',
+        itemFields: [
+          {id:'name', label:'Product name', placeholder:''},
+          {id:'description', label:'Description', placeholder:'', type:'textarea'},
+          {id:'dimensions', label:'Dimensions', placeholder:''},
+          {id:'features', label:'Features', placeholder:'', type:'textarea'},
+          {id:'price', label:'Starting price', placeholder:''}
+        ]
+      }
+    ],
+    hasAbout: true
+  }
+};
+
+// ---------- state ----------
+// Renderings Unveiled ("Concept Reveal") only gets a Quotes section for architecture.
+function subtypeHasQuotes(subtype, category){
+  const def = SUBTYPE_DEFS[subtype];
+  if(!def.hasQuotes) return false;
+  if(subtype === 'renderingsUnveiled' && category !== 'architecture') return false;
+  return true;
+}
+
+function freshSubtypeState(subtype, category){
+  const def = SUBTYPE_DEFS[subtype];
+  const fields = {};
+  def.fields.forEach(f=> fields[f.id] = f.default !== undefined ? f.default : '');
+  const quotes = subtypeHasQuotes(subtype, category) ? [{id:nid(), text:'', speaker:'', title:''}] : [];
+  const repeatableGroups = {};
+  (def.repeatables||[]).forEach(r=>{ repeatableGroups[r.id] = [makeRepeatableItem(r)]; });
+  const factsBlocks = def.facts.map(f=> ({heading:f.heading, items:[{label:'',value:''}]}));
+  const about = {content:''};
+  const projectFacts = {};
+  if(def.projectFacts){
+    PROJECT_FACTS_FIELDS.forEach(f=> projectFacts[f.id] = '');
+  }
+  return {fields, quotes, repeatableGroups, factsBlocks, about, projectFacts};
+}
+
+function makeRepeatableItem(repeatableDef){
+  const item = {id:nid()};
+  repeatableDef.itemFields.forEach(f=> item[f.id]='');
+  return item;
+}
+
+let state = Object.assign({
+  category: 'interiorDesign',
+  subtype: 'upcomingEvent',
+  company: '',
+  datelineCity: '',
+  datelineState: '',
+  dateDay: '',
+  dateMonth: '',
+  dateYear: '',
+  notes: '',
+  editInstructions: '',
+  aiOutput: '',
+  aiNotice: '',
+  aiLoading: false,
+  aiError: ''
+}, freshSubtypeState('upcomingEvent', 'interiorDesign'));
+
+// ---------- autosave (browser storage) ----------
+const AUTOSAVE_KEY = 'prwriter_autosave_v1';
+function saveState(){
+  const snapshot = Object.assign({}, state, {aiLoading:false, aiError:''});
+  try{
+    localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(snapshot));
+  }catch(e){}
+}
+function loadSavedState(){
+  try{
+    const raw = localStorage.getItem(AUTOSAVE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){ return null; }
+}
+function bumpUidPastSavedIds(s){
+  let maxN = 0;
+  const scan = (item)=>{
+    if(item && typeof item.id==='string' && item.id[0]==='b'){
+      const n = parseInt(item.id.slice(1),10);
+      if(!isNaN(n) && n>maxN) maxN = n;
+    }
+  };
+  (s.quotes||[]).forEach(scan);
+  Object.values(s.repeatableGroups||{}).forEach(items=> items.forEach(scan));
+  uid = Math.max(uid, maxN);
+}
+const savedState = loadSavedState();
+if(savedState){
+  state = savedState;
+  // Migrate state saved before repeatable groups existed / before the current
+  // subtype's set of repeatable groups changed, so old saved data never crashes
+  // the page — it just gets normalized into the current shape.
+  const savedDef = SUBTYPE_DEFS[state.subtype] || SUBTYPE_DEFS.upcomingEvent;
+  if(!state.repeatableGroups || typeof state.repeatableGroups !== 'object'){
+    state.repeatableGroups = {};
+  }
+  if(Array.isArray(state.repeatableItems)){
+    if(savedDef.repeatables && savedDef.repeatables[0]){
+      state.repeatableGroups[savedDef.repeatables[0].id] = state.repeatableItems;
+    }
+    delete state.repeatableItems;
+  }
+  (savedDef.repeatables||[]).forEach(r=>{
+    if(!Array.isArray(state.repeatableGroups[r.id])){
+      state.repeatableGroups[r.id] = [makeRepeatableItem(r)];
+    }
+  });
+  if(!state.projectFacts || typeof state.projectFacts !== 'object') state.projectFacts = {};
+  if(!state.about || typeof state.about !== 'object') state.about = {content:''};
+  bumpUidPastSavedIds(state);
+}
+
+function computeAboutHeading(){
+  return 'ABOUT ' + (state.company.trim() ? state.company.trim().toUpperCase() : 'J. DOE STUDIO');
+}
+
+// ---------- rendering: FORM ----------
+const formPane = document.getElementById('formPane');
+const previewPane = document.getElementById('previewPane');
+const docContainer = document.getElementById('docContainer');
+const previewToolbar = document.getElementById('previewToolbar');
+
+function renderForm(){
+  const def = SUBTYPE_DEFS[state.subtype];
+  let html = '';
+
+  html += `<div class="subtype-select-wrap">
+    <label>Category</label>
+    <select id="categorySelect">
+      ${Object.keys(CATEGORIES).map(k=>`<option value="${k}" ${k===state.category?'selected':''}>${CATEGORIES[k].label}</option>`).join('')}
+    </select>
+  </div>`;
+
+  html += `<div class="subtype-select-wrap">
+    <label>Press release type</label>
+    <select id="subtypeSelect">
+      ${Object.keys(SUBTYPE_DEFS).map(k=>`<option value="${k}" ${k===state.subtype?'selected':''}>${SUBTYPE_DEFS[k].label}</option>`).join('')}
+    </select>
+    <div class="guidance" style="margin:4px 0 0;">Switching type or category resets most of the fields below</div>
+  </div>`;
+
+  html += `<div class="field-group" style="max-width:320px;">
+    <label>Company / firm name <span class="required-mark">*</span></label>
+    <input type="text" id="f_company" value="${esc(state.company)}">
+  </div>`;
+
+  html += `<div class="field-row">
+    <div class="field-group" style="max-width:160px;">
+      <label>${state.subtype==='upcomingEvent' ? 'Studio City' : 'City'} <span class="required-mark">*</span></label>
+      <input type="text" id="f_city" value="${esc(state.datelineCity)}">
+    </div>
+    <div class="field-group" style="max-width:160px;">
+      <label>State / country <span class="required-mark">*</span></label>
+      <input type="text" id="f_state" value="${esc(state.datelineState)}">
+    </div>
+  </div>`;
+
+  html += `<div class="field-row">
+    <div class="field-group" style="max-width:70px;">
+      <label>Day <span class="required-mark">*</span></label>
+      <input type="text" id="f_day" value="${esc(state.dateDay)}">
+    </div>
+    <div class="field-group" style="max-width:160px;">
+      <label>Month <span class="required-mark">*</span></label>
+      <select id="f_month">
+        <option value=""></option>
+        ${MONTHS.map(m=>`<option value="${m}" ${state.dateMonth===m?'selected':''}>${m}</option>`).join('')}
+      </select>
+    </div>
+    <div class="field-group" style="max-width:90px;">
+      <label>Year <span class="required-mark">*</span></label>
+      <select id="f_year">
+        <option value=""></option>
+        <option value="2026" ${state.dateYear==='2026'?'selected':''}>2026</option>
+        <option value="2027" ${state.dateYear==='2027'?'selected':''}>2027</option>
+      </select>
+    </div>
+  </div>`;
+
+  html += `<div class="guidance" style="margin:-2px 0 12px;">${state.subtype==='upcomingEvent' ? 'This date appears as the release date of the announcement, not the event itself.' : 'This date appears as the release date of the announcement'}</div>`;
+
+  html += `<div class="hint-banner">Fill in the core details below — no need to write full sentences. The tool writes the full release from these facts when you click "Generate Press Release."</div>`;
+
+  html += `<div class="field-group">
+    <label>Notes <span class="required-mark">*</span></label>
+    <textarea id="f_notes" class="notes-field" placeholder="Enter any notes that might be useful. Write them as a train of thought, bullet points, or however your prefer. No worries about grammar or spelling – they'll be refined automatically.">${esc(state.notes)}</textarea>
+  </div>`;
+
+  html += `<div class="ad-banner">PLACE YOUR AD HERE<a class="ad-banner-link" href="https://www.patreon.com/16724522/join" target="_blank" rel="noopener noreferrer">Purchase</a></div>`;
+
+  html += `<div class="hint-banner">Fill in as many fields as you'd like. If you've already covered any of this information in the Notes section, there's no need to fill them here.</div>`;
+
+  function renderCoreField(f){
+    const input = f.type==='textarea'
+      ? `<textarea data-corefield="${f.id}" placeholder="${esc(f.placeholder||'')}">${esc(state.fields[f.id])}</textarea>`
+      : f.type==='select'
+        ? `<select data-corefield="${f.id}">${f.options.map(o=>`<option value="${esc(o)}" ${state.fields[f.id]===o?'selected':''}>${esc(o)}</option>`).join('')}</select>`
+        : `<input type="text" data-corefield="${f.id}" value="${esc(state.fields[f.id])}" placeholder="${esc(f.placeholder||'')}">`;
+    return `<div class="field-group" ${f.maxWidth?`style="max-width:${f.maxWidth};"`:''}>
+      <label>${esc(f.label)}${f.required?' <span class="required-mark">*</span>':''}</label>
+      ${input}
+    </div>`;
+  }
+
+  def.fields.forEach(f=>{
+    if(f.renderAtEnd) return;
+    if(f.interiorOnly && state.category==='architecture') return;
+    if(f.architectureOnly && state.category!=='architecture') return;
+    if(state.subtype==='upcomingEvent' && f.id==='conceptName'){
+      html += `<div class="hint-banner">These are optional fields. If you already mentioned this information in the Notes section above, then feel free to skip.</div>`;
+    }
+    html += renderCoreField(f);
+  });
+
+  let quotesHtml = '';
+  if(subtypeHasQuotes(state.subtype, state.category)){
+    quotesHtml += `<div class="section-title">Quotes</div>`;
+    state.quotes.forEach((q, idx)=>{
+      quotesHtml += `<div class="block-card">
+        <div class="block-card-head">
+          <span class="block-type-label">Quote ${idx+1}</span>
+          <div class="block-actions"><button class="icon-btn danger" data-delquote="${q.id}" title="Remove">✕</button></div>
+        </div>
+        <div class="field-group"><label>Quote</label>
+          <textarea data-quotefield="text" data-id="${q.id}" placeholder="Anything you'd like to say in your voice?">${esc(q.text)}</textarea></div>
+        <div class="field-row">
+          <div class="field-group"><label>Speaker</label><input type="text" data-quotefield="speaker" data-id="${q.id}" value="${esc(q.speaker)}"></div>
+          <div class="field-group"><label>Title</label><input type="text" data-quotefield="title" data-id="${q.id}" value="${esc(q.title)}"></div>
+        </div>
+      </div>`;
+    });
+    quotesHtml += `<button class="btn small" id="addQuoteBtn">+ Add Quote</button>`;
+  }
+
+  let repeatablesHtml = '';
+  (def.repeatables||[]).forEach(r=>{
+    repeatablesHtml += `<div class="section-title">${esc(r.sectionTitle || (r.itemLabel + 's'))}</div>`;
+    (state.repeatableGroups[r.id]||[]).forEach((item, idx)=>{
+      repeatablesHtml += `<div class="block-card">
+        <div class="block-card-head">
+          <span class="block-type-label">${esc(r.itemLabel)} ${idx+1}</span>
+          <div class="block-actions"><button class="icon-btn danger" data-delitem="${item.id}" title="Remove">✕</button></div>
+        </div>`;
+      r.itemFields.forEach(f=>{
+        const input = f.type==='textarea'
+          ? `<textarea data-itemfield="${f.id}" data-id="${item.id}" placeholder="${esc(f.placeholder||'')}">${esc(item[f.id])}</textarea>`
+          : `<input type="text" data-itemfield="${f.id}" data-id="${item.id}" value="${esc(item[f.id])}" placeholder="${esc(f.placeholder||'')}">`;
+        repeatablesHtml += `<div class="field-group">
+          <label>${esc(f.label)}</label>
+          ${input}
+        </div>`;
+      });
+      repeatablesHtml += `</div>`;
+    });
+    repeatablesHtml += `<button class="btn small" data-additem="${r.id}">${esc(r.addLabel)}</button>`;
+  });
+
+  // Project Completion reads better with Spaces/Facade before Quotes; every
+  // other subtype keeps Quotes first.
+  html += state.subtype === 'projectCompletion' ? (repeatablesHtml + quotesHtml) : (quotesHtml + repeatablesHtml);
+
+  def.facts.forEach((factDef, fbIdx)=>{
+    const block = state.factsBlocks[fbIdx];
+    html += `<div class="section-title">${esc(factDef.heading)}</div>`;
+    html += `<div class="block-card">`;
+    block.items.forEach((it,i)=>{
+      html += `<div class="fact-row">
+        <input type="text" data-fact="label" data-fb="${fbIdx}" data-idx="${i}" value="${esc(it.label)}" placeholder="Label">
+        <input type="text" data-fact="value" data-fb="${fbIdx}" data-idx="${i}" value="${esc(it.value)}" placeholder="Value">
+        <button class="icon-btn danger" data-delfact="${fbIdx}" data-idx="${i}" title="Remove row">✕</button>
+      </div>`;
+    });
+    html += `<button class="btn small" data-addfact="${fbIdx}">+ Row</button>`;
+    html += `</div>`;
+  });
+
+  if(def.projectFacts && state.category === 'architecture'){
+    html += `<div class="section-title">Project Facts</div>`;
+    html += `<div class="guidance" style="margin:-4px 0 10px;">Appears as its own block at the end of the release, appended exactly as entered — not written by the AI.</div>`;
+    html += `<div class="block-card">`;
+    PROJECT_FACTS_FIELDS.forEach(f=>{
+      const input = f.type==='textarea'
+        ? `<textarea data-projfact="${f.id}" placeholder="${esc(f.placeholder||'')}">${esc(state.projectFacts[f.id])}</textarea>`
+        : `<input type="text" data-projfact="${f.id}" value="${esc(state.projectFacts[f.id])}" placeholder="${esc(f.placeholder||'')}">`;
+      html += `<div class="field-group"><label>${esc(f.label)}</label>${input}</div>`;
+    });
+    html += `</div>`;
+  }
+
+  const editInstructionsHtml = `<div class="section-title">Edit instructions</div>
+  <div class="field-group">
+    <textarea id="f_editInstructions" placeholder="Don't like the result? You can request edits here and click Regenerate.">${esc(state.editInstructions)}</textarea>
+  </div>`;
+  const generateBtn2Html = `<button class="btn primary small" id="generateBtn2" style="margin:4px 0 16px;" ${state.aiLoading?'disabled':''}>${state.aiOutput ? '✨ Regenerate' : '✨ Generate Press Release'}</button>`;
+  const renderAtEndFieldsHtml = def.fields.filter(f=>f.renderAtEnd).map(f=>renderCoreField(f)).join('');
+  const faqHtml = `<div class="section-title">FAQ</div>
+  <div class="faq-list">
+    <details class="faq-item">
+      <summary>How do I use the PR &amp; Story Writer?</summary>
+      <p>Fill in as many details as you can and let it do the work for you. Once you're done, copy-paste into a document or download the .txt file.</p>
+    </details>
+    <details class="faq-item">
+      <summary>How do I write an interior design press release?</summary>
+      <p>Start with a headline that captures the news, not just the project name — think "material," "concept," or "outcome" over generic titles. Follow with a strong opening paragraph covering the who, what, where, and why, then use the body to expand on design concept, brands used, materials, and any notable collaborators. Keep the tone objective, editorial, and newsworthy rather than promotional, and close with a short studio boilerplate and contact details for press inquiries.</p>
+    </details>
+    <details class="faq-item">
+      <summary>How do I write an architecture press release?</summary>
+      <p>Open with a headline that leads with the story angle — a completed project, a design innovation, or a notable client — instead of just naming the building; think clickbaity. In the opening paragraph, cover the essentials: what was built, where, by whom, and why it matters. Use the subsequent paragraphs to detail scale, sustainability features, materials, or design challenges solved, and mention other relevant projects in your portfolio. Keep the tone objective, editorial, and newsworthy rather than promotional, and close with a short practice boilerplate and contact details for press inquiries.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Are there free tools to write architecture and interior design press releases?</summary>
+      <p>Yes, the PR &amp; Story Writer is a free tool built specifically for architecture and interior design professionals. Just fill in your project details and it generates a press-ready release, saving you the time of starting from a blank page or hiring outside PR help.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Where can I access interior design press release templates?</summary>
+      <p>Try browsing newswire sites online or check the "News" section of your favorite studios and practices for inspo.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Where can I access architecture press release templates?</summary>
+      <p>Try browsing newswire sites online or check the "News" section of your favorite studios and practices for inspo.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Who is this tool by?</summary>
+      <p>This tool is created by a Milan-based architecture and interior design content marketer with over a decade of experience covering architecture, interior design, construction, and building materials. Her PR angles have landed clients coverage in the LA Times, Dezeen, Vogue, and more.</p>
+    </details>
+  </div>`;
+
+  if(def.hasAbout){
+    html += `<div class="section-title">About / Boilerplate <span class="required-mark">*</span></div>`;
+    html += `<div class="block-card">
+      <div class="field-group">
+        <textarea id="f_aboutContent" style="min-height:90px" placeholder="Paste your existing company boilerplate...">${esc(state.about.content)}</textarea></div>
+    </div>`;
+
+    html += renderAtEndFieldsHtml;
+    html += editInstructionsHtml;
+    html += generateBtn2Html;
+
+    html += `<div class="ad-banner">PLACE YOUR AD HERE<a class="ad-banner-link" href="https://www.patreon.com/16724522/join" target="_blank" rel="noopener noreferrer">Purchase</a></div>`;
+    html += faqHtml;
+  } else {
+    html += renderAtEndFieldsHtml;
+    html += editInstructionsHtml;
+    html += generateBtn2Html;
+
+    html += `<div class="ad-banner">PLACE YOUR AD HERE<a class="ad-banner-link" href="https://www.patreon.com/16724522/join" target="_blank" rel="noopener noreferrer">Purchase</a></div>`;
+    html += faqHtml;
+  }
+
+  formPane.innerHTML = html;
+  attachFormEvents();
+}
+
+function attachFormEvents(){
+  const generateBtn2 = document.getElementById('generateBtn2');
+  if(generateBtn2) generateBtn2.addEventListener('click', callClaudeAPI);
+
+  document.getElementById('categorySelect').addEventListener('change', e=>{
+    state.category = e.target.value;
+    state.aiOutput = ''; state.aiNotice = ''; state.aiError = ''; state.aiLoading = false;
+    renderForm(); renderPreview(); renderToolbar();
+  });
+  document.getElementById('subtypeSelect').addEventListener('change', e=>{
+    state.subtype = e.target.value;
+    Object.assign(state, freshSubtypeState(state.subtype, state.category));
+    // Notes, edit instructions, and any generated output are specific to the
+    // release you were just working on — carrying them into a different type
+    // is exactly the "stale info bleeding in" bug this guards against.
+    state.notes = ''; state.editInstructions = '';
+    state.aiOutput = ''; state.aiNotice = ''; state.aiError = ''; state.aiLoading = false;
+    renderForm(); renderPreview(); renderToolbar();
+  });
+  document.getElementById('f_company').addEventListener('input', e=>{
+    state.company = e.target.value;
+    renderPreview();
+  });
+  document.getElementById('f_city').addEventListener('input', e=>{ state.datelineCity = e.target.value; renderPreview(); });
+  document.getElementById('f_state').addEventListener('input', e=>{ state.datelineState = e.target.value; renderPreview(); });
+  document.getElementById('f_day').addEventListener('input', e=>{ state.dateDay = e.target.value; renderPreview(); });
+  document.getElementById('f_month').addEventListener('change', e=>{ state.dateMonth = e.target.value; renderPreview(); });
+  document.getElementById('f_year').addEventListener('change', e=>{ state.dateYear = e.target.value; renderPreview(); });
+  document.getElementById('f_notes').addEventListener('input', e=>{ state.notes = e.target.value; });
+
+  formPane.querySelectorAll('[data-corefield]').forEach(el=>{
+    el.addEventListener(el.tagName==='SELECT' ? 'change' : 'input', e=>{
+      state.fields[e.target.getAttribute('data-corefield')] = e.target.value;
+      renderPreview();
+    });
+  });
+
+  formPane.querySelectorAll('[data-quotefield]').forEach(el=>{
+    el.addEventListener('input', e=>{
+      const id = e.target.getAttribute('data-id');
+      const field = e.target.getAttribute('data-quotefield');
+      const q = state.quotes.find(x=>x.id===id);
+      if(q) q[field] = e.target.value;
+      renderPreview();
+    });
+  });
+  const addQuoteBtn = document.getElementById('addQuoteBtn');
+  if(addQuoteBtn) addQuoteBtn.addEventListener('click', ()=>{
+    state.quotes.push({id:nid(), text:'', speaker:'', title:''});
+    renderForm(); renderPreview();
+  });
+  formPane.querySelectorAll('[data-delquote]').forEach(el=>{
+    el.addEventListener('click', e=>{
+      state.quotes = state.quotes.filter(x=>x.id!==e.target.getAttribute('data-delquote'));
+      renderForm(); renderPreview();
+    });
+  });
+
+  formPane.querySelectorAll('[data-itemfield]').forEach(el=>{
+    el.addEventListener('input', e=>{
+      const id = e.target.getAttribute('data-id');
+      const field = e.target.getAttribute('data-itemfield');
+      let item = null;
+      for(const groupId in state.repeatableGroups){
+        item = state.repeatableGroups[groupId].find(x=>x.id===id);
+        if(item) break;
+      }
+      if(item) item[field] = e.target.value;
+      renderPreview();
+    });
+  });
+  formPane.querySelectorAll('[data-additem]').forEach(el=>{
+    el.addEventListener('click', e=>{
+      const groupId = e.target.getAttribute('data-additem');
+      const rDef = (SUBTYPE_DEFS[state.subtype].repeatables||[]).find(r=>r.id===groupId);
+      if(rDef){
+        state.repeatableGroups[groupId].push(makeRepeatableItem(rDef));
+        renderForm(); renderPreview();
+      }
+    });
+  });
+  formPane.querySelectorAll('[data-delitem]').forEach(el=>{
+    el.addEventListener('click', e=>{
+      const itemId = e.target.getAttribute('data-delitem');
+      for(const groupId in state.repeatableGroups){
+        const before = state.repeatableGroups[groupId].length;
+        state.repeatableGroups[groupId] = state.repeatableGroups[groupId].filter(x=>x.id!==itemId);
+        if(state.repeatableGroups[groupId].length !== before) break;
+      }
+      renderForm(); renderPreview();
+    });
+  });
+
+  formPane.querySelectorAll('[data-fact]').forEach(el=>{
+    el.addEventListener('input', e=>{
+      const fb = +e.target.getAttribute('data-fb');
+      const idx = +e.target.getAttribute('data-idx');
+      const which = e.target.getAttribute('data-fact');
+      state.factsBlocks[fb].items[idx][which] = e.target.value;
+      renderPreview();
+    });
+  });
+  formPane.querySelectorAll('[data-addfact]').forEach(el=>{
+    el.addEventListener('click', e=>{
+      const fb = +e.target.getAttribute('data-addfact');
+      state.factsBlocks[fb].items.push({label:'',value:''});
+      renderForm(); renderPreview();
+    });
+  });
+  formPane.querySelectorAll('[data-delfact]').forEach(el=>{
+    el.addEventListener('click', e=>{
+      const fb = +e.target.getAttribute('data-delfact');
+      const idx = +e.target.getAttribute('data-idx');
+      state.factsBlocks[fb].items.splice(idx,1);
+      if(!state.factsBlocks[fb].items.length) state.factsBlocks[fb].items.push({label:'',value:''});
+      renderForm(); renderPreview();
+    });
+  });
+
+  formPane.querySelectorAll('[data-projfact]').forEach(el=>{
+    el.addEventListener('input', e=>{
+      state.projectFacts[e.target.getAttribute('data-projfact')] = e.target.value;
+      renderPreview();
+    });
+  });
+
+  const aboutContentEl = document.getElementById('f_aboutContent');
+  if(aboutContentEl){
+    aboutContentEl.addEventListener('input', e=>{ state.about.content = e.target.value; renderPreview(); });
+  }
+
+  const editInstructionsEl = document.getElementById('f_editInstructions');
+  if(editInstructionsEl){
+    editInstructionsEl.addEventListener('input', e=>{ state.editInstructions = e.target.value; saveState(); });
+  }
+
+}
+
+// ---------- rendering: PREVIEW ----------
+// There is no local template rendering — every release is written by Claude.
+// Bolds a leading "CITY, STATE – DAY MONTH YEAR." dateline at the start of a paragraph, if present.
+function renderParaWithDateline(text){
+  const escaped = esc(text);
+  const m = escaped.match(/^([^.]*?[–—-]\s*\d{1,2}\s+[A-ZÀ-Ú]+\s+\d{4}\.)\s*/);
+  if(m){
+    return `<strong>${m[1]}</strong> ${escaped.slice(m[0].length)}`;
+  }
+  return escaped;
+}
+
+function buildOutputHTML(){
+  let inner = '';
+  if(state.aiNotice){
+    const bullets = state.aiNotice.split('\n').map(l=>l.trim()).filter(l=>l.startsWith('-')).map(l=>l.replace(/^-\s*/,''));
+    inner += `<div class="ai-notice">
+      <div class="ai-notice-title">A couple of things before I can generate this</div>
+      <ul>${bullets.map(b=>`<li>${esc(b)}</li>`).join('')}</ul>
+    </div>`;
+  }
+  if(state.aiLoading){
+    inner += `<p class="empty-note"><span class="spinner"></span>Writing your press release...</p>`;
+  } else if(state.aiError){
+    inner += `<p class="ai-status error">Something went wrong: ${esc(state.aiError)}</p>`;
+  } else if(state.aiOutput){
+    const paras = state.aiOutput.split(/\n\s*\n/).map(s=>s.trim()).filter(Boolean);
+    let editable = '';
+    paras.forEach((p, idx)=>{
+      if(idx===0) editable += `<div class="doc-headline">${esc(p)}</div>`;
+      else if(idx===1) editable += `<div class="doc-summary">${esc(p)}</div>`;
+      else if(idx===2) editable += `<p>${renderParaWithDateline(p)}</p>`;
+      else editable += `<p>${esc(p)}</p>`;
+    });
+    inner += `<div id="aiOutputRegion" contenteditable="true">${editable}</div>`;
+    inner += `<div class="guidance" style="margin:4px 0 0;">Click into the text above to edit it directly.</div>`;
+    const def = SUBTYPE_DEFS[state.subtype];
+    if(def.projectFacts && state.category === 'architecture'){
+      const factLines = PROJECT_FACTS_FIELDS
+        .map(f=>{ const v=(state.projectFacts[f.id]||'').trim(); return v ? `<strong>${esc(f.label)}:</strong> ${esc(v)}` : null; })
+        .filter(Boolean);
+      if(factLines.length){
+        inner += `<div class="about-heading">PROJECT FACTS</div>`;
+        inner += `<p>${factLines.join('<br>')}</p>`;
+      }
+    }
+    if(def.hasAbout && state.about.content.trim()){
+      inner += `<div class="about-heading">${esc(computeAboutHeading())}</div>`;
+      inner += `<p>${esc(state.about.content.trim())}</p>`;
+    }
+    if(def.fields.some(f=>f.id==='contact')){
+      const contactLines = [(state.fields.contact||'').trim(), (state.fields.contactEmail||'').trim()].filter(Boolean);
+      if(contactLines.length){
+        inner += `<div class="about-heading">MEDIA CONTACT</div>`;
+        inner += `<p>${contactLines.map(esc).join('<br>')}</p>`;
+      }
+    }
+  } else if(!state.aiNotice){
+    inner += `<p class="empty-note">Fill in the fields on the left, then click "✨ Generate Press Release" — Claude will write it from scratch in your chosen voice.</p>`;
+  }
+  return `<div class="doc">${inner}</div>`;
+}
+
+function renderPreview(){
+  docContainer.innerHTML = buildOutputHTML();
+  const editableRegion = document.getElementById('aiOutputRegion');
+  if(editableRegion){
+    editableRegion.addEventListener('input', ()=>{
+      const paras = Array.from(editableRegion.children).map(el=>el.innerText.trim()).filter(Boolean);
+      state.aiOutput = paras.join('\n\n');
+      saveState();
+    });
+  }
+  saveState();
+}
+
+// Plain labeled facts — deliberately NOT pre-written sentences or a fixed skeleton.
+// Handing Claude a "draft" of ready-made connector phrases ("is pleased to announce...")
+// anchors every generation to the same handful of patterns; a bare fact list forces it
+// to construct original sentences each time.
+function buildFactsOutline(){
+  const def = SUBTYPE_DEFS[state.subtype];
+  const lines = [];
+
+  lines.push(`Release type: ${def.label} (${CATEGORIES[state.category].label})`);
+  if(state.company.trim()) lines.push(`Company: ${state.company.trim()}`);
+  const datelineParts = [state.datelineCity.trim(), state.datelineState.trim()].filter(Boolean).join(', ');
+  const dateVal = [state.dateDay.trim(), state.dateMonth, state.dateYear.trim()].filter(Boolean).join(' ');
+  if(datelineParts || dateVal) lines.push(`Dateline: ${datelineParts}${datelineParts && dateVal ? ' – ' : ''}${dateVal}`);
+  lines.push('');
+
+  def.fields.forEach(f=>{
+    if(f.interiorOnly && state.category==='architecture') return;
+    if(f.architectureOnly && state.category!=='architecture') return;
+    if(f.id==='contact' || f.id==='contactEmail') return;
+    const val = (state.fields[f.id]||'').trim();
+    if(val) lines.push(`${f.label}: ${val}`);
+  });
+  lines.push('');
+
+  if(subtypeHasQuotes(state.subtype, state.category)){
+    state.quotes.forEach((q,i)=>{
+      if(!q.text.trim()) return;
+      const attribution = [q.speaker.trim(), q.title.trim()].filter(Boolean).join(', ');
+      lines.push(`Quote ${i+1}: "${q.text.trim()}"${attribution ? ' — ' + attribution : ''}`);
+    });
+    lines.push('');
+  }
+
+  (def.repeatables||[]).forEach(r=>{
+    (state.repeatableGroups[r.id]||[]).forEach((item, i)=>{
+      const parts = r.itemFields
+        .map(f=>{ const v=(item[f.id]||'').trim(); return v ? `${f.label}: ${v}` : null; })
+        .filter(Boolean);
+      if(parts.length) lines.push(`${r.itemLabel} ${i+1} — ${parts.join('; ')}`);
+    });
+    lines.push('');
+  });
+
+  def.facts.forEach((factDef, fbIdx)=>{
+    const block = state.factsBlocks[fbIdx];
+    const items = block.items.filter(it=>it.label.trim()||it.value.trim());
+    if(items.length){
+      lines.push(`${factDef.heading}:`);
+      items.forEach(it=> lines.push(`- ${it.label.trim()?it.label+': ':''}${it.value}`));
+      lines.push('');
+    }
+  });
+
+  return lines.join('\n').replace(/\n{3,}/g,'\n\n').trim();
+}
+
+function getAboutText(){
+  const def = SUBTYPE_DEFS[state.subtype];
+  if(!def.hasAbout || !state.about.content.trim()) return '';
+  return computeAboutHeading() + '\n\n' + state.about.content.trim();
+}
+
+function getProjectFactsText(){
+  const def = SUBTYPE_DEFS[state.subtype];
+  if(!def.projectFacts || state.category !== 'architecture') return '';
+  const lines = PROJECT_FACTS_FIELDS
+    .map(f=>{ const v=(state.projectFacts[f.id]||'').trim(); return v ? `${f.label}: ${v}` : null; })
+    .filter(Boolean);
+  if(!lines.length) return '';
+  return 'PROJECT FACTS\n\n' + lines.join('\n');
+}
+
+function getMediaContactText(){
+  const def = SUBTYPE_DEFS[state.subtype];
+  if(!def.fields.some(f=>f.id==='contact')) return '';
+  const name = (state.fields.contact||'').trim();
+  const email = (state.fields.contactEmail||'').trim();
+  const lines = [name, email].filter(Boolean);
+  if(!lines.length) return '';
+  return 'MEDIA CONTACT\n\n' + lines.join('\n');
+}
+
+// ---------- AI generation ----------
+function getActiveText(){
+  if(!state.aiOutput) return '';
+  const parts = [state.aiOutput, getProjectFactsText(), getAboutText(), getMediaContactText()].filter(Boolean);
+  return parts.join('\n\n');
+}
+
+// Rich-text version of the release for clipboard copy — keeps the headline bold,
+// summary italic, and dateline bold when pasted into Word, Gmail, Google Docs, etc.
+function getActiveHTML(){
+  if(!state.aiOutput) return '';
+  const paras = state.aiOutput.split(/\n\s*\n/).map(s=>s.trim()).filter(Boolean);
+  let html = '';
+  paras.forEach((p, idx)=>{
+    if(idx===0) html += `<p style="font-weight:700;text-align:center;margin:0 0 16px;">${esc(p)}</p>`;
+    else if(idx===1) html += `<p style="font-style:italic;margin:0 0 16px;">${esc(p)}</p>`;
+    else if(idx===2) html += `<p style="margin:0 0 12px;">${renderParaWithDateline(p)}</p>`;
+    else html += `<p style="margin:0 0 12px;">${esc(p)}</p>`;
+  });
+  const def = SUBTYPE_DEFS[state.subtype];
+  if(def.projectFacts && state.category === 'architecture'){
+    const factLines = PROJECT_FACTS_FIELDS
+      .map(f=>{ const v=(state.projectFacts[f.id]||'').trim(); return v ? `<b>${esc(f.label)}:</b> ${esc(v)}` : null; })
+      .filter(Boolean);
+    if(factLines.length){
+      html += `<p style="font-weight:700;margin:16px 0 8px;">PROJECT FACTS</p>`;
+      html += `<p style="margin:0 0 12px;">${factLines.join('<br>')}</p>`;
+    }
+  }
+  if(def.hasAbout && state.about.content.trim()){
+    html += `<p style="font-weight:700;margin:16px 0 8px;">${esc(computeAboutHeading())}</p>`;
+    html += `<p style="margin:0 0 12px;">${esc(state.about.content.trim())}</p>`;
+  }
+  if(def.fields.some(f=>f.id==='contact')){
+    const contactLines = [(state.fields.contact||'').trim(), (state.fields.contactEmail||'').trim()].filter(Boolean);
+    if(contactLines.length){
+      html += `<p style="font-weight:700;margin:16px 0 8px;">MEDIA CONTACT</p>`;
+      html += `<p style="margin:0 0 12px;">${contactLines.map(esc).join('<br>')}</p>`;
+    }
+  }
+  return html;
+}
+
+async function callClaudeAPI(){
+  const editInstructions = (state.editInstructions || '').trim();
+  const previousOutput = state.aiOutput;
+  const isRevision = !!(editInstructions && previousOutput);
+
+  state.aiLoading = true;
+  state.aiError = '';
+  state.aiNotice = '';
+  renderToolbar();
+  renderPreview();
+  const generateBtn2 = document.getElementById('generateBtn2');
+  if(generateBtn2) generateBtn2.disabled = true;
+
+  const factsOutline = buildFactsOutline();
+  const examples = (typeof getStyleExamples === 'function' ? getStyleExamples(state.category, state.subtype) : []).join('\n\n---\n\n');
+  const voiceNote = state.category === 'architecture'
+    ? 'This is for an architecture practice: favor precise, spatial, technical-but-elegant language (massing, form, materiality, program).'
+    : 'This is for an interior design / lifestyle brand: favor warm, sensory, editorial language.';
+  const eventStatusNote = state.subtype === 'upcomingEvent'
+    ? (state.fields.eventStatus === 'Completed'
+        ? '\n- This event has already taken place — write it as a past-tense recap of what happened (e.g. "the display was on view," "the collection was presented"), not a forward-looking announcement. Adjust the headline and any invitation-style language (visiting hours, "will be presented," etc.) accordingly.'
+        : '\n- This event has not yet taken place — write it as a forward-looking announcement in future/present tense (e.g. "will be on view," "the collection will be presented," "visitors can..."), not a past-tense recap.')
+    : '';
+  const projectFactsRule = (SUBTYPE_DEFS[state.subtype].projectFacts && state.category === 'architecture')
+    ? '\n- Do NOT write a "Project Facts" / project credits block (Project Name, Client, Size, Location, Project team, Collaborators), even if the examples below have one. The user\'s own entries for that block are appended separately after your response, verbatim — writing your own would create a duplicate.'
+    : '';
+  const noFactsListRule = !(SUBTYPE_DEFS[state.subtype].projectFacts && state.category === 'architecture')
+    ? '\n- Do NOT end the release with a bulleted or structured "facts," "details," or "at a glance" list — write all details (dates, times, venue, address, etc.) in flowing prose within the body paragraphs instead. That structured closing-facts convention is reserved for architecture project releases only.'
+    : '';
+  const mediaContactRule = SUBTYPE_DEFS[state.subtype].fields.some(f=>f.id==='contact')
+    ? '\n- Do NOT write your own "Media Contact" / press contact line, even if Media contact or Media email details are given in FACTS. Those are appended separately after your response, verbatim — writing your own would create a duplicate.'
+    : '';
+  const similarProjectsRule = (state.subtype === 'commissionWin' && (state.fields.similarProjects||'').trim())
+    ? '\n- The "Similar upcoming or past projects" fact describes OTHER, separate projects included only for context — not the project being announced in this release. Never apply their dates, names, or completion status to the main project; keep any mention of them clearly attributed to those other projects, not blended into facts about the one you\'re announcing.'
+    : '';
+  const revisionRule = isRevision
+    ? '\n- This is a revision of the CURRENT DRAFT given below (found right before FACTS): preserve its wording, structure, and included facts except where the REQUESTED CHANGES require a change. Do not regenerate from scratch or rewrite parts that weren\'t asked about.'
+    : '';
+  const taskIntroLine = isRevision
+    ? 'You are revising the CURRENT DRAFT below (found right before FACTS) according to the REQUESTED CHANGES that follow it. Use the FACTS only as ground truth — do not introduce anything beyond what is already in FACTS, NOTES, or the current draft.'
+    : 'Using ONLY the FACTS below, write an entirely original, publication-ready press release from scratch — headline, one-sentence summary, dateline, body paragraphs, quotes, facts list, all of it composed by you.';
+  const revisionBlock = isRevision
+    ? `CURRENT DRAFT:\n\n${previousOutput}\n\nREQUESTED CHANGES:\n\n${editInstructions}\n\n`
+    : '';
+  const systemPrompt = `You are a senior PR copywriter for the luxury design and architecture world. ${voiceNote}
+
+${taskIntroLine}
+
+STRICT ACCURACY IS NON-NEGOTIABLE. Every specific claim in the release — names, dates, numbers, dimensions, materials, locations, awards, collaborators, sustainability features, quotes, or any other detail presented as fact — must come directly from FACTS or NOTES below. Never invent, infer, guess, embellish, or "fill in" a detail that isn't there, even one small and plausible-sounding (an invented material, a made-up square footage, a fabricated design feature, a sensory description of what something looks or feels like, historical or contextual color that wasn't given). If FACTS are thin, write a shorter, more restrained release rather than padding it with invented specifics to match the length or density of detail in the EXAMPLES — the EXAMPLES are a guide to voice only, never a source of content.
+
+This includes small connective assumptions that don't feel like "facts" but still are: do not say something happened, launches, or is available "today," "now," or "this week" unless a date is actually given (use neutral phrasing like "has unveiled" / "presents" instead of dating it yourself); do not claim a product or collection is available for order/purchase, or state where or how to buy it, unless an availability detail or purchase channel is explicitly given in FACTS or NOTES — if none is given, simply don't mention availability at all.
+
+Read timing and ownership of every fact carefully before using it. If a fact states a future date (e.g., "to be completed in 2027"), describe it as upcoming — never rewrite it as already finished, and never move that date onto a different project, person, or moment than the one it was actually given for. When FACTS mention more than one project (e.g., the project being announced plus related or comparison projects), keep every date, name, and status attributed to the correct one — do not blend details from one project into another.
+
+The EXAMPLES below are this writer's own past work — study them closely and write in that same voice: their vocabulary, their sentence rhythm, how sensory or restrained they get, how confident and specific their claims are, how they build a paragraph. Match that voice tightly.
+
+At the same time, thousands of different releases get written with this same voice across different facts. If every release also copies the examples' specific sentence patterns and structure, they start reading like siblings of each other — that is the failure mode to avoid, separately from voice. So:
+- Adopt the voice; do not reuse or lightly rephrase any specific sentence or paragraph structure from the EXAMPLES. Same writer, different sentences each time.
+- Avoid generic stock PR openings such as "[Company] is pleased to announce," "[Company] is proud to unveil," "[Company] is bringing its distinctive approach to," or similar — find a more specific, characterful way into the story each time, grounded in what's actually distinctive about these particular facts, in this writer's voice.
+- Vary your sentence structure, paragraph order, and rhetorical approach from release to release; do not default to a fixed template.
+- When attributing quotes, use present tense ("says [Name]") rather than past tense ("said [Name]").
+- Immediately after the headline, write a one-sentence summary as its own paragraph: a single plain-spoken sentence in normal sentence case (no quotation marks, not a repeat of the headline) that captures the essence of the announcement, in the example style of "An ambitious six-month program of exhibitions, installations, research projects, and events at the MIT Museum will dive into our planet's vast oceans, connecting art, architecture, design, science, and technology to reveal mysteries of the deep."
+- After the summary, open the next paragraph (the start of the body) with a traditional press-release dateline, in this exact format and nowhere else: CITY, STATE/COUNTRY – DAY MONTH YEAR. — all in capital letters, using an en dash, ending with a period, built from the Dateline fact (e.g. "MILAN, ITALY – 4 MARCH 2026."). The rest of that sentence follows immediately after, in normal sentence case.
+
+Never use these words or phrases, or close synonyms of them, anywhere in the release: ${BANNED_WORDS.join(', ')}.
+
+Also avoid these sentence patterns entirely:
+- "Rather than [X], it/they [Y]" contrastive constructions.
+- "As much by [X] as [Y]" parallel-comparison constructions.
+- Grouping descriptive details into a list of exactly three items (e.g., "wood, stone, and light").
+
+The language must never be poetic or subjective. No lyrical or evocative descriptions, no editorializing about how a space or object feels, no unverifiable adjectives about mood or atmosphere. Stick to factual, concrete, objective statements — what was designed, built, chosen, unveiled, won, or said, described plainly.
+
+Rules:
+- Output structure, as separate paragraphs separated by a blank line and in this exact order: (1) the headline alone; (2) the one-sentence summary alone; (3) the dateline-opening body paragraph; (4) the remaining body paragraphs, quotes, and closing facts. Do not merge or skip (1) or (2) — they must each be their own paragraph.
+- Every fact, name, date, number, material, dimension, and quote in FACTS is real. Use them accurately, and do not invent or infer facts, quotes, materials, dimensions, sensory details, or any other details not present in FACTS or NOTES — not even small, plausible-sounding ones added for color or to sound more complete.${eventStatusNote}
+- If something in FACTS is missing, thin, or blank, simply don't mention it or write around it briefly — never invent a placeholder or a made-up specific to fill the gap. A short, accurate release beats a longer one padded with invented detail.
+- Do NOT write an "About [Company]" / boilerplate section, even if the examples below have one. The user's own pre-approved boilerplate is appended separately after your response, verbatim — writing your own would create a duplicate.${projectFactsRule}${noFactsListRule}${mediaContactRule}${similarProjectsRule}
+- You may also receive loose NOTES from the user — a stream-of-consciousness, bullet points, or rough fragments, possibly with typos or bad grammar. Weave any relevant facts or details from the notes into the appropriate place in the release, corrected and in full sentences. Ignore anything in the notes that is just the user thinking out loud rather than a fact to include.
+- Before finalizing, check every sentence against FACTS and NOTES: if a claim, number, name, or descriptive detail can't be traced back to something actually given, cut it or rewrite the sentence without it.
+- There is no back-and-forth here — this is a single, one-shot request with no way for the user to reply. If REQUESTED CHANGES or NOTES are ambiguous, incomplete, or seem cut off, do NOT stop to ask a clarifying question — make the most reasonable interpretation and proceed with the release.
+- Only if it is truly impossible to produce a release (e.g., the request directly contradicts FACTS in a way you cannot resolve on your own), skip writing a release entirely and respond with ONLY this instead: the exact line "NEEDS_INPUT" by itself, then 2-4 short bullet points (each starting with "- ") in plain, friendly language explaining what's blocking you. Nothing else in that case — no attempted release, no other commentary.
+- Return ONLY the final press release text — no preamble, no commentary, no markdown formatting.${revisionRule}
+
+EXAMPLES (this writer's voice — study closely, but write new sentences and structure, never copy these verbatim or near-verbatim):
+${examples}`;
+
+  try{
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        max_tokens: 4096,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: `${revisionBlock}FACTS:\n\n${factsOutline}${state.notes.trim() ? `\n\nNOTES:\n\n${state.notes.trim()}` : ''}` }]
+      })
+    });
+    if(!res.ok){
+      const errBody = await res.text();
+      let msg = errBody;
+      try{ msg = JSON.parse(errBody).error; }catch(e){}
+      throw new Error(`(${res.status}) ${msg}`);
+    }
+    const data = await res.json();
+    state.aiOutput = (data.content && data.content[0] && data.content[0].text) || '';
+    if(/^NEEDS_INPUT\b/i.test(state.aiOutput.trim())){
+      state.aiNotice = state.aiOutput.trim().replace(/^NEEDS_INPUT\s*/i, '');
+      state.aiOutput = previousOutput;
+    }
+  } catch(e){
+    state.aiError = e.message || String(e);
+  } finally {
+    state.aiLoading = false;
+    renderToolbar();
+    renderPreview();
+    const generateBtn2After = document.getElementById('generateBtn2');
+    if(generateBtn2After){
+      generateBtn2After.disabled = false;
+      generateBtn2After.textContent = state.aiOutput ? '✨ Regenerate' : '✨ Generate Press Release';
+    }
+  }
+}
+
+// ---------- header toolbar (generate/copy/download/AI) ----------
+function renderToolbar(){
+  let html = '';
+
+  const hasOutput = !!state.aiOutput;
+  html += `<button class="btn primary small" id="generateBtn" ${state.aiLoading?'disabled':''}>${state.aiLoading?'Writing…':(hasOutput ? '✨ Regenerate' : '✨ Generate Press Release')}</button>`;
+  html += `<button class="btn small" id="copyBtn" ${hasOutput?'':'disabled'}>Copy Text</button>`;
+  html += `<button class="btn small" id="downloadBtn" ${hasOutput?'':'disabled'}>Download .txt</button>`;
+
+  previewToolbar.innerHTML = html;
+
+  document.getElementById('generateBtn').addEventListener('click', callClaudeAPI);
+
+  document.getElementById('copyBtn').addEventListener('click', async ()=>{
+    const plain = getActiveText();
+    const richHtml = getActiveHTML();
+    try{
+      if(window.ClipboardItem && richHtml){
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            'text/plain': new Blob([plain], {type:'text/plain'}),
+            'text/html': new Blob([richHtml], {type:'text/html'})
+          })
+        ]);
+      } else {
+        await navigator.clipboard.writeText(plain);
+      }
+    } catch(e){
+      try{ await navigator.clipboard.writeText(plain); }catch(e2){}
+    }
+    const btn = document.getElementById('copyBtn');
+    const old = btn.textContent; btn.textContent='Copied!';
+    setTimeout(()=>btn.textContent=old,1200);
+  });
+  document.getElementById('downloadBtn').addEventListener('click', ()=>{
+    const blob = new Blob([getActiveText()], {type:'text/plain'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const firstLine = (state.aiOutput.split('\n').find(l=>l.trim()) || '').trim();
+    const name = (firstLine || 'press-release').slice(0,60).replace(/[^\w\-]+/g,'-');
+    a.href = url; a.download = name + '.txt';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+}
+
+// =====================================================================
+// PROJECT STORY WRITER
+// =====================================================================
+
+const PROJECT_TYPES = ['Residence','Restaurant','Healthcare Facility','Leisure Centre','Education Facility','Masterplan','Other'];
+
+const STORY_FIELDS = [
+  { id:'projectName', label:'Project name', placeholder:'', required:true },
+  { id:'designerFirm', label:'Interior design firm / designer', placeholder:'' },
+  { id:'architectureFirm', label:'Architecture firm', placeholder:'', creditsOnly:true },
+  { id:'builder', label:'Builder / General Contractor', placeholder:'', creditsOnly:true, architectureOnly:true },
+  { id:'landscapeDesign', label:'Landscape design', placeholder:'', creditsOnly:true, architectureOnly:true },
+  { id:'stylist', label:'Styling', placeholder:'', creditsOnly:true },
+  { id:'photography', label:'Photography credit', placeholder:'', creditsOnly:true },
+  { id:'location', label:'Location', placeholder:'Neighborhood, City' },
+  { id:'clientNames', label:'Client', placeholder:'Leave blank to keep them unnamed', hideForResidence:true },
+  { id:'homeowners', label:'Homeowners', placeholder:'Describe the homeowners – their family unit, what they do, and any details that might be helpful. You can also choose to include their names.', type:'textarea', residenceOnly:true },
+  { id:'clientStory', label:'Client story / background', placeholder:"Who are they, and what shaped the brief? e.g. their profession, how they found the property, their personal style or priorities.", type:'textarea' },
+  { id:'size', label:'Square footage / size', placeholder:'' },
+  { id:'lotSize', label:'Lot size', placeholder:'', creditsOnly:true, architectureOnly:true, residenceOnly:true },
+  { id:'aduArea', label:'Accessory dwelling unit (ADU) area', placeholder:'', creditsOnly:true, architectureOnly:true, residenceOnly:true },
+  { id:'floorCount', label:'Floor count', placeholder:'' },
+  { id:'bedrooms', label:'Bedrooms', placeholder:'', residenceOnly:true },
+  { id:'bathrooms', label:'Bathrooms', placeholder:'', residenceOnly:true },
+  { id:'completionDate', label:'Completion date', placeholder:'e.g. Spring 2026, or a project timeline/range' },
+  { id:'designConcept', label:'Design concept / inspiration', placeholder:'', type:'textarea' },
+  { id:'designApproach', label:'Overall design approach', placeholder:'', type:'textarea' },
+  { id:'materials', label:'Key materials & palette', placeholder:'', type:'textarea' },
+  { id:'brandsAndArt', label:'Brands, artists & notable pieces', placeholder:"List any brands or artists featured in the project, e.g. sofa by Roche Bobois, painting by Jane Doe", type:'textarea' },
+  { id:'aboutDesigner', label:'About the designer / firm (optional)', placeholder:'Copy and paste your boilerplate here.', type:'textarea', creditsOnly:true, renderAtEnd:true }
+];
+
+const STORY_CREDIT_FIELDS = [
+  { id:'designerFirm', creditLabel:'Interior Design' },
+  { id:'architectureFirm', creditLabel:'Architecture' },
+  { id:'builder', creditLabel:'Builder' },
+  { id:'landscapeDesign', creditLabel:'Landscape Design' },
+  { id:'stylist', creditLabel:'Styling' },
+  { id:'photography', creditLabel:'Photography' },
+  { id:'size', creditLabel:'Size' },
+  { id:'lotSize', creditLabel:'Lot Size' },
+  { id:'aduArea', creditLabel:'ADU Area' },
+  { id:'bedrooms', creditLabel:'Bedrooms' },
+  { id:'bathrooms', creditLabel:'Bathrooms' }
+];
+
+// Some fields (Bedrooms/Bathrooms, Builder, Lot Size...) only apply to certain
+// categories or project types, and a few (Interior design firm vs. Architecture
+// firm, Client vs. Homeowners, Size's label) swap meaning depending on them —
+// this centralizes that so it stays consistent across the form, the AI facts
+// outline, and the credits block.
+function shouldShowStoryField(f){
+  const isResidence = storyState.projectType === 'Residence';
+  const isArchitecture = storyState.category === 'architecture';
+  if(f.residenceOnly && !isResidence) return false;
+  if(f.hideForResidence && isResidence) return false;
+  if(f.architectureOnly && !isArchitecture) return false;
+  if(f.interiorOnly && isArchitecture) return false;
+  return true;
+}
+function storyCreditFieldVisible(creditField){
+  const fieldDef = STORY_FIELDS.find(sf=>sf.id===creditField.id);
+  return !fieldDef || shouldShowStoryField(fieldDef);
+}
+function storyFieldRequired(f){
+  if(f.id === 'designerFirm') return storyState.category === 'interiorDesign';
+  if(f.id === 'architectureFirm') return storyState.category === 'architecture';
+  return !!f.required;
+}
+function storyFieldCreditsOnly(f){
+  if(f.id === 'architectureFirm' && storyState.category === 'architecture') return false;
+  return !!f.creditsOnly;
+}
+function storyFieldLabel(f){
+  const isArch = storyState.category === 'architecture';
+  const isResidence = storyState.projectType === 'Residence';
+  if(f.id === 'designerFirm') return isArch ? 'Interior design firm (if applicable)' : 'Interior design firm / designer';
+  if(f.id === 'architectureFirm') return isArch ? 'Architecture firm / designer' : 'Architecture firm';
+  if(f.id === 'size' && isArch && isResidence) return 'Main house area';
+  if(f.id === 'clientStory' && !isResidence) return 'Client needs';
+  return f.label;
+}
+function storyFieldPlaceholder(f){
+  const isResidence = storyState.projectType === 'Residence';
+  if(f.id === 'clientStory' && !isResidence) return 'What did the client ask for?';
+  return f.placeholder;
+}
+
+const STORY_ROOM_FIELDS = [
+  { id:'roomName', label:'Room / space name', placeholder:'e.g. Living Room' },
+  { id:'roomNotes', label:'Notes', placeholder:'What\'s in this room — furniture, lighting, art, materials — and the brands or artists behind them, if known', type:'textarea' }
+];
+
+// Real interior design project stories the user supplied, header/credit lines
+// stripped so only voice/structure carries through (credits are appended by
+// this app's own Project Credits block, not written by the AI). Studied for
+// voice only — never copied from — same convention as SUBTYPE_EXAMPLES above.
+const STORY_EXAMPLES_INTERIOR = [
+`A 6-Bedroom Dallas Home Reworked Mid-Construction with Exceptional Craftsmanship
+
+Sees Design unifies a 10,000-11,000 sq. ft. Preston Hollow residence through late-stage layout revisions and refined surface treatments
+
+This Dallas, TX home began as an entirely different project on an entirely different lot. Sees Design was initially engaged to collaborate with an architect on a fully custom new build for a family, with early architectural plans already underway, when a substantial spec home unexpectedly came onto the market.
+
+Drawn by the opportunity for a significantly shorter construction timeline, the clients pivoted. The house, already well into construction, offered scale and presence but lacked personal character. It was purchased with one clear expectation: that it would be fundamentally reworked into a home that is tailored and lived in.
+
+Fresh off the sale of a technology company and alongside their professional growth, the homeowners brought two distinct creative viewpoints to the process. His taste leaned modern and eclectic; hers, romantic and traditionally rooted. The central challenge, and ultimately the success of the project, lay in reconciling those opposing sensibilities into a cohesive family home. The approach to the home reflects the dynamic partnership at the heart of the project.
+
+Despite the home's advanced stage of construction, Sees Design reimagined the interiors from the ground up. Layouts were adjusted, architectural detailing refined, and finishes reconsidered to move the residence away from its spec origins. What emerged is a layered interior language that feels deliberate and personal.
+
+The foyer sets the tone with a sense of drama and scale. Overhead, chandeliers from JAMB and Cox London, including the Magnolia Chandelier, establish an immediate visual anchor. An entry table by Cox London grounds the space, while carefully selected lighting introduces warmth against the home's architectural volume.
+
+In the "great room", the focus shifts to comfort and gathering. Oversized lanterns by Jamb, specifically the Grand Delaval hanging lanterns, define the ceiling plane, while Porta Romana Clam Shell wall lights provide a softer counterpoint along the perimeter. Lamps by Iatesta Studio punctuate seating areas, layered with fabrics from Zak+Fox, Fortuny, Hunt Leather, R&G, Les Créations de la Maison, Pavoni, Rosemary Hallgarten, C&C Milano, Élitis, and Fleurons d'Helene.
+
+Seating is anchored by the Rose Tarlow "Library" sofa, upholstered in Rogers & Goffigon wool plaid, paired with Rose Tarlow slipper chairs in Foliette fabric and Edwin chairs. Rose Tarlow Chinoiserie chairs and Dennis & Leen Louis XVI Library chairs introduce classic silhouettes, while a Formations "San Leandro" coffee table and custom audio storage cabinet, the Dennis & Leen Fontenay, reinforce the room's balance of formality and ease. Drapery and cornices in Rogers & Goffigon, with sheers by Larsen, frame the space. Side tables include the playful Message in a Bottle table, a game table by David Sutherland, and the Talon table from Blackman Cruz. Underfoot, rugs from the Dallas-based Esmaili and wood flooring by Pittet Architecturals ground the palette.
+
+With handcrafted Christopher Peacock fitted cabinetry, the kitchen stands as one of the home's most active spaces and functions as both a working kitchen and a gathering point. Custom built-in banquette seating upholstered in Rose Tarlow performance fabrics as well as Perennials has become a daily fixture for the family of five. The room flows directly into a large outdoor dining area, reinforcing its role as the social heart of the house.
+
+Adjacent to the kitchen, the family room or den centers on a custom sectional upholstered in Holland & Sherry corduroy, paired with accent pillows by Robert Kime. Drapes in Rogers & Goffigon fabrics soften the room, while a custom ottoman completes the seating arrangement. This space, along with the kitchen, carries the stamp of approval as a most frequently used area in the home.
+
+Entertaining was a key priority throughout the project. To support large family gatherings, Sees Design introduced multiple outdoor destinations, including a pizza oven, covered loggia, and cabana positioned alongside the swimming pool, allowing interior and exterior spaces to function together.
+
+The dining room leans more decisively into traditional expression. Guided by the client's request for custom wallcoverings, the space introduces a touch of femininity. Walls are wrapped in De Gournay's Classic Saint Laurent pattern, rendered in custom colours on neutral India tea paper. A tracery ceiling adds quiet drama without overwhelming the room. The dining table features a Formations Alessio base, surrounded by Dennis & Leen English chairs upholstered in Rosemary Hallgarten mohair. A secondary table with a Dennis & Leen Louis XVI oval fluted base accommodates overflow seating while subtly defining circulation between the dining room and kitchen.
+
+Additional furnishings include a custom Marroquin settee upholstered in Rose Tarlow, a Stark rug, an 18th-century Swedish Rococo cabinet sourced via 1stDibs, and lamps by Vaughan. Drapes by Rogers & Goffigon detailed with subtle, shimmering Scalamandré "Moiré" complete the room.
+
+In the primary bedroom, a custom bed canopy lined in Dedar silk creates an intimate focal point. Bedding by Leontine Linens, drapes in Jasper Mercury, and wallcoverings from CMO Paris establish a layered softness. Nightstands by Dennis & Leen – the "Paris" Commode – are paired with lamps by Vaughan.
+
+The primary bath continues the material refinement, with tile by Materials Marketing and ceiling-mounted fixtures by Paul Ferrante. A vanity chair upholstered in handmade Venetian Fortuny and a window shade by Rubelli add texture and colour. Wallcoverings from Phillip Jeffries, in the "Framed" specialty paper weave, introduce subtle structure.
+
+Powder rooms offer moments of contrast. Lighting from Iatesta Studio including "Cubic" sconces in an antique silver finish and a chandelier set a sculptural tone. Finishes are unified through paintwork, ensuring continuity throughout the house.
+
+Antiques play a quiet but significant role across the home. Many pieces were established during an earlier project with the homeowners and reintroduced here, while the majority of accessories were sourced through Dennis & Leen, reinforcing a sense of continuity and familiarity.`,
+
+`The interior designer Chad Dorsey brings his "relaxed luxury" to this home, which includes a breakfast room, a lounge, bar, living room, scullery, dining room, kitchen with corresponding family room, gallery hall, powder room, primary ensuite bedroom, two guest bedrooms, and a patio.
+
+Porter Teleo's hand-painted wallpaper "Taking Flight" brings rich hues and organic forms to the breakfast room. A framed oil painting by Marina Perez Simão inserts the boldness and dynamism of the Brazilian artist's bold palettes into the space. Created from layers of banana plant fiber, the 'Anders' light by Pinch Design anchors the room, and seating by Poltrona Frau and Scott + Cooner creates an inviting nook.
+
+In the lounge, Alex Prager's Starlight, a limited edition archival pigment print first presented at the LA artist's solo show in 2021 at Lehmann Maupin, London, sets Americana cinematography as the focal point of the room. Sourced from Sputnik Modern, a pair of pedestal coffee tables introduce a metallic finish to the room. The 'Big Sur' mantle by STRIKE — Dorsey's collection of fireplaces in unexpected sculptural proportions — embodies a contemporary California manifesto in its Nero Marble finish.
+
+In the bar, Andy Warhol's After The Party 183 (1979), a screenprint photograph featuring plates, glasses, cutlery, and wine bottles, contrasts against mirrored wall tiles by Ann Sacks.
+
+Created using his signature graphite and rubber cement technique, a framed work by Tony Lewis adds gestural abstraction above another fireplace mantle by STRIKE. 'Reims Double Arm' sconces by Jiun Ho, with hexagonal hand-cut crystal shades, bring illumination into a pair of remarkably wide flat arches connecting to the lounge.
+
+More abstraction unfolds in the scullery, where a "hypershape" brush mark drawing by New York-based Torkwase Dyson is guided by what the artist refers to as Black Compositional Thought.
+
+A large-scale mirror sourced from Nick Brock Antiques contrasts against the hand-painted floral motifs of a wallpaper by de Gournay. A chandelier from Lindsey Adelman's 'Branching Bubble' series, first debuted in 2006, recalls the brass swivel joints and elbows seen in the industrial stores on lower Manhattan's Canal Street. Vegetation details in a painting by Sophie von Hellmann interplay with the various wooden tones in the space.
+
+In the kitchen, cabinetry by bulthaup. A monumental stove hood in plaster, custom-designed for the space by Chad Dorsey Design, emerges from the wallcovering in clean, concrete-like continuity. The kitchen opens into the living room, where a rug from Orley Shabahang, woven in the hill villages of Iran, sets the stage for an antique table and a mid-century rattan chair.
+
+The staircase hall showcases multiple works, including three pieces from Sarah Meyohas' "Speculations," a series the artist conceived for BitchCoin, a cryptocurrency conceived as an artwork that playfully constructed value.
+
+The Tidal side table, a hand-poured, meniscus glass crystal table top on a sculpted base with polished details by John Pomp Studios, injects vibrancy into a corner.
+
+The powder room is characterized by the dark, moody tones of an embossed vinyl wallcovering with a raffia weave aspect from Élitis. A custom vanity by Chad Dorsey Studio introduces a thread of lightness with its bright marble.
+
+In the primary bedroom, linen fabric drapery by Zoffany, based on a late 17th-century painted cloth, features lush pastoral landscapes. Two framed pieces by Joseph Havel pair with a chair by Kimberly Denman.
+
+Two walk-in closets have unique identities and configurations to reflect each homeowner's tastes and wardrobe needs.`,
+
+`Free-Spirited Mahjong & Maximalism Across Three-Story Highland Park Home
+
+The interior design firm Avrea and Company were granted free reign to demolish a three-story Dallas Tudor Revival home built in 1928 and to start anew, but chose to retain its historic character.
+
+One of the two homeowners, Kate LaGere, is co-founder of the Mahjong Line — the brand of "Mahjong tiles and accessories for the stylish masses" — and the spirit of her colorful brand was inevitably reflected across the details of the home, in a maximalist, fearless palette.
+
+With the exception of the kitchen, the home had never been renovated until the family purchased it in 2014. Despite structural challenges including low ceilings and a chopped-up floor plan, the home's generous fenestration and large porch offered ample opportunities for experimentation.
+
+The couple frequently host large parties and were uninterested in the traditional formal dining room. It was especially important for LaGere to have dedicated spaces for hosting friends for Friday game day. An 18-foot-long lounge area in the front of the home is anchored with long banquette seating with high seating capacity. Purple-white gingham wall fabric extends from the bench seating and overflows onto the wallcoverings, only to be tamed by the softness of the wooden flooring and soffit.
+
+The fabric of the wallcoverings likewise stretches toward the bar. The use of white oak across custom cabinetry is an unusual tone choice that introduces novelty into the space, and French grosgrain trimmings by Samuel & Sons are inset as a deep-toned layer of poise and intricacy. Sliding doors dress the floor area and allow for optional delineation when needed. Inspired by the Connaught cocktail bar in London, the bar counters offer abundant space for a collection of vintage martini shakers.
+
+The powder room is one area where the spirit of the Mahjong Line truly makes an appearance. Gloss hexagon floor tiles introduce two shades of a striking, strong aubergine. Flush against all walls, a custom floating vanity features mustard veining. A lacquer mirror seemingly radiates from handcrafted screen-print wallpaper by the Austrian brand Zeuxis & Parrhasius — a "goldfish's mating dance" in cheery purple, yellow, and orange.
+
+Transitioning from the bolder color choices, the soft mint green of the kitchen allows for respite and for the eye to rest between two dramatic areas in the home.
+
+Each room throughout the home is matched with ceiling suspension lighting that either acts as a focal point or softly complements the color and material scheme. In the living room, framed oil portraits rest on oak wooden wall paneling that softens the room. A checkered fabric armchair brings in a contemporary cottage nook. Two fireplaces represent Avrea and Company's first undertaking in designing mantels. In the back, a designated mahjong space is ready to host many long nights of conviviality and games.
+
+At the staircase lobby, Avrea and Company's signature use of tribal, rare Caucasian Persian rugs and runners makes an appearance. On the walls is a collage of love letters, purchased from the grandchildren of the original owners — a thread to the home's past legacy.
+
+LaGere collected relics found in the house during the demo and had a window box art piece made to display the items, a "time capsule of sorts" from the 1930s-50s.
+
+ABOUT AVREA AND COMPANY
+Avrea and Company is a Dallas-based interiors firm representing a variety of design assignments across the country, embracing uniquely American style with modern sensibilities yet everyday practicality. The firm's vision echoes a look back into history, accessing antiquities globally for inspiration, all while tempered with current trends for the trifecta in balance — versatile, eclectic, and optimistic in style. Its portfolio represents a diverse exploration into both design and location, ranging from a rustic family retreat in the Rockies, an art deco-inspired Ohio estate, and a Moroccan-inspired beach house at Alys Beach — each enveloped within its environment and locale.`,
+
+`Renovating a Historical University Park Home with Clutter-Free Ethos for "ThisBeauty" Founder
+
+Inspired by the charm of a New York City brownstone, Urbanology Designs honored the 1920s home's original layout while redistributing its square footage to add new spaces.
+
+Drawn to the charm and character of the historic neighborhood of University Park in Dallas, TX, the lifestyle entrepreneur and founder of the beauty line ThisBeauty, Ashley Robertson, was captivated by the unique architecture of this home first built in 1929. Considering the popularity of the neighborhood, encountering a home for sale is infrequent, and along with her husband, she was excited for the opportunity.
+
+The square footage across the different spaces was reconfigured for their unique needs and everyday functionality. Urbanology Designs renovated each space to stand as intentional and uncluttered, echoing Ashley's minimalist and curated approach to her clean beauty brand. Despite the pursuit of minimalism, preserving the character and historical detail of the home was essential, and all original wall textures and design details were matched throughout the expanded spaces.
+
+The renovation strategically expanded key areas of the home, allowing for the addition of a new den, laundry room, breakfast nook, primary suite, and a large children's bedroom.
+
+The homeowners did not want the home to feel new or forcibly modern. Rather than opt for a "Texas traditional" or "Texas contemporary" approach, the design studio's vision for the home centered around a refined classic style with subtle Spanish and European influences. Inspired by the charm of a New York City walk-up or brownstone, the design studio honored the home's original layout, preserving its compartmentalized spaces while adding thoughtful expansions to meet the needs of their growing family.
+
+The home was extended to include a den for family moments and entertaining, highlighted by a glass garage door that opens to the outdoors. Taking center stage here is a salvaged 1940s Italian fireplace in French limestone that creates a rich palette with the Minwax and Dark Walnut woods across the space. A bar closet opens to a serendipitous surprise with House of Hackney "Pride" wallpaper, a design with hand-illustrated ostriches that interplay with off-black and clay stripes.
+
+The expansion also allows for the creation of a breakfast nook, nestled between the den and kitchen, offering a gathering area for casual family meals underneath soft warmth by Blueprint Lighting.
+
+The kitchen, while small, was updated for maximum functionality. The homeowners were determined to preserve its original structure. Classic cabinetry with Minwax and Espresso stains, base drawer pullouts, and a hidden coffee station with flipper doors maximize storage while keeping countertops neat and highlighting the material details of the marble.
+
+In the living room, the home's original charm shines through with the original fireplace, serving as a timeless focal point in this updated space with preserved wall textures.
+
+The upstairs landing features a charming seating area framed by the original wall moldings, offering a layer of privacy before entering the sanctuary of the bedroom. By expanding the square footage in key areas, the primary bedroom could be updated to a primary suite. The closet was expanded, significantly boosting storage while introducing a sleek design that maintains a "less is more" philosophy throughout. Enclosing all hanging storage and shelving develops the illusion of clutter-free living.
+
+Strategically placed windows bring abundant natural light into key areas of the home — including the bathroom, where a curved shower stands as the focal point. Clad in deep, rich maroon tile, the shower complements the hand-selected slabs from Aria Stone, creating a luxurious and inviting spa-like atmosphere.`,
+
+`Samantha Fisher Designs Gallerist's Dallas Home Around Major Museum-Quality Art Collection
+
+An extraordinary art collection sets the tone in the Dallas home of Lisa and Chuck Brown. Lisa previously owned a celebrated gallery and over the years has amassed a museum-quality collection with pieces by Anselm Kiefer, Jenny Holzer, Roy Lichtenstein, Damien Hirst, and Vernon Fisher, in a diverse collection varied with its combination of international, Texan, and emerging artists.
+
+The family recently moved into a 3-bedroom residence backing up to a creek in the Devonshire neighborhood — a property they were ready to make their own. Samantha Fisher treated the interior design as a surprise, embedding unexpected furniture items ranging from Swedish antiques to traditional finds. The approach mitigates a modern museum look that, according to the designer, would "risk feeding into the cliche of a collector's home and create monotony." Throughout, creamy neutrals that are refined, tailored, and comfortable allow the artworks to dictate the palette.
+
+In the entryway, a monumental Ironies chandelier with an opaque, white, crosshatched resin finish is suspended over a table and chair — unconventional furniture pieces for entryways but ones that gracefully leverage the configuration of the space. Here, the room centralizes the view into the backyard as well as a piece by New York artist Tara Donovan, with nails that come together to create the image of a target.
+
+While wallcoverings are kept mute in most major rooms, in the mahjong room, or the green room, the palette widens with garden greens and pinks that coalesce with over sixteen artworks collected by the homeowners over the years. A pair of acrylic chairs are upholstered with Rolling Hills fabric by Schumacher, its animals flocking through a rustic landscape. An antique Swedish cherry-pink mohair three-seater is fit snug into a cabinet of curiosities beside a grand piano.
+
+The highlight of the powder room is the Mother Sconce by Barlas Baylar, with faceted chains hand-draped onto the frame, procured from Hudson New York. The metals of the sconce interplay with the gold florals across a wallpaper by Gracie. The white, high-gloss lacquer of a custom-designed vanity by Samantha Fisher acts as negative space amongst the bold hues.
+
+Making a brazen mark in the living room is Wet Willy by the Haas Brothers (2019), a fur-and-cast bronze sculpture produced using the lost-wax casting process. Surrounding an Ironies resin table with a brass base is seating that includes the Carmine swivel lounge chair by Palecek in a two-tone fog white finish, and a chair upholstered with Holly Hunt fabric. Wide oak flooring introduces warmth, and a custom fireplace in cast stone. Also on view are pieces by Mel Bochner, Mel Lucas, Liliana Porter, David Bates, and Damien Hirst.
+
+A highlight of the home is the dining room, enveloped by vivid greenery on each side. On one wall is a collection of screen prints from the Eight Soups series by John Baldessari (2012) — a rare sighting of all eight Soups together in one space. On the other wall is an oil illusion of a chalkboard by Vernon Fisher, its wood structure seemingly disintegrating into the cream paint color behind it.
+
+In lieu of a chandelier, a monumental mahogany-and-steel sculpture by James Surls, resembling an eye, is suspended above a handcrafted table by Gregorius Pineo, completed with custom chairs. In the bar area, a sculpture by Anselm Kiefer — resembling a toy, but produced in lead — is a small, cheeky easter egg emerging from a side wall.
+
+The primary bedroom likewise enjoys a view of the trees outside, and the palette complements it with organic shades and highly tactile elements. The Casimir Bed by Ironies is flanked by a custom bench designed by Samantha Fisher. On a side table, vinyl grasscloth introduces a distinct pistachio green shade. And proving that media works can in fact be displayed in a home collection is a Truism by Jenny Holzer, projectable across the bed's side.
+
+Other artworks are installed across the media room, children's bedrooms, and circulation spaces, including works by Kiki Smith, Julie Bozzi, Trenton Doyle Hancock, Roy Lichtenstein, Marilyn Minter, Beatriz Milhazes, Fred Tomaselli, and more.
+
+Outside, a fire pit is surrounded with Belt Cord Outdoor seating by Rodolfo Dordoni for Minotti, an antique table, and additional seating for a leisurely escape.
+
+ABOUT SAMANTHA FISHER
+Named D Home "Best Designers" from 2016-2023 and with work published in various shelter magazines, Samantha Fisher Interior Design provides clients with a customized, highly service-oriented experience in crafting homes for living.`,
+
+`Publicis Groupe China Headquarters
+
+A global leader in advertising and public relations, Publicis Groupe has embraced its 'Power of One' philosophy by consolidating a diverse range of agencies under one roof. To translate this vision into a vibrant workplace, Ippolito Fleitz Group was commissioned to design the group's China headquarters in the heart of Shanghai. Drawing inspiration from traditional Chinese courtyards and echoing the city's ever-evolving spirit, the new headquarters embody the group's strategic shift toward greater collaboration, agility, and creative synergy, while asserting a bold and distinctive spatial identity.
+
+Spanning eight floors of the iconic CPIC Xintiandi Commercial Centre in Shanghai's vibrant Xintiandi area, the design faced the key challenge of unifying agencies with distinct identities into one coherent vision. The solution is a robust, unified framework that translates the Power of One vision into a consistent experience while allowing for individual identities. This is supported by a layered colour strategy that gives each floor and neighbourhood its own personality through variations in colour, material, and detail, while a consistent palette ensures visual rhythm, clarity, and intuitive orientation, harmonising the vertical experience while celebrating diversity.
+
+This sense of continuity is anchored by a central sculptural staircase. Serving as both a physical and social connector, the staircase enables movement between floors and fosters spontaneous encounters. In a high-rise where unity can easily fragment, the design cultivates a dynamic community that is a hive of motion, collaboration, and collective energy.
+
+The visitor journey is designed to impress, immerse, and inspire. As you step out of the lift, you are struck by the sight of a red ceramic brick wall that evokes Shanghai's iconic lane houses, paired with Publicis Groupe's lion emblem, brightly illuminated by a glowing light film. This bold, tactile entrance sets the tone for what lies ahead: an experience with a strong presence that is deeply rooted in the locality.
+
+At the heart of the visitor floor lies the Pitch Room. Circular in plan and wrapped in a curved LED screen, it is far from a traditional conference space — instead, it has been reimagined as an immersive storytelling platform in which creativity can flourish. Movable chairs and standing tables offer flexibility, while smart glass provides instant privacy at the touch of a button. Nearby, the Digital Award Wall transforms recognition into interaction: made of glass bricks embedded with LEDs, it showcases defining moments from Publicis's legacy, turning static history into a living archive of motion, light, and story.
+
+Each floor is organised around a central core that serves as a spatial and visual anchor. Clad in stainless steel panels and featuring a continuous horizontal wooden shelf, the core brings material continuity and calm geometry to each level, with water stations, coffee collection points, nursing rooms, and displays seamlessly integrated so essential functions feel like a natural part of the architecture. Surrounding the core is a dynamic circulation zone with variable openings designed to spark casual encounters, featuring high tables and phone booths that support informal work modes, while workstations beyond are partially screened by coloured, translucent glass for visual depth and privacy. Along the window façade, contemplative hot desks offer moments of quiet focus with expansive city views.
+
+The employee hub, accessible directly from the ground-floor lobby, offers a calm, tactile, and focused environment where staff can feel supported and valued. This floor brings together HR, IT, and finance in clearly zoned, accessible stations that address essential employee needs, whether that's grabbing a coffee, fixing a laptop issue, or having a quick chat with HR. At the heart of the space is an in-house café clad in vibrant orange terrazzo that channels the atmosphere of a neighbourhood corner shop, with a Publicis twist that includes branded merchandise.
+
+Pantries on all floors offer casual settings for spontaneous meetings, clad in red brick, wood lacquer, or hand-laid tiles in shades of red, wood, and green, bringing texture and warmth to daily routines. The Grand Pantry on the top floor embodies agility, adaptability, and collective energy: with foldable screens, operable partitions, and a dynamic ceiling system, it can be expanded or contracted as needed to support interaction at any scale, hosting anything from casual lunches to full-storey events.`
+];
+
+// Cross-category fallback matches getStyleExamples() above: architecture project
+// stories aren't loaded yet, so they fall back to the interior examples for now.
+function getStoryStyleExamples(category){
+  if(category === 'interiorDesign' && STORY_EXAMPLES_INTERIOR.length) return STORY_EXAMPLES_INTERIOR;
+  if(STORY_EXAMPLES_ARCHITECTURE.length) return STORY_EXAMPLES_ARCHITECTURE;
+  return STORY_EXAMPLES_INTERIOR;
+}
+const STORY_EXAMPLES_ARCHITECTURE = [
+`A Midcentury-Inspired Hillside Residence in Roxbury Park Enhanced for Hosting and Entertaining
+
+Nestled in a hillside in the Roxbury Park neighborhood in Los Angeles, this residential renovation project by architecture studio Hsu McCullough encompasses two floors with an emphasis on the horizontal, featuring additions and alterations catered to the owners' lifestyles.
+
+Unbeknownst to the casual passerby, the property stealthily descends into its hillside location making the panoramic views of the urban landscape an unexpected surprise. Framed with dropping bottlebrushes, a covert street entrance leads into a long deck and into the upper floor, which includes the master bedroom, bathroom, living room, and dining room. The majority of internal walls were removed to unify the common spaces into an open configuration with unobstructed sightlines, dramatically revealing an exciting light shelf and creating the illusion of a raised ceiling.
+
+The space was previously compartmentalized with low light circulation and scarce visibility of the outdoors. Wide sliding doors were added to the kitchen to reveal a newfound bright view of the pocket courtyard, marrying the indoors and the outdoors. A mature tree climbs up from the floor beneath and creates a treehouse view for the dining room while providing solar control and shading. A lacquered solid wood table built by the homeowners is complemented with carved dragon chairs, all silhouetted by a feature wall with **[BRAND]** printed mural wallpaper that embodies the spirit of the outside greenery.
+
+In the living room, bold blue **[BRAND]** modular sofas look towards the urban landscape below. Fascinated by the original decorative guardrail of the descending staircase inside, Hsu McCullough replicated the design across the ironwork of the new external fencing, including those of the balcony and the entrance. This new residence-wide congruity now characterizes the identity of the property, especially across the seemingly omniscient balcony — the core of connectivity for the entire outer level.
+
+The home descends into the ground level that holds secondary rooms, a rec room, and a swimming pool. The homeowners, a young couple, have an avid penchant for DJing and parties, and the studio worked to ensure that various spaces across the residence can comfortably host large groups of people.
+
+Hsu McCullough revealed multiple exciting alterations of unused spaces. A large area that was previously utilized as a messy and forgotten utility space was turned into a new rec room. They took advantage of its windowless situation to create a mysterious, Old Hollywood ambiance. A billiard table, an antique pump organ, and accompanying spectator seating are all highlighted by rich-hued carpet flooring and framed Bauhaus-style compositions. A monumental, detailed stained glass work was retained from the original home and accessorizes the room with vibrant romance and period charm. A door leads to one of the owner's radiology home office.
+
+Outside, the swimming pool acts as the center stage for events and parties, and Hsu McCullough took on alterations and additions to accommodate the most comfortable use of the space for different occasions. They raised the patio up with the addition of wide museum-style stairs, added ceramic tiles around the pool, and embedded crack planting into the new flooring. A bench fence was added to one side of the pool to prevent fall accidents. Various new seating arrangements around the space allow for abundant lounging comfort.
+
+A new accessory dwelling unit, also previously used as a storage room, is now a self-contained retro-decorated pool house with its own kitchen and bathroom. Thanks to a raised ceiling, guests can enjoy an expansive view of the pool.
+
+The home features bold modern furnishings highly influenced by midcentury characteristics, including the fireplace, lighting fixtures, bathroom vanities, and flooring.`,
+
+`An Urban Residential Meadow in El Sereno
+
+Remodeled to centralize around a biodiverse urban meadow, Catalpa is a residential renovation project with stylistic alterations and strategic additions by architecture studio Hsu McCullough. Located in the El Sereno neighborhood in Los Angeles, the residence is home to Birds of Paradise director and screenwriter Sarah Adina Smith, cinematographer Shaheen Seth, and their newborn infant.
+
+The home is adjacent to an industrial area with a brewery and train tracks nearby and the studio wanted to ensure the home gently coalesces with and embraces the urban fabric as well as the rolling hills that surround El Sereno, drawing influence from contemporary Japanese homes located in dense metropolises like Tokyo and Osaka that succeed in making the home a beacon within their setting.
+
+The studio developed the renovation of an existing home with a cheeky Santa-Barbara-meets-Morocco approach, bringing their expertise in daylighting strategies while building around the owner's routines and rituals and their particular fondness for permaculture.
+
+The owners had resided in the home for a few years prior to Hsu McCullough's revamping and one of their primary complaints was the awkward, jumbled distribution of the rooms that gave a confining sensation of being disconnected to the land. The studio removed the internal walls to make way for an open configuration, maximizing light circulation across the home and adding flexible space to encourage fluid activities and interactions. With the new layout, the ground floor now has the entry, living, play, kitchen, and dining areas all in a single space. As with all open configurations, the challenge of keeping messes hidden emerges and new window seating keeps knickknacks out of sight.
+
+Emitting masculine-feminine energy, the kitchen is a long open-plan living space that connects the living room on one end all the way to the garden outside, generously indulging an affinity for cooking, playing, and hosting. Its central space is outfitted with a brass kitchen island with a backsplash that emits warm reflections which vary depending on the time of day. Salmon pink cabinetry contrasts against the dark wooden cladding of the walls and ceiling that transition into flooring.
+
+Connecting the space to the garden are half-round arches reminiscent of Gaudí's flamboyant curves. They bring in a playful buoyancy that draws slight influence from Marrakech's Medina but that dismisses proportionality and mechanicality in favor of organic, freehand shapes that had been blueprinted with a Sharpie pen — accolades to the human hand.
+
+The dining area transitions into the garden seamlessly with shared concrete flooring, and flush-to-wall sliding doors conceal any concept of closure. This indoor-outdoor continuity maximizes the view of a 23 sq. ft. garden, the owners' pride and joy, and a much-needed respite away from the clamor of the city. The space had been previously blocked by a beam making it an inefficient landscape for plants to thrive in, uncomfortable to work with, and unattractive. The garden beds nourish year-round with biodiverse fruits and vegetables and the trees are carefully positioned to perform a range of functions. Instead of muting it, the residence is now structured around this meadow habitat.
+
+Hsu McCullough took on an infill endeavor and made use of unused residual space in a sublevel crawl space between the house and the garden. They strategically bridged the area to add a subterranean room that acts as a multipurpose soothing haven for activities like reading and meditation. This new addition — the "Sunken Room" — is characterized by its vibrant coral and teal hues and leverages its recessed placement to create the sensation of submerging underwater, fittingly housing the owners' aquariums. Lush **[BRAND]** wallpaper cheekily frames the foliage that peeks in through the two windows to develop a sense of continuity with the outdoors. The aquatic darkness of this new space contrasts against the lightness of the rest of the home, acting as a palette cleanser.
+
+The entrance door gives the distinct impression of opening to a medieval Spanish castle and is a six-panel redwood testament to the owners' admiration of handmade craftsmanship and their faith in the possibilities of local collaborative effort, something the owners carry forward from their film careers. In a long, meticulous process, they sourced the door from a nearby salvage yard and had it refurbished by a carpenter who works down their street, finishing it with seven layers of paint.
+
+The studio faithfully maintained the retro sentiments of the ground floor bathroom which had been remodeled by previous residents back in the eighties. Leaving the mustard-yellow ceramic tiles and rounded curvature intact as a relic of the home's former life, they embedded modest practical tweaks to better optimize the space. To the delight of the owners, the studio devised a secret laundry chute inside the cabinet that deposits items directly to the laundry area in the basement below.
+
+The zigzagged staircase draws influence from Saharan mud house dwellings and harbors a secret Harry Potter-style hideout for the child in yet another structural surprise.
+
+Upstairs, the master bedroom opens to a new decked extension built on the space below, allowing the owners to hover above the garden and even reach out to touch the tree canopies beneath with a rare eastern skyline view of Downtown L.A. The studio didn't shy away from framing the power lines, train tracks, and the overall urbanness that distinguish the area. The deck is furnished with a long modular **[BRAND]** sofa that appears to emerge from the walls and a wooden hanging swing crafted by the same carpenter behind the entrance door. A round porthole window pierces the muted white of the exterior, providing a two-way peek into the everyday and adding a signature touch that renders the home identifiable from a distance.
+
+Brass accents and fixtures, patterned wallpaper, and a collection of art embellish the bedrooms and bathrooms across the second floor.`,
+
+`A Sculptural Home in a Mar Vista 'Unicorn' Plot Organized Around Courtyards
+
+Largely inspired by canyon and meadow architecture, this sizable two-story single-family private residence designed by Hsu McCullough for AIH Development is located in Los Angeles' Mar Vista neighborhood. The new construction is chevron-shaped and its scale flares from front to rear, and the wedged plot is consequently much larger than the exterior view might suggest at first impression.
+
+The home is characterized by its series of courtyards. Beyond their physical attributes, these courtyard spaces serve passive cooling and can often push heat out, helping to reduce energy consumption.
+
+Indeed, at 11,341 sq ft, the area is remarkably large when compared to the average footage in the Mar Vista neighborhood. The studio responded to the 'unicorn' plot by devising a contemporary spatial experience and generously organizing the floorplan around a core of a large courtyard and accompanying swimming pool, poolhouse, and barbeque area.
+
+A walkway along concrete block stepping pavers indicates entrance legibility, leading to midcentury-inspired breeze block fences that frame a serene enclosed front courtyard.
+
+Inside, an atrium with set stones influenced by Japanese zen gardens illuminates the space with a soft glow and a therapeutic landscape.
+
+Hsu McCullough took a medium-tone approach with wood and concrete leading the palette, allowing ample opportunity for the homeowners' furniture and artwork to inject color into the home.
+
+The open-plan living room, dining room, and kitchen are characterized by a monochromatic play in the white oak across the flooring, cabinetry, and walls, with the hue of the wood darkening as it transitions upwards.
+
+All across the home, the outside spills inside with the abundant use of floor-to-ceiling glass walls, highlighting the hues of wood.
+
+A sleek black dominates the detailing and the house features clean, minimal accents throughout. Slim fireplaces are built into Nero Marquina and slatted wood combination feature walls in the living space and primary suite. Black window frames anchored to the flooring add visual interest and frame the outdoors.
+
+The kitchen features a walk-in pantry, Sub Zero and Wolf appliances, and a Calacatta marble island with a countertop decked with a Dornbracht faucet and book-matched slabs.
+
+Moving away from the traditional placement of the stairs in the entryway, Hsu McCullough devised a more natural and intuitive interior flow and chose to tuck it inwards instead. A sculptural feature and statement piece of its own, the staircase is a mono stringer featuring treads in white oak and balustrades in steel rods that run the entire height of the first-floor view, creating a dynamic play of shadows in the daytime.
+
+A tall narrow window illuminates the second-floor hallway and allows for cheeky two-way viewing.
+
+On the upper floor are three ensuite bedrooms on one diagonal of the chevron shape and the primary suite and home office on the other.
+
+The primary suite features a large walk-in closet with secondary laundry appliances and a fireplace feature wall, looking to the courtyard with a close-up view of the legacy tree below. The use of a juliet balcony with sliding doors is a simple configuration that adds substantial airiness to the room while introducing a social dynamic with the outdoors.
+
+Outside, the centerpiece of the courtyard is a new rectangular saltwater pool along with an attached spa and accompanying wooden deck, as well as spaces like a barbeque area and a dining area with its fireplace.
+
+Hsu McCullough also added a monolithic concrete pool house/ADU to accommodate guests and provide entertaining amenities. The tall vegetation on its green roof is a subtle technique of providing privacy from neighboring homes without infringing on the neighborhood's panorama.
+
+The plot had existing unkempt and overgrown vegetation — a serendipitous finding for the studio. After an exhaustive process of trimming and cleaning, two retained mature trees now stand out in a tidy landscape. A circular tree bench was installed around the trunk of the elm tree and offers a cinematic view of the entire home.
+
+The studio used a scissor lift in the pre-design phase to investigate access to views and optimize orientation accordingly. Thanks to the uninterrupted views across low-rise properties, the plot gives the distinct impression of being within an 'urban canyon.' They made the most out of this rare opportunity by integrating a rooftop terrace. An exterior staircase leads to a distinctive oval-shaped rooftop with a kitchenette equipped with a refrigerator, warming drawer, ice maker, and fire kit.
+
+Dog-friendly 'barkitecture' details are integrated throughout the property, like the use of floor-to-ceiling windows on the second floor and a bowl station in the primary laundry room.
+
+All in all, the home comprises six bedrooms, seven bathrooms, a pool house/ADU, a three-car garage, a gym/activity suite, a home office, and two laundry areas.`,
+
+`Enlarging a Turn-of-the-Century Craftsman Home in Culver City
+
+This modestly-sized residential renovation project by architecture studio Hsu McCullough is located in Culver City, in the vicinity of Sony Pictures Studios. A turn-of-the-century Craftsman home, the structure was built in 1917 and is currently part of Culver City's Historic Preservation Program in recognition of its architectural and cultural importance.
+
+Hsu McCullough worked on additions and alterations in a two-phase project over six years, first beginning with the restoration and enlargement of the primary home and later renewing the collaboration to add a large accessory dwelling unit (ADU).
+
+In their approach to the project, both the studio and the homeowners strictly didn't want to "turn their back" on its heritage or detract from Los Angeles legacy by forcing out-of-place design trends. They embraced and respected the original structure by maintaining its unpretentious Craftsman characteristics and opting for transitional additions.
+
+Upstairs in the main home, they recovered what was primarily a storage attic into an enlarged, habitable space with new windows by utilizing the surface area of the dormers and exposing the ceilings to create a master suite, laundry area, nursery, and corresponding bathroom.
+
+Downstairs, French doors open to a brand new southern-style back porch and raised deck in unfinished wood, adding a much-needed outdoor gathering space to the home. A pair of armless 'Maya' chairs in oversized proportions by **Room & Board** open the area for everyday lounging under the shade of the new eaves, overlooking an array of orange trees.
+
+The homeowners — a couple with two children — frequently host visiting family members and requested additional habitable space to accommodate them comfortably. The largest addition by Hsu McCullough during the second phase of the collaboration is a detached ADU to replace the messy garage they tore down. They used the existing main house as a significant reference while modeling this new unit, inspired by its scale, sloping, dormers, detailing, and color scheme. They mimicked its shiplap siding, curvature, and cream facade in a complex and meticulous woodworking process and installed replica 1917 wood windows by **T.M. Cobb**.
+
+A pocket sliding door in black anodized aluminum finish offers unobstructed views into the garden and cheekily dialogues with the main home. The living room is furnished with minimal design pieces, including a sofa by **Room & Board**, the 'Bandelier Arm Chair' in light oak by **Safavieh**, a rug from **Rejuvenation**, Moroccan leather poufs from **Ikram Design**, and white oak shaker cabinetry. A loft ladder with white oak treads by **Alaco** ascends into a multifunctional space upstairs. Adjacent, the homeowners' recording studio is tucked away with its own entry access.
+
+Wall/floor tiles by **Daltile** and polished chrome fixtures from **KOHLER** characterize the bathroom. Fully stocked and ready to welcome, the kitchen features a soapstone countertop and backsplash, sink and faucet from **Ferguson**, white oak shaker custom cabinetry, and an under-counter **Frigidaire** refrigerator.`,
+
+`Stacking from Shallow to Deep
+
+The winning design for the new maritime museum in Sanya Yazhou Bay Science and Technology City highlights the deep-water explorations conducted throughout the ages and their discoveries.
+
+Spread across a site area of 20,488 square metres, the museum complex comprises exhibition halls, cultural spaces, curatorial facilities, offices area, a cinema, a retail store, themed dining areas, and a terrace.
+
+In a design concept set to establish the museum as a flagship landmark upon its grand opening, the Sanya Yazhou Bay Maritime Museum embodies the depths and the movement of the sea with its layout, structure, materiality and form, while employing an architectural language that harmoniously blends modern technology with the regional Hainan style.
+
+Evoking the ocean waves, the main cladding along the back of the facade flows in a zigzagged, streamlined manner that resembles waves and currents and echoes the interior exhibition layout. It was modelled using the latest parametric techniques to prioritise both energy efficiency and aesthetics.
+
+The journey begins in a vast, full-height lobby — the core of the building — rich with natural light and large-scale focal points, where visitors begin to feel the distinct impression of submerging, diving, and delving in the water. Thanks to elevator access in the lobby, the exhibition halls continuously flow from top to bottom, similar to that of a swim, dive, or research expedition through the deep sea. Their experience is an exploration through the different depths of the ocean: the Epipelagic Zone, Bathyal Zone, Mesopelagic Zone, and Abyssal Zone. Moving downwards, a series of escalators and a wide staircase make the vertical connectivity a fluid experience from one exhibition area to the next.
+
+The light diffuses into the exhibition halls. Balconies are embedded as pockets within the shell to connect visitors with the outdoors, offering moments of sunlight that contrast the more dimly-lit experience inside while creating a connection with the surrounding urban environment.
+
+Further encapsulating marine ecologic realms, the space appears to be engulfed in water when walking between the changing lights and colours. Large features suspended mid-air in between these open spaces, much like the astonishing sealife one would encounter in an oceanic experience.
+
+Ceramic tiles — anti-alkali, corrosion resistant, and coated with long-lasting paint suitable for Sanya's coastal climate — undulate across the lobby's curtain wall. The perforated skin envelope makes use of a simple, yet also dynamic, approach that reflects the elegance from the museum, modelled using the latest parametric techniques to prioritise both energy efficiency and aesthetics. The gradient grey-blue terrazzo floor and materials match the theme and sequence of the exhibition, enhancing the experience of exploration from shallow to deep sea. The ocean-blue aluminium parapets guide visitors through the journey, and wave shadows cast by the façade glass create a sense of immersion in the deep blue ocean.
+
+From the flowing ceiling of the exhibition hall, through the continual changes in light and colour that evoke a rhythmic aquatic landscape, to the large-scale exhibits that hang suspended as if submerged, the architecture references the undulation of deep oceanic currents and the fluid pulse of the sea.`,
+
+`Intro
+
+The Hangzhou Boiler Factory has had a key position in Hangzhou's industrial landscape since it first opened in the 1950s — renowned for the boilers and pressure vessels it sold across the continent. In 2013, operations relocated to new premises leaving industrial relics behind.
+
+After years of abandonment and decay, the disused factory is set to house a cultural center with two new additions that establish it as the new home base of the Hangzhou Philharmonic Orchestra: a 1600-seat concert hall and an office building. The hope is that the rehabilitation and development project will awaken traces of the factory's industrial legacy, revitalize its isolated context, and activate its socio-economic potential.
+
+Intervening for the sake of music
+
+The former steam drum container workshop played a significant role in the city's industrial boom and has now come to represent a prosperous era for the Chengbei Industrial Zone. It also boasted the largest single-span building in Asia at its opening.
+
+To retain the industrial heritage of the factory while allowing for new functions and structural safety, the five-span roof and one portion of the facade of the original factory building are removed. These make way for a cylinder mass that has a 1600-seat vineyard-style concert hall at its core — its form a nod to the tubular steam drums that the factory once produced. Standalone, the new implant frames the existing factory building with a curved overflow to its west side to keep its influence on the original footprint minimal. The addition injects airy contemporaneity and maintains its distinct identity without attempting to imitate the visual language of its neighbor. The transparency of the bottom portion of its curtain wall facade invites daylight to bathe the interior, counteracting the cocooned environment required for orchestra performances.
+
+Expanding the factory on one side is a new building addition that houses ancillary facilities for the orchestra, including offices and music rooms. Its building envelope is characterized by rounded corners that gently taper off the rigidness of the original factory. A sun-shading system likewise takes on curves in granting sun control around the perimeter.
+
+Co-existing with industrial heritage
+
+Besides the five-span roof and one part of the facade, all original components of the factory are retained. However, the seismic performance of the original factory building structure does not meet the requirements of the local seismic design code, and certain components, such as the original roof panels and trusses, require reinforcement.
+
+The first floor of the original factory enjoys the wide area and circulation distinctive of factory staging areas. Enclosed by the original factory roof, the main floor area is conceived as an "indoor living room" with an area of about 3,000 square meters that becomes a leisure venue for visitors, ready to host events ranging from music festivals to fairs.
+
+Other spaces are designed as enclosed configurations to allow for additional functions and their corresponding acoustic needs. A 650-seat secondary concert hall is dominated by wooden wallcoverings and flooring. Its interior adds the layer of richness and opulence that is associated with orchestral tradition, softening the predominant use of concrete across the factory.`,
+
+`Newfound Glory
+
+VOITH & MACTAVISH ARCHITECTS RESTORE A 19TH-CENTURY VICTORIAN TOWNHOUSE IN PHILADELPHIA'S RITTENHOUSE SQUARE
+
+The clients, a couple, were looking to relocate to Philadelphia from Delaware. After viewing thirteen homes, they stumbled across an 8,000 sq. ft. four-story townhouse in Center City's Rittenhouse Square. As avid classical music fans, its vicinity to the Philadelphia Orchestra was a major factor that helped shape their eventual purchasing decision.
+
+First built in the mid-19th century during a building boom, the home frequently changed hands and needed significant interior and exterior work. A fire had destroyed much of the original interiors and corresponding details in the early 1900s, leaving few original features unscathed — such as some staircases, paneling, and a fireplace. Later in the 1930s, the home was transformed into a doctor's clinic on the first floor with the accompanying residence on the remaining three, during which time the interior configurations were awkwardly rearranged to house examination rooms and formal areas.
+
+The clients wanted to respect the historical legacy of the home — both the Victorian exterior and the early 20th-century remodeling in the interior — all the while making room for their own stylistic preferences. Voith & Mactavish Architects (VMA) were brought on to renovate, restore, and reconfigure the townhouse in a meticulous multi-phase project spanning over eleven years.
+
+The architecture firm had previously worked on similar residential restoration projects in the city and had an existing lexicon of detail to work with. They supplemented that knowledge in a highly-investigative process with the clients, digging into archives, exploring neighboring homes, and taking cues from remnants such as those hidden behind dropped ceilings. The homeowners preferred Adamesque characteristics over Victorian, and the objective was to develop a cohesive balance between the two.
+
+The first phase covered the sub-basement, basement, first floor, a new garden, a new garage, and restoration of the south elevation. New mechanical and electrical systems were installed. The primary challenge at this stage was the restructuring of the "chopped up" doctor-office floor plan on the first floor for residential needs.
+
+Gardens were added in a collaboration with the landscape architect Victoria Steiger. The composition of these green areas, previously barren, places the interior viewer's gaze at the center and strategizes the placement of the features — a water-lily pond, a fountain wall, connecting loggia, vines supported by iron armatures, hedging — while maximizing sightlines from the seating and fenestration across the different floors. Paving patterns build the walking experience. The main garden won the Traditional Building and Period Homes Palladio Award under the "Exterior Spaces: Gardens & Landscapes" category in 2005. In the rear, a new garage was brought in — and on its roof, yet another garden.
+
+Replacing what were likely the original kitchen and service rooms in the rear is a new library, almost 50 feet long, with a design that was inspired by the 'long halls' of English country homes. The area is accessed with a new side entrance and enjoys expansive views of the garden.
+
+The second phase addressed the street façade and the remaining floors that encompass the primary kitchen, entertaining rooms, dining area, bedrooms, and home offices. The clients were required to relocate for an elongated period.
+
+The dining room on the second floor was reduced in size to place a mantelpiece at its very center. The extra space was granted to a full-scale commercial kitchen, which is decked with professional-grade appliances and twelve feet of cooking surfaces for high cooking capacity — so high that city building inspectors erroneously believed that the townhouse was being converted to a restaurant. Though unconventional, the choice of having the primary kitchen on the second floor is an example of how the firm tailored the home to the homeowner's needs, desires, and routines rather than the other way around. In this case, they specifically asked to have the traffic flow focused toward the second floor. A small catering kitchen serves the first floor.
+
+Two additional entertaining rooms were added, including one that was newly classified as the "music room". Both retain much of their original entertaining functions and features. An original fireplace and overmantel still stand in the music room and were faux-painted and gilded. Leaded glass admits daylight inwards in areas where window views were compromised.
+
+VMA collaborated with Executive Interiors for the furnishings of the home, much of which was a direct reconstruction of the historic ones (with an exception of a few rooms that were influenced by 18th-century English design, as per the clients' request). The project was never intended to act as a full replica of the original mid-19th-century form. After all, it is not a production location for a period film but rather a home where history can coexist with new beginnings. Case in point: modern features were welcomed in areas where they would allow for a superior living experience, such as in the bathrooms and kitchens where state-of-the-art amenities and fixtures were installed.
+
+The couple indulges in a variety of hobbies spanning multiple areas, from sailing to art collecting to cooking to music, and their intimate involvement in design decisions was essential to the development of character in the home. Additionally, they had amassed a sizable art collection over the years — primarily of abstract expressionist works and framed platinum photography prints — and the display potential of the collection was a major consideration in planning internal configurations and wallcoverings.
+
+VMA included the hardware, marble, sinks, handpainted wallpaper, and chandeliers the owners had acquired domestically and abroad, using the scant remaining pieces of the original material as reference. Perhaps most notably, a variety of historical fireplace mantelpieces that they picked out along with coal grates act as stately focal points in most of the common areas. Remaining faithful to the original was no easy feat in certain parts. Reconstructing the standing and running trim, in particular, required exhaustive research and a fair amount of guessing.
+
+The exterior of the townhouse respects neighborhood cohesion without any infringement on its fabric. Its interior actively exhibits the many functional possibilities of heritage restoration and reconstruction. Back in 1995, the Philadelphia Historical Commission designated Rittenhouse Square as a local historic district, and decades later, the legacy continues to thrive.`
+];
+
+function makeStoryRoom(){
+  const item = { id: nid() };
+  STORY_ROOM_FIELDS.forEach(f=> item[f.id] = '');
+  return item;
+}
+
+function freshStoryState(){
+  const fields = {};
+  STORY_FIELDS.forEach(f=> fields[f.id] = '');
+  return {
+    category: 'interiorDesign',
+    projectType: 'Residence',
+    fields,
+    rooms: [makeStoryRoom()],
+    notes: '',
+    editInstructions: '',
+    photos: [],
+    aiOutput: '',
+    aiNotice: '',
+    aiLoading: false,
+    aiError: ''
+  };
+}
+
+let storyState = freshStoryState();
+let storyPhotoUrls = [];
+
+function refreshStoryPhotoUrls(){
+  storyPhotoUrls.forEach(u=>{ try{ URL.revokeObjectURL(u); }catch(e){} });
+  storyPhotoUrls = storyState.photos.map(f=>URL.createObjectURL(f));
+}
+
+const STORY_AUTOSAVE_KEY = 'prwriter_story_autosave_v1';
+
+function saveStoryState(){
+  const snapshot = Object.assign({}, storyState);
+  delete snapshot.photos;
+  delete snapshot.aiLoading;
+  try{ localStorage.setItem(STORY_AUTOSAVE_KEY, JSON.stringify(snapshot)); }catch(e){}
+}
+
+function loadStoryState(){
+  try{
+    const raw = localStorage.getItem(STORY_AUTOSAVE_KEY);
+    if(!raw) return null;
+    const parsed = JSON.parse(raw);
+    parsed.photos = [];
+    parsed.aiLoading = false;
+    return parsed;
+  }catch(e){ return null; }
+}
+
+const savedStory = loadStoryState();
+if(savedStory){
+  storyState = Object.assign(freshStoryState(), savedStory, {
+    fields: Object.assign(freshStoryState().fields, savedStory.fields || {})
+  });
+  if(!Array.isArray(storyState.rooms) || !storyState.rooms.length) storyState.rooms = [makeStoryRoom()];
+  let maxRoomN = 0;
+  (storyState.rooms||[]).forEach(r=>{
+    if(r && typeof r.id==='string' && r.id[0]==='b'){
+      const n = parseInt(r.id.slice(1),10);
+      if(!isNaN(n) && n>maxRoomN) maxRoomN = n;
+    }
+  });
+  uid = Math.max(uid, maxRoomN);
+}
+
+const storyFormPane = document.getElementById('storyFormPane');
+const storyDocContainer = document.getElementById('storyDocContainer');
+const storyPreviewToolbar = document.getElementById('storyPreviewToolbar');
+
+function renderStoryCoreField(f){
+  const placeholder = storyFieldPlaceholder(f);
+  const input = f.type === 'textarea'
+    ? `<textarea data-storyfield="${f.id}" placeholder="${esc(placeholder||'')}">${esc(storyState.fields[f.id])}</textarea>`
+    : `<input type="text" data-storyfield="${f.id}" value="${esc(storyState.fields[f.id])}" placeholder="${esc(placeholder||'')}">`;
+  return `<div class="field-group">
+    <label>${esc(storyFieldLabel(f))}${storyFieldRequired(f)?' <span class="required-mark">*</span>':''}</label>
+    ${input}
+  </div>`;
+}
+
+function renderStoryForm(){
+  let html = '';
+
+  html += `<div class="subtype-select-wrap">
+    <label>Category</label>
+    <select id="storyCategorySelect">
+      ${Object.keys(CATEGORIES).map(k=>`<option value="${k}" ${k===storyState.category?'selected':''}>${CATEGORIES[k].label}</option>`).join('')}
+    </select>
+  </div>`;
+
+  html += `<div class="subtype-select-wrap">
+    <label>Project type</label>
+    <select id="storyProjectTypeSelect">
+      ${PROJECT_TYPES.map(t=>`<option value="${esc(t)}" ${t===storyState.projectType?'selected':''}>${esc(t)}</option>`).join('')}
+    </select>
+  </div>`;
+
+  html += `<div class="section-title">Photos (optional)</div>`;
+  html += `<div class="guidance" style="margin:-2px 0 8px;">Add up to 10 photos of the finished project. The tool will analyze the photos you upload and describe what it sees. Do not upload if you don't want to activate that feature.</div>`;
+  html += `<input type="file" id="storyPhotoInput" accept="image/*" multiple ${storyState.photos.length>=10?'disabled':''}>`;
+  if(storyState.photos.length){
+    html += `<div class="photo-grid">`;
+    storyState.photos.forEach((file, idx)=>{
+      html += `<div class="photo-thumb"><img src="${storyPhotoUrls[idx]||''}" alt=""><button data-delphoto="${idx}" title="Remove">✕</button></div>`;
+    });
+    html += `</div>`;
+    html += `<div class="guidance" style="margin:6px 0 0;">${storyState.photos.length} / 10 photos added</div>`;
+  }
+
+  html += `<div class="hint-banner">Fill in the core details below — no need to write full sentences. The tool writes the full project story from these facts (and any photos you add) when you click "Generate Project Story."</div>`;
+
+  html += `<div class="field-group">
+    <label>Notes</label>
+    <textarea id="storyNotes" class="notes-field" placeholder="Enter any notes that might be useful. Write them as a train of thought, bullet points, or however you prefer.">${esc(storyState.notes)}</textarea>
+  </div>`;
+
+  html += `<div class="ad-banner">PLACE YOUR AD HERE<a class="ad-banner-link" href="https://www.patreon.com/16724522/join" target="_blank" rel="noopener noreferrer">Purchase</a></div>`;
+
+  STORY_FIELDS.forEach(f=>{ if(!f.renderAtEnd && shouldShowStoryField(f)) html += renderStoryCoreField(f); });
+
+  html += `<div class="section-title">Rooms / Spaces</div>`;
+  storyState.rooms.forEach((room, idx)=>{
+    html += `<div class="block-card">
+      <div class="block-card-head">
+        <span class="block-type-label">Room ${idx+1}</span>
+        <div class="block-actions"><button class="icon-btn danger" data-delroom="${room.id}" title="Remove">✕</button></div>
+      </div>`;
+    STORY_ROOM_FIELDS.forEach(f=>{
+      const input = f.type === 'textarea'
+        ? `<textarea data-roomfield="${f.id}" data-id="${room.id}" placeholder="${esc(f.placeholder||'')}">${esc(room[f.id])}</textarea>`
+        : `<input type="text" data-roomfield="${f.id}" data-id="${room.id}" value="${esc(room[f.id])}" placeholder="${esc(f.placeholder||'')}">`;
+      html += `<div class="field-group"><label>${esc(f.label)}</label>${input}</div>`;
+    });
+    html += `</div>`;
+  });
+  html += `<button class="btn small" id="addRoomBtn">+ Add Room / Space</button>`;
+
+
+  html += `<div class="section-title">Edit instructions</div>
+  <div class="field-group">
+    <textarea id="storyEditInstructions" placeholder="Don't like the result? You can request edits here and click Regenerate.">${esc(storyState.editInstructions)}</textarea>
+  </div>`;
+  STORY_FIELDS.forEach(f=>{ if(f.renderAtEnd && shouldShowStoryField(f)) html += renderStoryCoreField(f); });
+  html += `<button class="btn primary small" id="storyGenerateBtn" style="margin:4px 0 16px;" ${storyState.aiLoading?'disabled':''}>${storyState.aiOutput ? '✨ Regenerate' : '✨ Generate Project Story'}</button>`;
+  html += `<div class="ad-banner">PLACE YOUR AD HERE<a class="ad-banner-link" href="https://www.patreon.com/16724522/join" target="_blank" rel="noopener noreferrer">Purchase</a></div>`;
+
+  html += `<div class="section-title">FAQ</div>
+  <div class="faq-list">
+    <details class="faq-item">
+      <summary>What do I write for a project description for my interior design website?</summary>
+      <p>Open with the client's needs and the concept that shaped your response — the mood, function, or story you were solving for. Then walk through key design decisions: spatial layout, materials, furniture, and finishes, along with any challenges you navigated along the way. Close with the outcome and how the space now serves the people who use it.</p>
+    </details>
+    <details class="faq-item">
+      <summary>What do I write for a project description for my architecture practice?</summary>
+      <p>Start with the site and brief — the context, constraints, and client vision that framed the project. Then detail your design response: form, materials, structure, and sustainability strategies, along with any technical or planning challenges you solved. End with how the building performs and relates to its surroundings now that it's complete.</p>
+    </details>
+    <details class="faq-item">
+      <summary>What is the project description of interior design and architecture used for?</summary>
+      <p>It's an important step to take. It can be used for your site, project pitches to PR, or for brochure and book publications. It's the ultimate way to communicate your vision, challenges, and the thinking behind the work.</p>
+    </details>
+  </div>`;
+
+  storyFormPane.innerHTML = html;
+  attachStoryFormEvents();
+}
+
+function attachStoryFormEvents(){
+  const catSel = document.getElementById('storyCategorySelect');
+  if(catSel) catSel.addEventListener('change', e=>{
+    storyState.category = e.target.value;
+    storyState.aiOutput = ''; storyState.aiNotice = ''; storyState.aiError = ''; storyState.aiLoading = false;
+    renderStoryForm(); renderStoryPreview(); renderStoryToolbar(); saveStoryState();
+  });
+
+  const typeSel = document.getElementById('storyProjectTypeSelect');
+  if(typeSel) typeSel.addEventListener('change', e=>{
+    storyState.projectType = e.target.value;
+    saveStoryState();
+    renderStoryForm();
+    renderStoryPreview();
+  });
+
+  const notesEl = document.getElementById('storyNotes');
+  if(notesEl) notesEl.addEventListener('input', e=>{ storyState.notes = e.target.value; saveStoryState(); });
+
+  storyFormPane.querySelectorAll('[data-storyfield]').forEach(el=>{
+    el.addEventListener('input', e=>{
+      storyState.fields[e.target.getAttribute('data-storyfield')] = e.target.value;
+      saveStoryState();
+    });
+  });
+
+  storyFormPane.querySelectorAll('[data-roomfield]').forEach(el=>{
+    el.addEventListener('input', e=>{
+      const id = e.target.getAttribute('data-id');
+      const field = e.target.getAttribute('data-roomfield');
+      const room = storyState.rooms.find(r=>r.id===id);
+      if(room) room[field] = e.target.value;
+      saveStoryState();
+    });
+  });
+
+  const addRoomBtn = document.getElementById('addRoomBtn');
+  if(addRoomBtn) addRoomBtn.addEventListener('click', ()=>{
+    storyState.rooms.push(makeStoryRoom());
+    renderStoryForm(); saveStoryState();
+  });
+
+  storyFormPane.querySelectorAll('[data-delroom]').forEach(el=>{
+    el.addEventListener('click', e=>{
+      const id = e.target.getAttribute('data-delroom');
+      storyState.rooms = storyState.rooms.filter(r=>r.id!==id);
+      if(!storyState.rooms.length) storyState.rooms.push(makeStoryRoom());
+      renderStoryForm(); saveStoryState();
+    });
+  });
+
+  const photoInput = document.getElementById('storyPhotoInput');
+  if(photoInput){
+    photoInput.addEventListener('change', e=>{
+      const maxCount = 10;
+      const incoming = Array.from(e.target.files || []);
+      const room = maxCount - storyState.photos.length;
+      if(room <= 0){ alert(`You can add up to ${maxCount} photos.`); photoInput.value = ''; return; }
+      const accepted = incoming.slice(0, room);
+      if(incoming.length > accepted.length){
+        alert(`Only the first ${accepted.length} photo(s) were added — the limit is ${maxCount} photos.`);
+      }
+      storyState.photos = storyState.photos.concat(accepted);
+      refreshStoryPhotoUrls();
+      renderStoryForm();
+    });
+  }
+
+  storyFormPane.querySelectorAll('[data-delphoto]').forEach(el=>{
+    el.addEventListener('click', e=>{
+      const idx = +e.target.getAttribute('data-delphoto');
+      storyState.photos.splice(idx,1);
+      refreshStoryPhotoUrls();
+      renderStoryForm();
+    });
+  });
+
+  const editEl = document.getElementById('storyEditInstructions');
+  if(editEl) editEl.addEventListener('input', e=>{ storyState.editInstructions = e.target.value; saveStoryState(); });
+
+  const genBtn = document.getElementById('storyGenerateBtn');
+  if(genBtn) genBtn.addEventListener('click', callStoryClaudeAPI);
+}
+
+function getStoryCreditsText(){
+  const lines = STORY_CREDIT_FIELDS
+    .filter(storyCreditFieldVisible)
+    .map(f=>{ const v=(storyState.fields[f.id]||'').trim(); return v ? `${f.creditLabel}: ${v}` : null; })
+    .filter(Boolean);
+  if(!lines.length) return '';
+  return 'PROJECT CREDITS\n\n' + lines.join('\n');
+}
+
+function getStoryAboutText(){
+  const content = (storyState.fields.aboutDesigner||'').trim();
+  if(!content) return '';
+  const name = (storyState.fields.designerFirm||'').trim();
+  return `ABOUT ${name ? name.toUpperCase() : 'THE DESIGNER'}\n\n${content}`;
+}
+
+// The AI marks brand/artist names with **double asterisks**; kept literally in
+// storyState.aiOutput (never stripped there) so bolding is re-derived fresh on
+// every render, surviving contenteditable edits without needing stored markup.
+function applyStoryBold(escapedText){
+  return escapedText.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+}
+function stripStoryBold(text){
+  return text.replace(/\*\*(.+?)\*\*/g, '$1');
+}
+
+function getStoryActiveText(){
+  if(!storyState.aiOutput) return '';
+  const parts = [stripStoryBold(storyState.aiOutput), getStoryCreditsText(), getStoryAboutText()].filter(Boolean);
+  return parts.join('\n\n');
+}
+
+// Rich-text version for clipboard copy — keeps brand/artist names bold when
+// pasted into Word, Gmail, Google Docs, etc.
+function getStoryActiveHTML(){
+  if(!storyState.aiOutput) return '';
+  const paras = storyState.aiOutput.split(/\n\s*\n/).map(s=>s.trim()).filter(Boolean);
+  let html = '';
+  paras.forEach((p, idx)=>{
+    if(idx===0) html += `<p style="font-weight:700;margin:0 0 16px;">${applyStoryBold(esc(p))}</p>`;
+    else html += `<p style="margin:0 0 12px;">${applyStoryBold(esc(p))}</p>`;
+  });
+  const creditLines = STORY_CREDIT_FIELDS
+    .filter(storyCreditFieldVisible)
+    .map(f=>{ const v=(storyState.fields[f.id]||'').trim(); return v ? `<b>${esc(f.creditLabel)}:</b> ${esc(v)}` : null; })
+    .filter(Boolean);
+  if(creditLines.length){
+    html += `<p style="font-weight:700;margin:16px 0 8px;">PROJECT CREDITS</p>`;
+    html += `<p style="margin:0 0 12px;">${creditLines.join('<br>')}</p>`;
+  }
+  const aboutContent = (storyState.fields.aboutDesigner||'').trim();
+  if(aboutContent){
+    const name = (storyState.fields.designerFirm||'').trim();
+    html += `<p style="font-weight:700;margin:16px 0 8px;">ABOUT ${esc(name ? name.toUpperCase() : 'THE DESIGNER')}</p>`;
+    html += `<p style="margin:0 0 12px;">${esc(aboutContent)}</p>`;
+  }
+  return html;
+}
+
+function buildStoryOutputHTML(){
+  let inner = '';
+  if(storyState.aiNotice){
+    const bullets = storyState.aiNotice.split('\n').map(l=>l.trim()).filter(l=>l.startsWith('-')).map(l=>l.replace(/^-\s*/,''));
+    inner += `<div class="ai-notice">
+      <div class="ai-notice-title">A couple of things before I can generate this</div>
+      <ul>${bullets.map(b=>`<li>${esc(b)}</li>`).join('')}</ul>
+    </div>`;
+  }
+  if(storyState.aiOutput){
+    const paras = storyState.aiOutput.split(/\n\s*\n/).map(s=>s.trim()).filter(Boolean);
+    let editable = '';
+    paras.forEach((p, idx)=>{
+      if(idx===0) editable += `<div class="doc-headline">${applyStoryBold(esc(p))}</div>`;
+      else editable += `<p>${applyStoryBold(esc(p))}</p>`;
+    });
+    const canEdit = !storyState.aiLoading;
+    inner += `<div id="storyOutputRegion" ${canEdit?'contenteditable="true"':''}>${editable}</div>`;
+    if(!storyState.aiLoading){
+      inner += `<div class="guidance" style="margin:4px 0 0;">Click into the text above to edit it directly.</div>`;
+      const creditsText = getStoryCreditsText();
+      if(creditsText){
+        const creditLines = STORY_CREDIT_FIELDS
+          .filter(storyCreditFieldVisible)
+          .map(f=>{ const v=(storyState.fields[f.id]||'').trim(); return v ? `<strong>${esc(f.creditLabel)}:</strong> ${esc(v)}` : null; })
+          .filter(Boolean);
+        inner += `<div class="about-heading">PROJECT CREDITS</div>`;
+        inner += `<p>${creditLines.join('<br>')}</p>`;
+      }
+      const aboutContent = (storyState.fields.aboutDesigner||'').trim();
+      if(aboutContent){
+        const name = (storyState.fields.designerFirm||'').trim();
+        inner += `<div class="about-heading">ABOUT ${esc(name ? name.toUpperCase() : 'THE DESIGNER')}</div>`;
+        inner += `<p>${esc(aboutContent)}</p>`;
+      }
+    }
+  } else if(storyState.aiLoading){
+    inner += `<p class="empty-note"><span class="spinner"></span>Thinking…</p>`;
+  } else if(storyState.aiError){
+    inner += `<p class="ai-status error">Something went wrong: ${esc(storyState.aiError)}</p>`;
+  } else if(!storyState.aiNotice){
+    inner += `<p class="empty-note">Fill in the fields on the left, then click "✨ Generate Project Story" — the tool will write it from scratch by analyzing both your photos and notes.</p>`;
+  }
+  return `<div class="doc">${inner}</div>`;
+}
+
+function renderStoryPreview(){
+  storyDocContainer.innerHTML = buildStoryOutputHTML();
+  const editableRegion = document.getElementById('storyOutputRegion');
+  if(editableRegion){
+    editableRegion.addEventListener('input', ()=>{
+      const paras = Array.from(editableRegion.children).map(el=>el.innerText.trim()).filter(Boolean);
+      storyState.aiOutput = paras.join('\n\n');
+      saveStoryState();
+    });
+  }
+  saveStoryState();
+}
+
+function renderStoryToolbar(){
+  let html = '';
+  const hasOutput = !!storyState.aiOutput;
+  html += `<button class="btn primary small" id="storyGenerateBtnTop" ${storyState.aiLoading?'disabled':''}>${storyState.aiLoading?'Writing…':(hasOutput ? '✨ Regenerate' : '✨ Generate Project Story')}</button>`;
+  html += `<button class="btn small" id="storyCopyBtn" ${hasOutput?'':'disabled'}>Copy Text</button>`;
+  html += `<button class="btn small" id="storyDownloadBtn" ${hasOutput?'':'disabled'}>Download .txt</button>`;
+
+  storyPreviewToolbar.innerHTML = html;
+
+  const genBtn = document.getElementById('storyGenerateBtnTop');
+  if(genBtn) genBtn.addEventListener('click', callStoryClaudeAPI);
+
+  document.getElementById('storyCopyBtn').addEventListener('click', async ()=>{
+    const plain = getStoryActiveText();
+    const richHtml = getStoryActiveHTML();
+    try{
+      if(window.ClipboardItem && richHtml){
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            'text/plain': new Blob([plain], {type:'text/plain'}),
+            'text/html': new Blob([richHtml], {type:'text/html'})
+          })
+        ]);
+      } else {
+        await navigator.clipboard.writeText(plain);
+      }
+    } catch(e){
+      try{ await navigator.clipboard.writeText(plain); }catch(e2){}
+    }
+    const btn = document.getElementById('storyCopyBtn');
+    const old = btn.textContent; btn.textContent = 'Copied!';
+    setTimeout(()=>btn.textContent=old, 1200);
+  });
+
+  document.getElementById('storyDownloadBtn').addEventListener('click', ()=>{
+    const blob = new Blob([getStoryActiveText()], {type:'text/plain'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const firstLine = (storyState.aiOutput.split('\n').find(l=>l.trim()) || '').trim();
+    const name = (firstLine || 'project-story').slice(0,60).replace(/[^\w\-]+/g,'-');
+    a.href = url; a.download = name + '.txt';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+}
+
+function fileToBase64(file){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function callStoryClaudeAPI(){
+  const editInstructions = (storyState.editInstructions || '').trim();
+  const previousOutput = storyState.aiOutput;
+  const isRevision = !!(editInstructions && previousOutput);
+
+  storyState.aiLoading = true;
+  storyState.aiError = '';
+  storyState.aiNotice = '';
+  renderStoryToolbar();
+  renderStoryPreview();
+  const genBtn = document.getElementById('storyGenerateBtn');
+  if(genBtn) genBtn.disabled = true;
+
+  const lines = [];
+  lines.push(`Project type: ${storyState.projectType} (${CATEGORIES[storyState.category].label})`);
+  STORY_FIELDS.forEach(f=>{
+    if(storyFieldCreditsOnly(f)) return;
+    if(!shouldShowStoryField(f)) return;
+    const val = (storyState.fields[f.id] || '').trim();
+    if(val) lines.push(`${storyFieldLabel(f)}: ${val}`);
+  });
+  const roomLines = [];
+  storyState.rooms.forEach((room, i)=>{
+    const parts = STORY_ROOM_FIELDS.map(f=>{ const v = (room[f.id]||'').trim(); return v ? `${f.label}: ${v}` : null; }).filter(Boolean);
+    if(parts.length) roomLines.push(`Room/space ${i+1} — ${parts.join('; ')}`);
+  });
+  const factsOutline = lines.join('\n') + (roomLines.length ? '\n\n' + roomLines.join('\n') : '');
+  const examples = getStoryStyleExamples(storyState.category).join('\n\n---\n\n');
+
+  const voiceNote = storyState.category === 'architecture'
+    ? 'This is for an architecture practice: favor precise, spatial, technical-but-elegant language (massing, form, materiality, program).'
+    : 'This is for an interior design studio: favor warm, sensory, editorial language appropriate to a portfolio piece, in the tradition of design-press features like Architectural Digest or Elle Decor.';
+
+  const clientStoryGiven = (storyState.fields.clientStory || '').trim();
+  const clientStoryRule = clientStoryGiven
+    ? '\n- The "Client story / background" fact is important editorial material, not a footnote: use it to open the piece with a narrative hook about who the client is and what shaped the brief (their profession, personality, how they found the property, what they wanted from the space), the way a design-press feature would, before moving into the design itself. Never invent details about the client beyond what\'s given.'
+    : '';
+
+  const brandsGiven = (storyState.fields.brandsAndArt || '').trim();
+  const brandRule = brandsGiven
+    ? '\n- The user has listed brands and/or artists featured in this project (see "Brands, artists & notable pieces" below), but you cannot know for certain which specific piece in a photo corresponds to which listed name. When you describe a piece that appears to be a designer, branded, or artist-made item, insert the literal placeholder text "[BRAND]" (for furniture/product brands) or "[ARTIST]" (for artwork) immediately after it — e.g., "a lounge chair by [BRAND]" or "a sculpture by [ARTIST]" — instead of guessing which one it is. Never invent a brand or artist name, and never assign one of the listed names to a specific item unless the user\'s own room notes explicitly pair them.'
+    : '';
+
+  const revisionRule = isRevision
+    ? '\n- This is a revision of the CURRENT DRAFT given below (found right before FACTS): preserve its wording and structure except where the REQUESTED CHANGES require a change. Do not regenerate from scratch or rewrite parts that weren\'t asked about.'
+    : '';
+  const taskIntroLine = isRevision
+    ? 'You are revising the CURRENT DRAFT below (found right before FACTS) according to the REQUESTED CHANGES that follow it. Use the FACTS and any attached PHOTOS only as ground truth — do not introduce anything beyond what is already given.'
+    : 'Using ONLY the FACTS below — plus anything you can accurately observe in the attached photos, if any — write an entirely original project story: a title, then a narrative that moves through the client/concept story and the rooms or spaces described.';
+  const revisionBlock = isRevision
+    ? `CURRENT DRAFT:\n\n${previousOutput}\n\nREQUESTED CHANGES:\n\n${editInstructions}\n\n`
+    : '';
+
+  const systemPrompt = `You are a senior editorial writer for the luxury design and architecture world, writing project stories (portfolio case studies) for a design studio's own site or press kit. ${voiceNote}
+
+${taskIntroLine}
+
+STRICT ACCURACY IS NON-NEGOTIABLE for anything not visible in a photo. Every specific claim not directly observable in an attached photo — names, dates, numbers, dimensions, materials, locations, awards — must come directly from FACTS or NOTES below. Never invent, infer, guess, or embellish a detail that isn't there or visible.
+
+When photos are attached, you MAY describe what you can actually see — layout, materials, colors, lighting, furniture, finishes — but only describe what is genuinely visible; do not invent details about parts of a room that aren't shown, and do not assume a photo shows a room it isn't paired with in FACTS.${clientStoryRule}${brandRule}
+
+This is a project story, not a news release — unlike hard news copy, warm, descriptive, editorial language about materials, atmosphere, and mood is appropriate and expected here, as long as it stays grounded in what was actually given or shown. Real project stories in this genre name specific pieces precisely — the item, its brand or maker, and its material or fabric where given (e.g. "a sofa by [BRAND] in Rogers & Goffigon wool plaid") rather than describing furnishings generically — so match that level of specificity wherever FACTS or room notes support it.
+
+Favor concrete, specific description over abstract or philosophical language: describe what was designed, chosen, sourced, and built — not what a space "means," "represents," or is "in dialogue with." Sensory and atmospheric detail is welcome when it's grounded in something specific and visible (a material, a color, a piece of furniture, a view); avoid vague metaphorical framing about a space "conversing with" its surroundings or embodying an abstract concept.
+
+The EXAMPLES below are real project stories in this genre — study them closely for voice: their vocabulary, how specifically they name pieces and materials, how a paragraph builds and moves between rooms, how confidently and plainly they state things (fact-dense and precise, not summarizing or philosophizing about what it all "means"). Match that voice tightly, but do not reuse or lightly rephrase any specific sentence, paragraph structure, or opening line from the EXAMPLES — same writer, different sentences each time. Some EXAMPLES include an "ABOUT [FIRM]" line at the end — ignore that convention entirely, since it's handled separately by this app, not by you. The EXAMPLES span a real range of registers, from grounded, plainly-stated residential renovation write-ups to more evocative, conceptual language fitting for major civic and cultural projects — match your register to the scale and nature of the FACTS given here, not to whichever example happens to be closest in the list.
+
+Never use these words or phrases, or close synonyms of them, anywhere in the story: ${BANNED_WORDS.join(', ')}.
+
+Also avoid these sentence patterns entirely:
+- Any "reads as" construction, including "[X] reads less as [Y] than as [Z]" contrastive constructions.
+- Ending a sentence with "...rather than [Y]" to negate an alternative (e.g., "in dialogue with the plants rather than set apart from them").
+- Opening a sentence with "Together," to summarize or synthesize what was just described (e.g., "Together, the elements of the living room distill the larger ambition of the house..."). Never use "Together," anywhere in the story, and never end the story with a summarizing/synthesizing sentence like this at all — end on the last concrete detail instead, no wrap-up sentence.
+- "[X] conceived not as [Y], but as [Z]" or any "not as [X], but as [Y]" contrastive construction (e.g., "a restaurant conceived not as a static backdrop for dining, but as an environment shaped by...").
+
+Rules:
+- Output structure: (1) a title for the project story, alone on its own line, as its own paragraph; (2) the body — flowing narrative paragraphs separated by blank lines, opening with the client/concept story where given, then moving through the rooms or spaces. Do not force one paragraph per room — follow the natural shape of the material, the way a real feature would (a paragraph may cover one room in depth or move through two related ones together). Do not add bold subheadings within the body.
+- Wrap every specific brand, maker, or artist name in double asterisks, e.g. "a sofa by **Roche Bobois**" — including the literal [BRAND] and [ARTIST] placeholder tokens, e.g. "a chair by **[BRAND]**". Bold only the name itself, never the surrounding words (correct: "a sofa by **Roche Bobois**"; wrong: "**a sofa by Roche Bobois**"). This is the one exception to "no markdown formatting" below.
+- Do NOT write your own credits block (Interior Design, Architecture, Builder, Landscape Design, Styling, Photography, Size, Lot Size, ADU Area, Bedrooms, Bathrooms) or "About the designer" section, even though some of those facts are given to you below — they're appended separately after your response, verbatim. Writing your own would create a duplicate.
+- If something in FACTS is missing or blank, simply don't mention it — never invent a placeholder.
+- You may also receive loose NOTES from the user — weave any relevant facts from the notes into the appropriate place, corrected and in full sentences. Ignore anything that's just the user thinking out loud.
+- Before finalizing, check every sentence against FACTS, NOTES, and what's genuinely visible in the photos: if a claim can't be traced back to one of those, cut it or rewrite the sentence without it.
+- There is no back-and-forth here — this is a single, one-shot request. If REQUESTED CHANGES or NOTES are ambiguous or incomplete, do NOT stop to ask a clarifying question — make the most reasonable interpretation and proceed.
+- Only if it is truly impossible to produce a story (e.g., almost no facts and no photos at all), skip writing one and respond with ONLY this instead: the exact line "NEEDS_INPUT" by itself, then 2-4 short bullet points (each starting with "- ") in plain, friendly language explaining what's blocking you. Nothing else in that case.
+- Return ONLY the final project story text — no preamble, no commentary, no markdown formatting other than the ** brand/artist bolding described above.${revisionRule}
+
+EXAMPLES (voice reference only — study closely, but write new sentences and structure, never copy these verbatim or near-verbatim):
+${examples}`;
+
+  try{
+    const userContent = [];
+    for(const file of storyState.photos){
+      const b64 = await fileToBase64(file);
+      userContent.push({ type:'image', source:{ type:'base64', media_type: file.type || 'image/jpeg', data: b64 } });
+    }
+    userContent.push({ type:'text', text: `${revisionBlock}FACTS:\n\n${factsOutline}${storyState.notes.trim() ? `\n\nNOTES:\n\n${storyState.notes.trim()}` : ''}` });
+
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        max_tokens: 4096,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userContent }]
+      })
+    });
+    if(!res.ok){
+      const errBody = await res.text();
+      let msg = errBody;
+      try{ msg = JSON.parse(errBody).error; }catch(e){}
+      throw new Error(`(${res.status}) ${msg}`);
+    }
+    const data = await res.json();
+    storyState.aiOutput = (data.content && data.content[0] && data.content[0].text) || '';
+    if(/^NEEDS_INPUT\b/i.test(storyState.aiOutput.trim())){
+      storyState.aiNotice = storyState.aiOutput.trim().replace(/^NEEDS_INPUT\s*/i, '');
+      storyState.aiOutput = previousOutput;
+    }
+  } catch(e){
+    storyState.aiError = e.message || String(e);
+  } finally {
+    storyState.aiLoading = false;
+    renderStoryToolbar();
+    renderStoryPreview();
+    const genBtn2 = document.getElementById('storyGenerateBtn');
+    if(genBtn2){
+      genBtn2.disabled = false;
+      genBtn2.textContent = storyState.aiOutput ? '✨ Regenerate' : '✨ Generate Project Story';
+    }
+  }
+}
+
+// ---------- init ----------
+renderForm();
+renderPreview();
+renderToolbar();
+renderStoryForm();
+renderStoryPreview();
+renderStoryToolbar();
+
+// ---------- tabs ----------
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click', ()=>{
+    if(t.classList.contains('disabled')) return;
+    const tabName = t.getAttribute('data-tab');
+    document.querySelectorAll('.tab').forEach(t2=>t2.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('pressLayout').hidden = tabName !== 'press';
+    document.getElementById('storyLayout').hidden = tabName !== 'story';
+  });
+});
+
+})();
+</script>
+</body>
+</html>
