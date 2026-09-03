@@ -606,8 +606,25 @@ const BANNED_WORDS = [
   'coexist', 'built around', 'itself', 'embedded', 'overhead',
   'therefore', 'but rather', 'unfolds', 'govern', 'consistent',
   'plane', 'considered', 'demand', 'genuine', 'genuinely',
-  'gamechanger', 'commanding', 'reads as part', 'reads as', 'the result', 'compete for attention', 'restrained vocabulary'
+  'gamechanger', 'commanding', 'reads as part', 'reads as', 'the result', 'compete for attention', 'restrained vocabulary',
+  'labyrinth', 'enigma', 'nestled', 'remnant', 'indelible', 'metamorphosis',
+  'a testament to', 'sounds unheard', 'sights unseen', 'shows up', 'woven', 'sensibility'
 ];
+
+// Sentence-level patterns, shared between the press release and project story
+// prompts so both stay in sync — never duplicate this list inline elsewhere.
+const BANNED_SENTENCE_PATTERNS = [
+  '"Rather than [X], it/they [Y]" or "Rather than...it can..." contrastive constructions.',
+  '"As much by [X] as [Y]" parallel-comparison constructions.',
+  'Grouping descriptive details into a list of exactly three items (e.g., "wood, stone, and light" or "food, wine, and water").',
+  'Any "reads as" construction, including "[X] reads less as [Y] than as [Z]" contrastive constructions.',
+  'Ending a sentence with "...rather than [Y]" to negate an alternative (e.g., "in dialogue with the plants rather than set apart from them").',
+  'Opening a sentence with "Together," to summarize or synthesize what was just described (e.g., "Together, the elements of the living room distill the larger ambition of the house..."). Never use "Together," anywhere in the text, and never end with a summarizing/synthesizing sentence like this at all — end on the last concrete detail instead, no wrap-up sentence.',
+  '"[X] conceived not as [Y], but as [Z]" or any "not as [X], but as [Y]" contrastive construction (e.g., "a restaurant conceived not as a static backdrop for dining, but as an environment shaped by...").'
+];
+function bannedSentencePatternsText(){
+  return BANNED_SENTENCE_PATTERNS.map(p => `- ${p}`).join('\n');
+}
 
 // Fixed "Project Facts" block — architecture only (see def.projectFacts below),
 // rendered at the very end of the release, appended programmatically (never
@@ -1551,9 +1568,7 @@ At the same time, thousands of different releases get written with this same voi
 Never use these words or phrases, or close synonyms of them, anywhere in the release: ${BANNED_WORDS.join(', ')}.
 
 Also avoid these sentence patterns entirely:
-- "Rather than [X], it/they [Y]" contrastive constructions.
-- "As much by [X] as [Y]" parallel-comparison constructions.
-- Grouping descriptive details into a list of exactly three items (e.g., "wood, stone, and light").
+${bannedSentencePatternsText()}
 
 The language must never be poetic or subjective. No lyrical or evocative descriptions, no editorializing about how a space or object feels, no unverifiable adjectives about mood or atmosphere. Stick to factual, concrete, objective statements — what was designed, built, chosen, unveiled, won, or said, described plainly.
 
@@ -2620,13 +2635,7 @@ The EXAMPLES below are real project stories in this genre — study them closely
 Never use these words or phrases, or close synonyms of them, anywhere in the story: ${BANNED_WORDS.join(', ')}.
 
 Also avoid these sentence patterns entirely:
-- Any "reads as" construction, including "[X] reads less as [Y] than as [Z]" contrastive constructions.
-- Ending a sentence with "...rather than [Y]" to negate an alternative (e.g., "in dialogue with the plants rather than set apart from them").
-- Opening a sentence with "Together," to summarize or synthesize what was just described (e.g., "Together, the elements of the living room distill the larger ambition of the house..."). Never use "Together," anywhere in the story, and never end the story with a summarizing/synthesizing sentence like this at all — end on the last concrete detail instead, no wrap-up sentence.
-- "[X] conceived not as [Y], but as [Z]" or any "not as [X], but as [Y]" contrastive construction (e.g., "a restaurant conceived not as a static backdrop for dining, but as an environment shaped by...").
-- "Rather than [X], it/they [Y]" or "Rather than...it can..." contrastive constructions.
-- "As much by [X] as [Y]" parallel-comparison constructions.
-- Grouping descriptive details into a list of exactly three items (e.g., "food, wine, and water").
+${bannedSentencePatternsText()}
 
 Rules:
 - Output structure: (1) a title for the project story, alone on its own line, as its own paragraph; (2) the body — flowing narrative paragraphs separated by blank lines, opening with the client/concept story where given, then moving through the rooms or spaces. Do not force one paragraph per room — follow the natural shape of the material, the way a real feature would (a paragraph may cover one room in depth or move through two related ones together). Do not add bold subheadings within the body.
