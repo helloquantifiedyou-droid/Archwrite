@@ -653,7 +653,8 @@ const BANNED_WORDS = [
   'plane', 'considered', 'demand', 'genuine', 'genuinely',
   'gamechanger', 'commanding', 'reads as part', 'reads as', 'the result', 'the result is', 'compete for attention', 'restrained vocabulary',
   'labyrinth', 'enigma', 'nestled', 'remnant', 'indelible', 'metamorphosis',
-  'a testament to', 'sounds unheard', 'sights unseen', 'shows up', 'woven', 'sensibility'
+  'a testament to', 'sounds unheard', 'sights unseen', 'shows up', 'woven', 'sensibility',
+  'afterthought', 'announced', 'deliberately', 'actually', 'literal', 'literally'
 ];
 
 // Sentence-level patterns, shared between the press release and project story
@@ -665,7 +666,8 @@ const BANNED_SENTENCE_PATTERNS = [
   'Any "reads as" construction, including "[X] reads less as [Y] than as [Z]" contrastive constructions.',
   'Ending a sentence with "...rather than [Y]" to negate an alternative (e.g., "in dialogue with the plants rather than set apart from them").',
   'Opening a sentence with "Together," to summarize or synthesize what was just described (e.g., "Together, the elements of the living room distill the larger ambition of the house..."). Never use "Together," anywhere in the text, and never end with a summarizing/synthesizing sentence like this at all — end on the last concrete detail instead, no wrap-up sentence.',
-  '"[X] conceived not as [Y], but as [Z]" or any "not as [X], but as [Y]" contrastive construction (e.g., "a restaurant conceived not as a static backdrop for dining, but as an environment shaped by...").'
+  '"[X] conceived not as [Y], but as [Z]" or any "not as [X], but as [Y]" contrastive construction (e.g., "a restaurant conceived not as a static backdrop for dining, but as an environment shaped by...").',
+  'Describing something by what it is NOT, avoids, or that a client "didn\'t want," as a recurring device — e.g. "not the literal kind," "avoids belonging to a single story," "didn\'t want a home that announced itself as," "letting objects sit out rather than be edited away." One such construction is fine if the facts genuinely call for a contrast; using this negation-first framing repeatedly across a single piece reads as an affected tic. Lead with the positive, concrete fact — what something IS, was chosen, or was included — rather than what it isn\'t or was avoided.'
 ];
 function bannedSentencePatternsText(){
   return BANNED_SENTENCE_PATTERNS.map(p => `- ${p}`).join('\n');
@@ -2820,6 +2822,7 @@ ${bannedSentencePatternsText()}
 
 Rules:
 - Output structure: (1) a title for the project story, alone on its own line, as its own paragraph; (2) the body — flowing narrative paragraphs separated by blank lines, opening with the client/concept story where given, then moving through the rooms or spaces. Do not force one paragraph per room — follow the natural shape of the material, the way a real feature would (a paragraph may cover one room in depth or move through two related ones together). Do not add bold subheadings within the body.
+- Open the body's first sentence with a clear, concrete, declarative statement that establishes the actual subject — the firm, the client, or the space — the way the EXAMPLES do (e.g. naming the designer/firm and what they brought to the project, or naming the home and its location). Never open with a vague relative or temporal phrase whose reference isn't yet established, like "Before this," "Prior to the renovation," or "Before the redesign," — state directly what the project is and where before moving into any backstory.
 - Keep paragraphs SHORT: roughly 250-500 characters each (about 2-4 sentences) — noticeably shorter than a typical press-release paragraph. Break into a new paragraph whenever the focus shifts — a new room, a new material, a new beat of the client story — rather than letting one paragraph run long. The result should read as more, shorter paragraphs with frequent line breaks throughout, never a handful of dense ones.
 - Wrap every specific brand, maker, or artist name in double asterisks, e.g. "a sofa by **Roche Bobois**" — including the literal [BRAND] and [ARTIST] placeholder tokens, e.g. "a chair by **[BRAND]**". Bold only the name itself, never the surrounding words (correct: "a sofa by **Roche Bobois**"; wrong: "**a sofa by Roche Bobois**"). This is the one exception to "no markdown formatting" below.
 - Do NOT write your own "PROJECT FACTS" block (Project name, Lot size, Architecture firm, Interior design firm, Contracting, Photography) or "About the designer" section, even though some of those facts are given to you below — they're appended separately after your response, verbatim. Writing your own would create a duplicate.
