@@ -333,8 +333,8 @@
   .spinner{
     display:inline-block;
     width:12px;height:12px;
-    border:2px solid #ccc;
-    border-top-color:var(--ink);
+    border:2px solid rgba(91,8,158,0.2);
+    border-top-color:var(--canvas);
     border-radius:50%;
     animation:spin 0.7s linear infinite;
     vertical-align:-2px;
@@ -2646,7 +2646,7 @@ function buildStoryOutputHTML(){
       }
     }
   } else if(storyState.aiLoading){
-    inner += `<p class="empty-note"><span class="spinner"></span>Thinking…</p>`;
+    inner += `<p class="empty-note"><span class="spinner"></span>Writing…</p>`;
   } else if(storyState.aiError){
     inner += `<p class="ai-status error">Something went wrong: ${esc(storyState.aiError)}</p>`;
   } else if(!storyState.aiNotice){
