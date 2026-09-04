@@ -457,6 +457,11 @@
   .ai-notice-title{font-weight:700;margin-bottom:6px;}
   .ai-notice ul{margin:0;padding-left:18px;}
   .ai-notice li{margin-bottom:4px;}
+  .ai-notice.danger-notice{
+    background:#fbe9e7;
+    border-color:var(--danger);
+    color:#7a1810;
+  }
   .ad-banner{
     background:#ffd400;
     color:#111111;
@@ -560,7 +565,7 @@
 <div class="hero">
   <div class="hero-main">
     <h2 class="hero-title"><span class="hero-title-eyebrow">Interior Design &amp; Architecture</span>Press Release &amp; Project Story Writer</h2>
-    <p class="hero-subtitle">Fill in a few core details, pick your category, and get a publication-ready press release written in your own voice. No signup required.</p>
+    <p class="hero-subtitle">Pick your interior design or architecture category, fill in your notes, and get publication-ready press releases or project descriptions.</p>
     <div class="hero-badges">
       <span class="hero-badge" style="color:#e8820c;"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span style="color:#4a1a68;">12 press release types</span></span>
       <span class="hero-badge" style="color:#e8820c;"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6"/></svg><span style="color:#4a1a68;">10 project story templates</span></span>
@@ -1738,10 +1743,14 @@ const STORY_FIELDS = [
   { id:'bedrooms', label:'Bedrooms', placeholder:'', residenceOnly:true },
   { id:'bathrooms', label:'Bathrooms', placeholder:'', residenceOnly:true },
   { id:'completionDate', label:'Completion date', placeholder:'e.g. Spring 2026, or a project timeline/range' },
+  { id:'keyFacts', label:'Key facts', placeholder:'', type:'textarea', architectureOnly:true },
+  { id:'context', label:'Context', placeholder:'', type:'textarea', architectureOnly:true },
   { id:'designConcept', label:'Design concept / inspiration', placeholder:'', type:'textarea' },
   { id:'designApproach', label:'Overall design approach', placeholder:'', type:'textarea' },
+  { id:'designPortfolio', label:'Design portfolio', placeholder:'Copy and paste information for relevant related projects the firm has completed or that are ongoing.', type:'textarea', architectureOnly:true },
   { id:'materials', label:'Key materials & palette', placeholder:'', type:'textarea' },
   { id:'brandsAndArt', label:'Brands, artists & notable pieces', placeholder:"List any brands or artists featured in the project, e.g. sofa by Roche Bobois, painting by Jane Doe", type:'textarea' },
+  { id:'pressKitUrl', label:'Press kit link (URL)', placeholder:'https://', architectureOnly:true, renderAtEnd:true },
   { id:'aboutDesigner', label:'About the designer / firm (optional)', placeholder:'Copy and paste your boilerplate here.', type:'textarea', creditsOnly:true, renderAtEnd:true }
 ];
 
@@ -1789,6 +1798,7 @@ function storyFieldLabel(f){
   if(f.id === 'architectureFirm') return isArch ? 'Architecture firm / designer' : 'Architecture firm';
   if(f.id === 'size' && isArch && isResidence) return 'Main house area';
   if(f.id === 'clientStory' && !isResidence) return 'Client needs';
+  if(f.id === 'designApproach' && isArch) return 'Summary of approach';
   return f.label;
 }
 function storyFieldPlaceholder(f){
@@ -1801,6 +1811,24 @@ const STORY_ROOM_FIELDS = [
   { id:'roomName', label:'Room / space name', placeholder:'e.g. Living Room' },
   { id:'roomNotes', label:'Notes', placeholder:'What\'s in this room — furniture, lighting, art, materials — and the brands or artists behind them, if known', type:'textarea' }
 ];
+
+// Facade block — mirrors Press Release > Architecture > Project Completion's
+// Facade repeatable. Architecture stories only.
+const STORY_FACADE_FIELDS = [
+  { id:'facadeMaterials', label:'Materials palette', placeholder:'What materials are used?', type:'textarea' },
+  { id:'facadeForm', label:'Form', placeholder:'What is the form of the structure?', type:'textarea' },
+  { id:'facadeDesignApproach', label:'Design approach', placeholder:'', type:'textarea' }
+];
+
+function makeStoryFacade(){
+  const item = { id: nid() };
+  STORY_FACADE_FIELDS.forEach(f=> item[f.id] = '');
+  return item;
+}
+
+function makeStoryQuote(){
+  return { id: nid(), text:'', speaker:'', title:'' };
+}
 
 // Real interior design project stories the user supplied, header/credit lines
 // stripped so only voice/structure carries through (credits are appended by
@@ -2169,11 +2197,14 @@ function freshStoryState(){
     projectType: 'Residence',
     fields,
     rooms: [makeStoryRoom()],
+    facade: [],
+    quotes: [makeStoryQuote()],
     notes: '',
     editInstructions: '',
     photos: [],
     aiOutput: '',
     aiNotice: '',
+    aiPhotoNotice: false,
     aiLoading: false,
     aiError: ''
   };
@@ -2213,6 +2244,8 @@ if(savedStory){
     fields: Object.assign(freshStoryState().fields, savedStory.fields || {})
   });
   if(!Array.isArray(storyState.rooms) || !storyState.rooms.length) storyState.rooms = [makeStoryRoom()];
+  if(!Array.isArray(storyState.facade)) storyState.facade = [];
+  if(!Array.isArray(storyState.quotes) || !storyState.quotes.length) storyState.quotes = [makeStoryQuote()];
   let maxRoomN = 0;
   (storyState.rooms||[]).forEach(r=>{
     if(r && typeof r.id==='string' && r.id[0]==='b'){
@@ -2297,6 +2330,39 @@ function renderStoryForm(){
   });
   html += `<button class="btn small" id="addRoomBtn">+ Add Room / Space</button>`;
 
+  if(storyState.category === 'architecture'){
+    html += `<div class="section-title">Facade</div>`;
+    storyState.facade.forEach((item, idx)=>{
+      html += `<div class="block-card">
+        <div class="block-card-head">
+          <span class="block-type-label">Facade ${idx+1}</span>
+          <div class="block-actions"><button class="icon-btn danger" data-delfacade="${item.id}" title="Remove">✕</button></div>
+        </div>`;
+      STORY_FACADE_FIELDS.forEach(f=>{
+        const input = f.type === 'textarea'
+          ? `<textarea data-facadefield="${f.id}" data-id="${item.id}" placeholder="${esc(f.placeholder||'')}">${esc(item[f.id])}</textarea>`
+          : `<input type="text" data-facadefield="${f.id}" data-id="${item.id}" value="${esc(item[f.id])}" placeholder="${esc(f.placeholder||'')}">`;
+        html += `<div class="field-group"><label>${esc(f.label)}</label>${input}</div>`;
+      });
+      html += `</div>`;
+    });
+    html += `<button class="btn small" id="addFacadeBtn">+ Add Facade</button>`;
+
+    html += `<div class="section-title">Quotes</div>`;
+    storyState.quotes.forEach((q, idx)=>{
+      html += `<div class="block-card">
+        <div class="block-card-head">
+          <span class="block-type-label">Quote ${idx+1}</span>
+          <div class="block-actions"><button class="icon-btn danger" data-delstoryquote="${q.id}" title="Remove">✕</button></div>
+        </div>
+        <div class="field-group"><label>Quote</label>
+          <textarea data-storyquotefield="text" data-id="${q.id}" placeholder="Anything you'd like to say in your voice?">${esc(q.text)}</textarea></div>
+        <div class="field-group"><label>Speaker</label><input type="text" data-storyquotefield="speaker" data-id="${q.id}" value="${esc(q.speaker)}"></div>
+        <div class="field-group"><label>Title</label><input type="text" data-storyquotefield="title" data-id="${q.id}" value="${esc(q.title)}"></div>
+      </div>`;
+    });
+    html += `<button class="btn small" id="addStoryQuoteBtn">+ Add Quote</button>`;
+  }
 
   STORY_FIELDS.forEach(f=>{ if(f.renderAtEnd && shouldShowStoryField(f)) html += renderStoryCoreField(f); });
   html += `<div class="section-title">Edit instructions</div>
@@ -2330,7 +2396,7 @@ function attachStoryFormEvents(){
   const catSel = document.getElementById('storyCategorySelect');
   if(catSel) catSel.addEventListener('change', e=>{
     storyState.category = e.target.value;
-    storyState.aiOutput = ''; storyState.aiNotice = ''; storyState.aiError = ''; storyState.aiLoading = false;
+    storyState.aiOutput = ''; storyState.aiNotice = ''; storyState.aiPhotoNotice = false; storyState.aiError = ''; storyState.aiLoading = false;
     renderStoryForm(); renderStoryPreview(); renderStoryToolbar(); saveStoryState();
   });
 
@@ -2373,6 +2439,55 @@ function attachStoryFormEvents(){
       const id = e.target.getAttribute('data-delroom');
       storyState.rooms = storyState.rooms.filter(r=>r.id!==id);
       if(!storyState.rooms.length) storyState.rooms.push(makeStoryRoom());
+      renderStoryForm(); saveStoryState();
+    });
+  });
+
+  storyFormPane.querySelectorAll('[data-facadefield]').forEach(el=>{
+    el.addEventListener('input', e=>{
+      const id = e.target.getAttribute('data-id');
+      const field = e.target.getAttribute('data-facadefield');
+      const item = storyState.facade.find(x=>x.id===id);
+      if(item) item[field] = e.target.value;
+      saveStoryState();
+    });
+  });
+
+  const addFacadeBtn = document.getElementById('addFacadeBtn');
+  if(addFacadeBtn) addFacadeBtn.addEventListener('click', ()=>{
+    storyState.facade.push(makeStoryFacade());
+    renderStoryForm(); saveStoryState();
+  });
+
+  storyFormPane.querySelectorAll('[data-delfacade]').forEach(el=>{
+    el.addEventListener('click', e=>{
+      const id = e.target.getAttribute('data-delfacade');
+      storyState.facade = storyState.facade.filter(x=>x.id!==id);
+      renderStoryForm(); saveStoryState();
+    });
+  });
+
+  storyFormPane.querySelectorAll('[data-storyquotefield]').forEach(el=>{
+    el.addEventListener('input', e=>{
+      const id = e.target.getAttribute('data-id');
+      const field = e.target.getAttribute('data-storyquotefield');
+      const q = storyState.quotes.find(x=>x.id===id);
+      if(q) q[field] = e.target.value;
+      saveStoryState();
+    });
+  });
+
+  const addStoryQuoteBtn = document.getElementById('addStoryQuoteBtn');
+  if(addStoryQuoteBtn) addStoryQuoteBtn.addEventListener('click', ()=>{
+    storyState.quotes.push(makeStoryQuote());
+    renderStoryForm(); saveStoryState();
+  });
+
+  storyFormPane.querySelectorAll('[data-delstoryquote]').forEach(el=>{
+    el.addEventListener('click', e=>{
+      const id = e.target.getAttribute('data-delstoryquote');
+      storyState.quotes = storyState.quotes.filter(x=>x.id!==id);
+      if(!storyState.quotes.length) storyState.quotes.push(makeStoryQuote());
       renderStoryForm(); saveStoryState();
     });
   });
@@ -2476,6 +2591,12 @@ function buildStoryOutputHTML(){
     inner += `<div class="ai-notice">
       <div class="ai-notice-title">A couple of things before I can generate this</div>
       <ul>${bullets.map(b=>`<li>${esc(b)}</li>`).join('')}</ul>
+    </div>`;
+  }
+  if(storyState.aiPhotoNotice && storyState.aiOutput){
+    inner += `<div class="ai-notice danger-notice">
+      <div class="ai-notice-title">Note</div>
+      <p style="margin:0;">You requested that I'll describe what's in the attached photos, but no photos were attached to this request — only the FACTS and NOTES text is present. I wrote the story based on the facts given, since there's enough material to work with even without images. If you'd like to include image analysis with images, please attach the photos and click Regenerate.</p>
     </div>`;
   }
   if(storyState.aiOutput){
@@ -2612,6 +2733,7 @@ async function callStoryClaudeAPI(){
   storyState.aiLoading = true;
   storyState.aiError = '';
   storyState.aiNotice = '';
+  storyState.aiPhotoNotice = false;
   renderStoryToolbar();
   renderStoryPreview();
   const genBtn = document.getElementById('storyGenerateBtn');
@@ -2630,7 +2752,23 @@ async function callStoryClaudeAPI(){
     const parts = STORY_ROOM_FIELDS.map(f=>{ const v = (room[f.id]||'').trim(); return v ? `${f.label}: ${v}` : null; }).filter(Boolean);
     if(parts.length) roomLines.push(`Room/space ${i+1} — ${parts.join('; ')}`);
   });
-  const factsOutline = lines.join('\n') + (roomLines.length ? '\n\n' + roomLines.join('\n') : '');
+  const facadeLines = [];
+  if(storyState.category === 'architecture'){
+    storyState.facade.forEach((item, i)=>{
+      const parts = STORY_FACADE_FIELDS.map(f=>{ const v = (item[f.id]||'').trim(); return v ? `${f.label}: ${v}` : null; }).filter(Boolean);
+      if(parts.length) facadeLines.push(`Facade ${i+1} — ${parts.join('; ')}`);
+    });
+  }
+  const quoteLines = [];
+  if(storyState.category === 'architecture'){
+    storyState.quotes.forEach((q, i)=>{
+      if(!q.text.trim()) return;
+      const attribution = [q.speaker.trim(), q.title.trim()].filter(Boolean).join(', ');
+      quoteLines.push(`Quote ${i+1}: "${q.text.trim()}"${attribution ? ' — ' + attribution : ''}`);
+    });
+  }
+  const factsOutline = [lines.join('\n'), roomLines.join('\n'), facadeLines.join('\n'), quoteLines.join('\n')]
+    .filter(Boolean).join('\n\n');
   const examples = getStoryStyleExamples(storyState.category).join('\n\n---\n\n');
 
   const voiceNote = storyState.category === 'architecture'
@@ -2681,12 +2819,13 @@ Rules:
 - Keep paragraphs SHORT: roughly 250-500 characters each (about 2-4 sentences) — noticeably shorter than a typical press-release paragraph. Break into a new paragraph whenever the focus shifts — a new room, a new material, a new beat of the client story — rather than letting one paragraph run long. The result should read as more, shorter paragraphs with frequent line breaks throughout, never a handful of dense ones.
 - Wrap every specific brand, maker, or artist name in double asterisks, e.g. "a sofa by **Roche Bobois**" — including the literal [BRAND] and [ARTIST] placeholder tokens, e.g. "a chair by **[BRAND]**". Bold only the name itself, never the surrounding words (correct: "a sofa by **Roche Bobois**"; wrong: "**a sofa by Roche Bobois**"). This is the one exception to "no markdown formatting" below.
 - Do NOT write your own "PROJECT FACTS" block (Project name, Lot size, Architecture firm, Interior design firm, Contracting, Photography) or "About the designer" section, even though some of those facts are given to you below — they're appended separately after your response, verbatim. Writing your own would create a duplicate.
+- If any Quotes are given below, weave each one naturally into the narrative at a relevant point (attributed to its speaker/title, e.g. "says [Name], [Title]"), using present tense for the attribution ("says", not "said"). Never invent a quote that isn't given.
 - If something in FACTS is missing or blank, simply don't mention it — never invent a placeholder.
 - You may also receive loose NOTES from the user — weave any relevant facts from the notes into the appropriate place, corrected and in full sentences. Ignore anything that's just the user thinking out loud.
 - Before finalizing, check every sentence against FACTS, NOTES, and what's genuinely visible in the photos: if a claim can't be traced back to one of those, cut it or rewrite the sentence without it.
 - There is no back-and-forth here — this is a single, one-shot request. If REQUESTED CHANGES or NOTES are ambiguous or incomplete, do NOT stop to ask a clarifying question — make the most reasonable interpretation and proceed.
 - This is a one-shot tool: the user cannot see or reply to a clarifying question, so NEVER ask for confirmation and NEVER hold back from writing because FACTS are thin, NOTES are brief, or photos don't obviously match a named room. Always produce the fullest, most complete story you can from whatever is actually given — when FACTS are sparse, lean on the photos as your primary descriptive material instead, per the rules above. Only if there is truly nothing at all to work with (no meaningful facts beyond perhaps a project name, no notes, and no photos), skip writing one and respond with ONLY this instead: the exact line "NEEDS_INPUT" by itself, then 2-4 short bullet points (each starting with "- ") in plain, friendly language explaining what's blocking you. Nothing else in that case. This should be exceptionally rare — thin facts plus photos, or facts alone with no photos, are always enough to write a genuine, complete story.
-- Return ONLY the final project story text — no preamble, no commentary, no markdown formatting other than the ** brand/artist bolding described above.${revisionRule}
+- Return ONLY the final project story text — no preamble, no commentary, no markdown formatting other than the ** brand/artist bolding described above. Never write a sentence addressed to the user about your own process — e.g. never say things like "I'll describe what's in the attached photos," "I notice no photos were attached," or "let me write this based on the facts given." Begin the response directly with the story's title, nothing before it.${revisionRule}
 
 EXAMPLES (voice reference only — study closely, but write new sentences and structure, never copy these verbatim or near-verbatim):
 ${examples}`;
@@ -2732,6 +2871,19 @@ ${examples}`;
     if(/^NEEDS_INPUT\b/i.test(storyState.aiOutput.trim())){
       storyState.aiNotice = storyState.aiOutput.trim().replace(/^NEEDS_INPUT\s*/i, '');
       storyState.aiOutput = previousOutput;
+    } else {
+      // Defensive net: the model occasionally leaks a stray sentence commenting on
+      // whether photos were attached instead of writing straight into the story —
+      // strip that leading paragraph and surface a plain, user-facing notice instead
+      // of letting it render as the story's headline.
+      const metaPhotoLeakRegex = /\bno photos?\s*(?:were|was)?\s*(?:actually\s*)?attached\b|\bI(?:'ll| will)?\s*describe what(?:'s| is) in the attached photos\b/i;
+      const trimmedOut = storyState.aiOutput.trim();
+      const firstBreak = trimmedOut.indexOf('\n\n');
+      const firstPara = (firstBreak === -1 ? trimmedOut : trimmedOut.slice(0, firstBreak)).trim();
+      if(metaPhotoLeakRegex.test(firstPara)){
+        storyState.aiPhotoNotice = true;
+        storyState.aiOutput = firstBreak === -1 ? '' : trimmedOut.slice(firstBreak).trim();
+      }
     }
   } catch(e){
     storyState.aiError = e.message || String(e);
