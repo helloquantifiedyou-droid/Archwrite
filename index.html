@@ -654,7 +654,7 @@ const BANNED_WORDS = [
   'gamechanger', 'commanding', 'reads as part', 'reads as', 'the result', 'the result is', 'compete for attention', 'restrained vocabulary',
   'labyrinth', 'enigma', 'nestled', 'remnant', 'indelible', 'metamorphosis',
   'a testament to', 'sounds unheard', 'sights unseen', 'shows up', 'woven', 'sensibility',
-  'afterthought', 'announced', 'deliberately', 'actually', 'literal', 'literally'
+  'afterthought', 'announced', 'announcing', 'deliberately', 'actually', 'literal', 'literally'
 ];
 
 // Sentence-level patterns, shared between the press release and project story
@@ -2553,10 +2553,22 @@ function applyStoryBold(escapedText){
 function stripStoryBold(text){
   return text.replace(/\*\*(.+?)\*\*/g, '$1');
 }
+// A subheading paragraph is written by the AI as its own paragraph starting
+// with "## " — used sparingly, only for larger/complex stories that genuinely
+// split into sections. Detected the same way across the editable view, the
+// rich-text clipboard copy, and the plain-text export.
+function isStorySubhead(p){
+  return /^##\s+/.test(p.trim());
+}
+function storySubheadText(p){
+  return p.trim().replace(/^##\s+/, '');
+}
 
 function getStoryActiveText(){
   if(!storyState.aiOutput) return '';
-  const parts = [stripStoryBold(storyState.aiOutput), getStoryCreditsText(), getStoryAboutText()].filter(Boolean);
+  const plainOutput = stripStoryBold(storyState.aiOutput)
+    .split(/\n\s*\n/).map(p => isStorySubhead(p) ? storySubheadText(p) : p).join('\n\n');
+  const parts = [plainOutput, getStoryCreditsText(), getStoryAboutText()].filter(Boolean);
   return parts.join('\n\n');
 }
 
@@ -2568,6 +2580,7 @@ function getStoryActiveHTML(){
   let html = '';
   paras.forEach((p, idx)=>{
     if(idx===0) html += `<p style="font-weight:700;margin:0 0 16px;">${applyStoryBold(esc(p))}</p>`;
+    else if(isStorySubhead(p)) html += `<p style="font-weight:700;margin:20px 0 8px;">${esc(storySubheadText(p))}</p>`;
     else html += `<p style="margin:0 0 12px;">${applyStoryBold(esc(p))}</p>`;
   });
   const creditLines = STORY_CREDIT_FIELDS
@@ -2610,6 +2623,7 @@ function buildStoryOutputHTML(){
     let editable = '';
     paras.forEach((p, idx)=>{
       if(idx===0) editable += `<div class="doc-headline">${applyStoryBold(esc(p))}</div>`;
+      else if(isStorySubhead(p)) editable += `<div class="subhead">${esc(storySubheadText(p))}</div>`;
       else editable += `<p>${applyStoryBold(esc(p))}</p>`;
     });
     const canEdit = !storyState.aiLoading;
@@ -2647,7 +2661,11 @@ function renderStoryPreview(){
   const editableRegion = document.getElementById('storyOutputRegion');
   if(editableRegion){
     editableRegion.addEventListener('input', ()=>{
-      const paras = Array.from(editableRegion.children).map(el=>el.innerText.trim()).filter(Boolean);
+      const paras = Array.from(editableRegion.children).map(el=>{
+        const text = el.innerText.trim();
+        if(!text) return null;
+        return el.classList.contains('subhead') ? '## ' + text : text;
+      }).filter(Boolean);
       storyState.aiOutput = paras.join('\n\n');
       saveStoryState();
     });
@@ -2821,7 +2839,8 @@ Also avoid these sentence patterns entirely:
 ${bannedSentencePatternsText()}
 
 Rules:
-- Output structure: (1) a title for the project story, alone on its own line, as its own paragraph; (2) the body — flowing narrative paragraphs separated by blank lines, opening with the client/concept story where given, then moving through the rooms or spaces. Do not force one paragraph per room — follow the natural shape of the material, the way a real feature would (a paragraph may cover one room in depth or move through two related ones together). Do not add bold subheadings within the body.
+- Output structure: (1) a title for the project story, alone on its own line, as its own paragraph; (2) the body — flowing narrative paragraphs separated by blank lines, opening with the client/concept story where given, then moving through the rooms or spaces. Do not force one paragraph per room — follow the natural shape of the material, the way a real feature would (a paragraph may cover one room in depth or move through two related ones together).
+- Subheadings: for a substantial, complex project whose material genuinely splits into distinct sections (e.g. a large civic, cultural, or commercial project with a clear shift — from the design intervention to the heritage/preservation approach, or from concept to a distinct construction phase), you may insert up to 2-4 subheadings to break the body into sections, each grouping several paragraphs underneath it. Write each subheading as its own short line (a few words, no ending punctuation) prefixed with "## ", as its own paragraph separated by blank lines like everything else, e.g. "## Intervening for the sake of music". Do NOT use subheadings for shorter or simpler stories (most residential and smaller projects) where the material doesn't naturally break into sections — for those, write straight flowing paragraphs with no subheadings at all, as before. When in doubt, don't use them.
 - Open the body's first sentence with a clear, concrete, declarative statement that establishes the actual subject — the firm, the client, or the space — the way the EXAMPLES do (e.g. naming the designer/firm and what they brought to the project, or naming the home and its location). Never open with a vague relative or temporal phrase whose reference isn't yet established, like "Before this," "Prior to the renovation," or "Before the redesign," — state directly what the project is and where before moving into any backstory.
 - Keep paragraphs SHORT: roughly 250-500 characters each (about 2-4 sentences) — noticeably shorter than a typical press-release paragraph. Break into a new paragraph whenever the focus shifts — a new room, a new material, a new beat of the client story — rather than letting one paragraph run long. The result should read as more, shorter paragraphs with frequent line breaks throughout, never a handful of dense ones.
 - Wrap every specific brand, maker, or artist name in double asterisks, e.g. "a sofa by **Roche Bobois**" — including the literal [BRAND] and [ARTIST] placeholder tokens, e.g. "a chair by **[BRAND]**". Bold only the name itself, never the surrounding words (correct: "a sofa by **Roche Bobois**"; wrong: "**a sofa by Roche Bobois**"). This is the one exception to "no markdown formatting" below.
