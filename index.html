@@ -461,6 +461,7 @@
     background:#fbe9e7;
     border-color:var(--danger);
     color:#7a1810;
+    font-family:Calibri,Candara,"Segoe UI",Optima,Arial,sans-serif;
   }
   .ad-banner{
     background:#ffd400;
@@ -2587,9 +2588,12 @@ function getStoryActiveHTML(){
 function buildStoryOutputHTML(){
   let inner = '';
   if(storyState.aiNotice){
-    const bullets = storyState.aiNotice.split('\n').map(l=>l.trim()).filter(l=>l.startsWith('-')).map(l=>l.replace(/^-\s*/,''));
-    inner += `<div class="ai-notice">
+    const noticeLines = storyState.aiNotice.split('\n').map(l=>l.trim()).filter(Boolean);
+    const bullets = noticeLines.filter(l=>l.startsWith('-')).map(l=>l.replace(/^-\s*/,''));
+    const leadLines = noticeLines.filter(l=>!l.startsWith('-'));
+    inner += `<div class="ai-notice danger-notice">
       <div class="ai-notice-title">A couple of things before I can generate this</div>
+      ${leadLines.length ? `<p style="margin:0 0 8px;">${leadLines.map(l=>esc(l)).join('<br>')}</p>` : ''}
       <ul>${bullets.map(b=>`<li>${esc(b)}</li>`).join('')}</ul>
     </div>`;
   }
@@ -2868,19 +2872,27 @@ ${examples}`;
       throw new Error(`Claude returned an empty response (stop reason: ${data.stop_reason || 'unknown'}). Try again, or simplify the details and photos.`);
     }
     storyState.aiOutput = text;
-    if(/^NEEDS_INPUT\b/i.test(storyState.aiOutput.trim())){
-      storyState.aiNotice = storyState.aiOutput.trim().replace(/^NEEDS_INPUT\s*/i, '');
+    const trimmedOut = storyState.aiOutput.trim();
+    // Search for NEEDS_INPUT anywhere in the response, not just at the very start —
+    // the model sometimes prefixes it with a stray leaked sentence about photos
+    // despite instructions not to. Whatever precedes the marker is folded into the
+    // same notice rather than being left to render as a garbled story headline.
+    const needsInputIdx = trimmedOut.search(/\bNEEDS_INPUT\b/i);
+    if(needsInputIdx !== -1){
+      const preamble = trimmedOut.slice(0, needsInputIdx).trim();
+      const rest = trimmedOut.slice(needsInputIdx).replace(/^NEEDS_INPUT\s*/i, '').trim();
+      storyState.aiNotice = (preamble ? preamble + '\n' : '') + rest;
       storyState.aiOutput = previousOutput;
     } else {
       // Defensive net: the model occasionally leaks a stray sentence commenting on
       // whether photos were attached instead of writing straight into the story —
       // strip that leading paragraph and surface a plain, user-facing notice instead
       // of letting it render as the story's headline.
-      const metaPhotoLeakRegex = /\bno photos?\s*(?:were|was)?\s*(?:actually\s*)?attached\b|\bI(?:'ll| will)?\s*describe what(?:'s| is) in the attached photos\b/i;
-      const trimmedOut = storyState.aiOutput.trim();
+      const hasPhotoWord = /\b(photos?|images?)\b/i;
+      const hasNegation = /\b(not able to|don't see|do not see|I notice|no photos|no images|not attached|weren't attached|were not attached|without (?:any )?(?:photos|images))\b/i;
       const firstBreak = trimmedOut.indexOf('\n\n');
       const firstPara = (firstBreak === -1 ? trimmedOut : trimmedOut.slice(0, firstBreak)).trim();
-      if(metaPhotoLeakRegex.test(firstPara)){
+      if(hasPhotoWord.test(firstPara) && hasNegation.test(firstPara)){
         storyState.aiPhotoNotice = true;
         storyState.aiOutput = firstBreak === -1 ? '' : trimmedOut.slice(firstBreak).trim();
       }
