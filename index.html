@@ -1741,8 +1741,6 @@ const STORY_FIELDS = [
   { id:'homeowners', label:'Homeowners', placeholder:'Describe the homeowners – their family unit, what they do, and any details that might be helpful. You can also choose to include their names.', type:'textarea', residenceOnly:true, architectureOnly:true },
   { id:'clientStory', label:'Client story / background', placeholder:"Who are they, and what shaped the brief? e.g. their profession, how they found the property, their personal style or priorities.", type:'textarea' },
   { id:'size', label:'Square footage / size', placeholder:'' },
-  { id:'lotSize', label:'Lot size', placeholder:'', creditsOnly:true, architectureOnly:true, residenceOnly:true },
-  { id:'aduArea', label:'Accessory dwelling unit (ADU) area', placeholder:'', architectureOnly:true, residenceOnly:true },
   { id:'floorCount', label:'Floor count', placeholder:'' },
   { id:'bedrooms', label:'Bedrooms', placeholder:'', residenceOnly:true },
   { id:'bathrooms', label:'Bathrooms', placeholder:'', residenceOnly:true },
@@ -1750,17 +1748,16 @@ const STORY_FIELDS = [
   { id:'keyFacts', label:'Key facts', placeholder:'', type:'textarea', architectureOnly:true },
   { id:'context', label:'Context', placeholder:'', type:'textarea', architectureOnly:true },
   { id:'designConcept', label:'Design concept / inspiration', placeholder:'', type:'textarea' },
-  { id:'designApproach', label:'Overall design approach', placeholder:'', type:'textarea' },
+  { id:'designApproach', label:'Overall design approach', placeholder:'', type:'textarea', interiorOnly:true },
   { id:'designPortfolio', label:'Design portfolio', placeholder:'Copy and paste information for relevant related projects the firm has completed or that are ongoing.', type:'textarea', architectureOnly:true },
   { id:'materials', label:'Key materials & palette', placeholder:'', type:'textarea' },
-  { id:'brandsAndArt', label:'Brands, artists & notable pieces', placeholder:"List any brands or artists featured in the project, e.g. sofa by Roche Bobois, painting by Jane Doe", type:'textarea' },
+  { id:'brandsAndArt', label:'Brands, artists & notable pieces', placeholder:"List any brands or artists featured in the project, e.g. sofa by Roche Bobois, painting by Jane Doe", type:'textarea', interiorOnly:true },
   { id:'pressKitUrl', label:'Press kit link (URL)', placeholder:'https://', architectureOnly:true, renderAtEnd:true },
   { id:'aboutDesigner', label:'About the designer / firm (optional)', placeholder:'Copy and paste your boilerplate here.', type:'textarea', creditsOnly:true, renderAtEnd:true }
 ];
 
 const STORY_CREDIT_FIELDS = [
   { id:'projectName', creditLabel:'Project name' },
-  { id:'lotSize', creditLabel:'Lot size' },
   { id:'architectureFirm', creditLabel:'Architecture firm' },
   { id:'designerFirm', creditLabel:'Interior design firm' },
   { id:'builder', creditLabel:'Contracting' },
@@ -1800,9 +1797,8 @@ function storyFieldLabel(f){
   const isResidence = storyState.projectType === 'Residence';
   if(f.id === 'designerFirm') return isArch ? 'Interior design firm (if applicable)' : 'Interior design firm / designer';
   if(f.id === 'architectureFirm') return isArch ? 'Architecture firm / designer' : 'Architecture firm';
-  if(f.id === 'size' && isArch && isResidence) return 'Main house area';
+  if(f.id === 'size' && isArch && isResidence) return 'Size';
   if(f.id === 'clientStory' && !isResidence) return 'Client needs';
-  if(f.id === 'designApproach' && isArch) return 'Summary of approach';
   return f.label;
 }
 function storyFieldPlaceholder(f){
@@ -2309,7 +2305,7 @@ function renderStoryForm(){
   html += `<div class="hint-banner" style="margin-top:16px;">Fill in the core details below — no need to write full sentences. The tool writes the full project story from these facts (and any photos you add) when you click "Generate Project Story."</div>`;
 
   html += `<div class="field-group">
-    <label>Notes</label>
+    <label>Notes <span class="required-mark">*</span></label>
     <textarea id="storyNotes" class="notes-field" placeholder="Enter any notes that might be useful. Write them as a train of thought, bullet points, or however you prefer.">${esc(storyState.notes)}</textarea>
   </div>`;
 
@@ -2317,22 +2313,24 @@ function renderStoryForm(){
 
   STORY_FIELDS.forEach(f=>{ if(!f.renderAtEnd && shouldShowStoryField(f)) html += renderStoryCoreField(f); });
 
-  html += `<div class="section-title">Rooms / Spaces</div>`;
-  storyState.rooms.forEach((room, idx)=>{
-    html += `<div class="block-card">
-      <div class="block-card-head">
-        <span class="block-type-label">Room ${idx+1}</span>
-        <div class="block-actions"><button class="icon-btn danger" data-delroom="${room.id}" title="Remove">✕</button></div>
-      </div>`;
-    STORY_ROOM_FIELDS.forEach(f=>{
-      const input = f.type === 'textarea'
-        ? `<textarea data-roomfield="${f.id}" data-id="${room.id}" placeholder="${esc(f.placeholder||'')}">${esc(room[f.id])}</textarea>`
-        : `<input type="text" data-roomfield="${f.id}" data-id="${room.id}" value="${esc(room[f.id])}" placeholder="${esc(f.placeholder||'')}">`;
-      html += `<div class="field-group"><label>${esc(f.label)}</label>${input}</div>`;
+  if(storyState.category !== 'architecture'){
+    html += `<div class="section-title">Rooms / Spaces</div>`;
+    storyState.rooms.forEach((room, idx)=>{
+      html += `<div class="block-card">
+        <div class="block-card-head">
+          <span class="block-type-label">Room ${idx+1}</span>
+          <div class="block-actions"><button class="icon-btn danger" data-delroom="${room.id}" title="Remove">✕</button></div>
+        </div>`;
+      STORY_ROOM_FIELDS.forEach(f=>{
+        const input = f.type === 'textarea'
+          ? `<textarea data-roomfield="${f.id}" data-id="${room.id}" placeholder="${esc(f.placeholder||'')}">${esc(room[f.id])}</textarea>`
+          : `<input type="text" data-roomfield="${f.id}" data-id="${room.id}" value="${esc(room[f.id])}" placeholder="${esc(f.placeholder||'')}">`;
+        html += `<div class="field-group"><label>${esc(f.label)}</label>${input}</div>`;
+      });
+      html += `</div>`;
     });
-    html += `</div>`;
-  });
-  html += `<button class="btn small" id="addRoomBtn">+ Add Room / Space</button>`;
+    html += `<button class="btn small" id="addRoomBtn">+ Add Room / Space</button>`;
+  }
 
   if(storyState.category === 'architecture'){
     html += `<div class="section-title">Facade</div>`;
@@ -2773,10 +2771,12 @@ async function callStoryClaudeAPI(){
     if(val) lines.push(`${storyFieldLabel(f)}: ${val}`);
   });
   const roomLines = [];
-  storyState.rooms.forEach((room, i)=>{
-    const parts = STORY_ROOM_FIELDS.map(f=>{ const v = (room[f.id]||'').trim(); return v ? `${f.label}: ${v}` : null; }).filter(Boolean);
-    if(parts.length) roomLines.push(`Room/space ${i+1} — ${parts.join('; ')}`);
-  });
+  if(storyState.category !== 'architecture'){
+    storyState.rooms.forEach((room, i)=>{
+      const parts = STORY_ROOM_FIELDS.map(f=>{ const v = (room[f.id]||'').trim(); return v ? `${f.label}: ${v}` : null; }).filter(Boolean);
+      if(parts.length) roomLines.push(`Room/space ${i+1} — ${parts.join('; ')}`);
+    });
+  }
   const facadeLines = [];
   if(storyState.category === 'architecture'){
     storyState.facade.forEach((item, i)=>{
@@ -2845,7 +2845,7 @@ Rules:
 - Open the body's first sentence with a clear, concrete, declarative statement that establishes the actual subject — the firm, the client, or the space — the way the EXAMPLES do (e.g. naming the designer/firm and what they brought to the project, or naming the home and its location). Never open with a vague relative or temporal phrase whose reference isn't yet established, like "Before this," "Prior to the renovation," or "Before the redesign," — state directly what the project is and where before moving into any backstory.
 - Keep paragraphs SHORT: roughly 250-500 characters each (about 2-4 sentences) — noticeably shorter than a typical press-release paragraph. Break into a new paragraph whenever the focus shifts — a new room, a new material, a new beat of the client story — rather than letting one paragraph run long. The result should read as more, shorter paragraphs with frequent line breaks throughout, never a handful of dense ones.
 - Wrap every specific brand, maker, or artist name in double asterisks, e.g. "a sofa by **Roche Bobois**" — including the literal [BRAND] and [ARTIST] placeholder tokens, e.g. "a chair by **[BRAND]**". Bold only the name itself, never the surrounding words (correct: "a sofa by **Roche Bobois**"; wrong: "**a sofa by Roche Bobois**"). This is the one exception to "no markdown formatting" below.
-- Do NOT write your own "PROJECT FACTS" block (Project name, Lot size, Architecture firm, Interior design firm, Contracting, Photography) or "About the designer" section, even though some of those facts are given to you below — they're appended separately after your response, verbatim. Writing your own would create a duplicate.
+- Do NOT write your own "PROJECT FACTS" block (Project name, Architecture firm, Interior design firm, Contracting, Photography) or "About the designer" section, even though some of those facts are given to you below — they're appended separately after your response, verbatim. Writing your own would create a duplicate.
 - If any Quotes are given below, weave each one naturally into the narrative at a relevant point (attributed to its speaker/title, e.g. "says [Name], [Title]"), using present tense for the attribution ("says", not "said"). Never invent a quote that isn't given.
 - If something in FACTS is missing or blank, simply don't mention it — never invent a placeholder.
 - You may also receive loose NOTES from the user — weave any relevant facts from the notes into the appropriate place, corrected and in full sentences. Ignore anything that's just the user thinking out loud.
