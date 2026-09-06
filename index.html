@@ -609,6 +609,11 @@ function nid(){ return 'b' + (++uid); }
 function esc(s){
   return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
+// GA4 event fired on every real Generate/Regenerate click, so click volume shows
+// up in Reports > Engagement > Events, broken down by tool/category/type.
+function trackGenerateEvent(params){
+  if(typeof gtag === 'function') gtag('event', 'generate_click', params);
+}
 // Anthropic responses can include non-text content blocks (e.g. thinking)
 // before the actual text — find the text block rather than assuming content[0].
 function extractResponseText(data){
@@ -1791,6 +1796,13 @@ async function callClaudeAPI(){
   const editInstructions = (state.editInstructions || '').trim();
   const previousOutput = state.aiOutput;
   const isRevision = !!(editInstructions && previousOutput);
+
+  trackGenerateEvent({
+    tool: 'press_release',
+    category: state.category,
+    release_type: state.subtype,
+    is_regenerate: isRevision
+  });
 
   state.aiLoading = true;
   state.aiError = '';
@@ -2988,6 +3000,13 @@ async function callStoryClaudeAPI(){
   const editInstructions = (storyState.editInstructions || '').trim();
   const previousOutput = storyState.aiOutput;
   const isRevision = !!(editInstructions && previousOutput);
+
+  trackGenerateEvent({
+    tool: 'project_story',
+    category: storyState.category,
+    project_type: storyState.projectType,
+    is_regenerate: isRevision
+  });
 
   storyState.aiLoading = true;
   storyState.aiError = '';
