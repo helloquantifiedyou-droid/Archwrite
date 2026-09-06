@@ -1974,6 +1974,202 @@ function renderToolbar(){
 // PROJECT STORY WRITER
 // =====================================================================
 
+// Sample stories shown in the empty preview pad before the user generates
+// anything — always "Jane Doe Studio", one per category+projectType combination,
+// purely illustrative (never actually output by the AI).
+const SAMPLE_STORIES = {
+  interiorDesign: {
+    Residence: `A Renovated Hillside Residence Reimagined for Everyday Family Life
+
+Jane Doe Studio approached this 4,200-square-foot hillside residence in Los Angeles with a simple brief from its new owners: make a house built for entertaining feel like a home for a young family.
+
+The original 1962 floor plan was heavily compartmentalized, with a warren of small rooms that cut the house off from its canyon views. Jane Doe Studio removed several non-structural walls to open the main living areas into a single, connected sequence of spaces.
+
+In the living room, a custom sofa upholstered in Larkspur Textiles boucle anchors a seating arrangement built around a reclaimed walnut coffee table designed in-house. A pair of vintage cane-back chairs, sourced from a Palm Springs estate sale, sit opposite.
+
+"The clients wanted the house to feel like it had always belonged to them, even though everything in it is new," says Jane Doe, founder of Jane Doe Studio. "We leaned into materials that age well — plaster, wood, stone — so the house has room to soften over time."
+
+The kitchen was fully reconfigured around a Calacatta Viola marble island, paired with custom white oak cabinetry and brass fixtures by Nordlund Lighting chosen to warm the room's otherwise cool material palette.
+
+A new bank of steel-framed windows in the primary suite replaces what had been a solid wall, opening the room to the canyon beyond and flooding it with afternoon light.
+
+The renovation took just over fourteen months from design to completion, with the family moving in this past January.`,
+    Restaurant: `Jane Doe Studio Brings Warmth to a Downtown Restaurant Fit-Out
+
+Housed in a narrow storefront that once served as a print shop, this 2,800-square-foot restaurant called on Jane Doe Studio to make a long, awkward footprint feel intimate rather than cramped.
+
+The studio's solution centers on a material palette of white oak, hand-glazed terracotta tile, and brass, arranged to draw the eye down the length of the room rather than emphasize its narrowness.
+
+A curved banquette upholstered in a rust-colored mohair runs nearly the full length of one wall, punctuated by a series of arched mirrors that visually widen the space.
+
+"Long, narrow rooms get a bad reputation, but they can actually feel really intimate if you lean into it instead of fighting it," says Jane Doe, founder of Jane Doe Studio. "We wanted every table to feel like the best seat in the house."
+
+At the rear of the restaurant, an open kitchen finished in the same terracotta tile as the dining room lets guests watch the pass without feeling like they're in the way of service.
+
+Custom pendant lighting, fabricated from blown amber glass, was designed specifically for the space and drops low over each table to create pools of warm light throughout the room.
+
+The restaurant opened to the public this past spring and has since become a neighborhood fixture for weeknight dinners.`,
+    'Healthcare Facility': `Jane Doe Studio Reimagines the Patient Experience at a Boutique Wellness Clinic
+
+For a new outpatient wellness clinic, Jane Doe Studio was asked to design an environment that felt more like a spa than a medical office, without compromising on clinical functionality.
+
+The waiting area eschews the clinical palette typical of healthcare interiors in favor of warm plaster walls, oak millwork, and a living wall of ferns positioned behind the reception desk.
+
+"So much of healthcare design defaults to sterile because sterile feels safe," says Jane Doe, founder of Jane Doe Studio. "We wanted to prove you can meet every clinical requirement and still make people feel cared for the moment they walk in."
+
+Each of the clinic's eight treatment rooms features the same warm material palette, with acoustic felt paneling installed behind the walls to ensure patient privacy without resorting to institutional soundproofing aesthetics.
+
+Custom millwork throughout was designed to conceal medical equipment and storage, keeping every visible surface calm and uncluttered.
+
+The clinic opened to patients earlier this year and has already been used as a reference project by the wellness group's design team for future locations.`,
+    'Leisure Centre': `Jane Doe Studio Designs a Community Leisure Centre Around Natural Light
+
+Jane Doe Studio's interior design for this new community leisure centre centers on a double-height lobby designed to feel more like a hotel atrium than a municipal facility.
+
+Skylights positioned above the lobby's reception desk and lounge seating flood the space with daylight throughout the day, reducing the need for artificial lighting during operating hours.
+
+"Public leisure facilities so rarely get this kind of design attention," says Jane Doe, founder of Jane Doe Studio. "We wanted people to feel a little bit surprised walking in — like this was somewhere worth spending time, not just passing through."
+
+The lounge areas surrounding the pool deck are finished in a durable but warm palette of teak decking and glazed blue tile, chosen to withstand heavy daily use while avoiding the clinical feel typical of public pool facilities.
+
+A café at the center's entrance, finished in the same material palette as the lobby, serves as a gathering point for parents waiting during children's swim lessons.
+
+The leisure centre opened to the public this past summer and has seen a marked increase in daily visitors compared to the facility it replaced.`,
+    'Education Facility': `Jane Doe Studio Designs a Warmer Model for Campus Learning Spaces
+
+For a private secondary school's new humanities building, Jane Doe Studio was tasked with designing classroom and common spaces that encouraged informal collaboration alongside traditional instruction.
+
+The building's central corridor was reimagined as a series of window-seat alcoves and small breakout lounges, finished in warm oak millwork rather than the standard institutional palette of laminate and linoleum.
+
+"Students spend more time in hallways and in-between spaces than anyone really accounts for in school design," says Jane Doe, founder of Jane Doe Studio. "We wanted those moments to feel considered too, not just the classrooms."
+
+Each classroom features movable furniture systems designed to reconfigure quickly between lecture-style seating and small-group collaboration, developed in partnership with the school's faculty.
+
+A shared reading room at the building's center, furnished with custom banquette seating upholstered in a durable wool boucle, has become one of the most heavily used spaces on campus since opening.
+
+The building opened at the start of this academic year, with the school reporting strong feedback from both students and faculty on the new spaces.`,
+    Masterplan: `Jane Doe Studio Leads Interior Design Vision for Mixed-Use Masterplan
+
+As part of a broader mixed-use masterplan, Jane Doe Studio was engaged to develop the interior design language across the development's residential lobbies, shared amenity spaces, and ground-floor retail.
+
+The studio's approach establishes a consistent material palette — white oak, warm plaster, and brass — that ties the development's disparate building types together while allowing each individual space its own character.
+
+"Masterplan work is a different muscle than a single project," says Jane Doe, founder of Jane Doe Studio. "You're designing a language other people will eventually build on, not just a finished room."
+
+The development's central amenity building, which houses a shared lounge, co-working space, and fitness studio, serves as the anchor for the material and lighting standards applied throughout the rest of the project.
+
+Design guidelines developed by the studio will continue to inform the interiors of future phases as the masterplan is built out over the coming years.
+
+The first phase of the development, including the amenity building and two residential lobbies, is scheduled to open to residents later this year.`,
+    Other: `Jane Doe Studio Designs a Private Members' Club Lounge
+
+For a new private members' club, Jane Doe Studio was asked to design a lounge space that felt distinct from the club's more formal dining rooms — somewhere members could linger over a drink or a quiet conversation.
+
+The lounge's material palette leans darker and moodier than the studio's typical residential work, with smoked oak paneling, brass detailing, and a custom bar finished in a deep green lacquer.
+
+"Every room in a club needs its own personality, or the whole place starts to feel the same," says Jane Doe, founder of Jane Doe Studio. "This one was designed to feel like the room you'd want to end the night in."
+
+A custom banquette wraps the room's perimeter, upholstered in a rich burgundy mohair and punctuated by brass reading lamps at each seating cluster.
+
+The bar itself was designed as the room's centerpiece, backed by a custom mirrored shelving unit that displays the club's private label spirits collection.
+
+The lounge opened to members earlier this year and has quickly become the club's most requested space for private events.`
+  },
+  architecture: {
+    Residence: `Jane Doe Studio Designs a New Hillside Residence Organized Around Courtyards
+
+Located on a steeply sloped lot outside the city, this new-construction residence by Jane Doe Studio is organized around a series of courtyards that step down the hillside alongside the house itself.
+
+Rather than fighting the site's grade, the studio designed the home's three levels to follow the slope directly, with each level opening onto its own outdoor courtyard rather than a single unified yard.
+
+"The easy thing to do on a site like this is bulldoze it flat," says Jane Doe, founding principal of Jane Doe Studio. "We wanted the house to feel like it was always meant to be here, stepping down the hill rather than sitting on top of it."
+
+The home's material palette — board-formed concrete, cedar siding, and steel-framed glazing — was chosen to weather naturally over time, allowing the house to settle visually into its wooded surroundings.
+
+A cantilevered primary suite on the home's upper level extends several feet beyond the floor below, framing views of the valley without requiring any visible support columns.
+
+The residence was completed earlier this year and has since been submitted for a regional design award.`,
+    Restaurant: `Jane Doe Studio Completes Adaptive Reuse of a Former Warehouse Restaurant
+
+Jane Doe Studio has completed the architectural design of a new 4,000-square-foot restaurant occupying a converted warehouse in the city's arts district.
+
+The design retains the building's original brick and steel structure, introducing a new mezzanine level and an open kitchen at the heart of the dining room, visible from nearly every seat in the house.
+
+"The building had so much character already — our job was mostly to get out of its way," says Jane Doe, founding principal of Jane Doe Studio. "The new elements are deliberately quiet so the original brick and steel can still do the talking."
+
+A custom steel and reclaimed oak staircase connects the main dining room to the new mezzanine bar, added within the warehouse's existing volume without altering its exterior profile.
+
+Acoustic treatment was a particular focus given the building's hard surfaces, with a felt ceiling system concealed above a series of custom pendant lights designed specifically for the space.
+
+The restaurant opened to the public earlier this year to strong local press coverage.`,
+    'Healthcare Facility': `Jane Doe Studio Designs a Neighborhood Health Clinic Around Daylight and Calm
+
+For a new neighborhood health clinic, Jane Doe Studio was asked to design a building that felt approachable to a community historically underserved by healthcare infrastructure.
+
+The single-story building wraps around a central courtyard, allowing every waiting area and exam room to receive natural daylight — an intentional departure from the deep, windowless floor plates typical of clinic design.
+
+"A lot of clinic design treats daylight as a luxury instead of a basic need," says Jane Doe, founding principal of Jane Doe Studio. "We built the whole plan around making sure nobody in this building is ever far from a window."
+
+The exterior facade, clad in a warm terracotta rainscreen, was designed to feel civic and dignified rather than institutional, reflecting the clinic's role as a genuine community anchor.
+
+A community room adjacent to the main entrance, separated from clinical areas by its own entrance, allows the building to host health education events outside of normal clinic hours.
+
+The clinic opened to patients this year and is expected to serve as a model for two additional locations currently in early design.`,
+    'Leisure Centre': `Jane Doe Studio Completes Community Leisure Centre Anchored by Timber Roof Structure
+
+Jane Doe Studio has completed a new community leisure centre organized around an expansive timber roof structure that spans the building's pool hall without any interior columns.
+
+The exposed glue-laminated timber trusses, left visible throughout the pool hall, were chosen both for their structural efficiency and to soften the acoustics of a typically hard-surfaced, echo-prone space.
+
+"Pool buildings are usually pretty brutal acoustically and visually," says Jane Doe, founding principal of Jane Doe Studio. "The timber roof solves both problems at once — it's quieter in there, and it just feels like a nicer place to be."
+
+A glazed curtain wall along the pool hall's southern facade brings daylight deep into the space while a calculated overhang prevents excessive solar heat gain during summer months.
+
+The building also includes a fitness studio, a small café, and community meeting rooms, all organized around a shared entry lobby.
+
+The leisure centre opened to the public this past summer, replacing a decades-old facility on the same site.`,
+    'Education Facility': `Jane Doe Studio Designs New Humanities Building for Private School Campus
+
+Jane Doe Studio has completed a new humanities building for a private secondary school, designed to encourage informal collaboration alongside traditional classroom instruction.
+
+The building's massing steps down in section to match the surrounding campus's existing scale, with a central atrium connecting three floors of classrooms and shared study spaces.
+
+"We didn't want a building that towered over everything else on campus," says Jane Doe, founding principal of Jane Doe Studio. "It was important that this felt like it belonged with the buildings already there, not like a statement piece."
+
+A network of exterior walkways and covered outdoor classrooms extends the building's usable space beyond its enclosed footprint, taking advantage of the region's mild climate for much of the school year.
+
+The building's facade, clad in a warm brick that matches the campus's original 1920s buildings, ties the new structure visually to the school's historic core.
+
+The building opened at the start of this academic year and has already become a preferred gathering space for students between classes.`,
+    Masterplan: `Jane Doe Studio Leads Architectural Masterplan for Mixed-Use Development
+
+Jane Doe Studio has been engaged to lead the architectural masterplan for a new mixed-use development, establishing the massing, material language, and public realm strategy across several city blocks.
+
+The plan organizes the development around a central pedestrian spine, lined with ground-floor retail and punctuated by a series of public plazas at key intersections.
+
+"Masterplans live or die on the public space between the buildings, not just the buildings themselves," says Jane Doe, founding principal of Jane Doe Studio. "We spent as much time designing the street as we did any single structure."
+
+A consistent material palette of brick, glass, and dark metal detailing was established to unify the development's several building types while allowing individual architects — including Jane Doe Studio itself for several key buildings — flexibility within that framework.
+
+The masterplan also includes a phased sustainability strategy, with shared stormwater infrastructure and district-scale energy systems planned across the site.
+
+Construction on the development's first phase began earlier this year, with full buildout expected over the next several years.`,
+    Other: `Jane Doe Studio Designs a Public Observation Pavilion
+
+Jane Doe Studio has completed a small public pavilion designed to frame views over a restored wetland preserve, commissioned by a regional conservation authority.
+
+The lightweight steel-and-timber structure is elevated above the marsh on slender pilotis, minimizing its physical footprint on the sensitive wetland habitat below.
+
+"The whole point of this building is to disappear a little and let the landscape do the work," says Jane Doe, founding principal of Jane Doe Studio. "It's really just a frame for looking at something else."
+
+A perforated metal screen wraps the pavilion's upper level, filtering direct sunlight while allowing unobstructed views out toward the wetland's open water.
+
+The pavilion was constructed using largely prefabricated components to minimize construction impact on the surrounding habitat during the building process.
+
+The pavilion opened to the public this year and has quickly become a popular stop for birdwatchers and school groups visiting the preserve.`
+  }
+};
+
 const PROJECT_TYPES = ['Residence','Restaurant','Healthcare Facility','Leisure Centre','Education Facility','Masterplan','Other'];
 
 const STORY_FIELDS = [
@@ -2898,7 +3094,17 @@ function buildStoryOutputHTML(){
   } else if(storyState.aiError){
     inner += `<p class="ai-status error">Something went wrong: ${esc(storyState.aiError)}</p>`;
   } else if(!storyState.aiNotice){
-    inner += `<p class="empty-note">Fill in the fields on the left, then click "✨ Generate Project Story" — the tool will write it from scratch by analyzing both your photos and notes.</p>`;
+    const sample = (SAMPLE_STORIES[storyState.category] || {})[storyState.projectType];
+    if(sample){
+      inner += `<div class="hint-banner">The below text is a sample. Click Generate to get your own unique draft!</div>`;
+      const paras = sample.split(/\n\s*\n/).map(s=>s.trim()).filter(Boolean);
+      paras.forEach((p, idx)=>{
+        if(idx===0) inner += `<div class="doc-headline">${esc(p)}</div>`;
+        else inner += `<p>${esc(p)}</p>`;
+      });
+    } else {
+      inner += `<p class="empty-note">Fill in the fields on the left, then click "✨ Generate Project Story" — the tool will write it from scratch by analyzing both your photos and notes.</p>`;
+    }
   }
   return `<div class="doc">${inner}</div>`;
 }
