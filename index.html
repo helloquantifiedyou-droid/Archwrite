@@ -686,6 +686,142 @@ const PROJECT_FACTS_FIELDS = [
   {id:'projCollaborators', label:'Collaborators', placeholder:'', type:'textarea'}
 ];
 
+// Sample releases shown in the preview pad before the user generates anything —
+// always "Jane Doe Studio" as the company, one per category+subtype combination,
+// purely illustrative (never actually output by the AI).
+const SAMPLE_RELEASES = {
+  interiorDesign: {
+    upcomingEvent: `Jane Doe Studio Presents "Woven Light" Installation at Design Miami
+
+A site-specific lighting installation exploring texture, shadow, and handcrafted materials will debut at this year's fair.
+
+MIAMI, FL – 12 MARCH 2026. Jane Doe Studio will unveil "Woven Light," an immersive installation combining hand-woven textiles and sculptural lighting, at Design Miami this spring.
+
+The installation reimagines the studio's signature material language — rattan, linen, and blown glass — at an architectural scale, inviting visitors to move through a canopy of layered light and shadow.
+
+Visitors can experience "Woven Light" throughout the fair's run at the studio's dedicated pavilion.`,
+    awardWin: `Jane Doe Studio Wins Best Residential Interior at the National Design Awards
+
+The studio was recognized for its renovation of a Los Angeles hillside residence.
+
+LOS ANGELES, CA – 12 MARCH 2026. Jane Doe Studio has won Best Residential Interior at this year's National Design Awards for its renovation of a hillside residence in the Hollywood Hills.
+
+The jury cited the project's confident use of natural materials and its sensitive response to the site's dramatic topography.
+
+This marks the studio's second award recognition in three years.`,
+    projectCompletion: `Jane Doe Studio Completes Interior Design for a Hillside Residence
+
+The renovation reimagines a 1960s hillside home for a growing family.
+
+LOS ANGELES, CA – 12 MARCH 2026. Jane Doe Studio has completed the interior renovation of a 4,200-square-foot hillside residence in Los Angeles.
+
+Working closely with the homeowners, the studio opened the home's compartmentalized floor plan into a series of connected living spaces, pairing warm wood tones with custom furnishings throughout.
+
+The primary suite and kitchen were fully reconfigured to take advantage of the property's canyon views.`,
+    commissionWin: `Jane Doe Studio Announces New Commission for a Boutique Hotel Suite Collection
+
+The studio will design a series of signature suites for a boutique hospitality group.
+
+NEW YORK, NY – 12 MARCH 2026. Jane Doe Studio has been commissioned to design a new collection of signature suites for a boutique hotel group's flagship property.
+
+The project marks the studio's first hospitality commission and will draw on its residential design language at a larger scale.
+
+Design work is currently underway, with completion expected in the coming year.`,
+    bookLaunch: `Jane Doe Studio Announces Debut Monograph
+
+The book traces a decade of the studio's residential and hospitality work.
+
+NEW YORK, NY – 12 MARCH 2026. Jane Doe Studio is pleased to announce the release of its debut monograph, featuring a decade of the studio's residential and hospitality projects.
+
+The book includes photography, sketches, and commentary from the studio's founder on the ideas behind each project.
+
+It will be available through select retailers and the studio's website.`,
+    renderingsUnveiled: `Jane Doe Studio Unveils Renderings for a Boutique Retail Concept
+
+The concept reimagines a flagship storefront around natural materials and daylight.
+
+LOS ANGELES, CA – 12 MARCH 2026. Jane Doe Studio has released renderings for a new boutique retail concept opening later this year.
+
+The design centers on a double-height atrium finished in oak and limestone, bringing daylight deep into the retail floor.
+
+The space is scheduled to open to the public later this year.`,
+    productLaunch: `Jane Doe Studio Launches Debut Furniture Collection
+
+The collection extends the studio's material language into a line of case goods and seating.
+
+LOS ANGELES, CA – 12 MARCH 2026. Jane Doe Studio has launched its debut furniture collection, featuring case goods and seating crafted in solid oak and hand-woven textiles.
+
+Each piece is made to order in collaboration with a small network of independent makers.
+
+The collection is available now through the studio's website.`
+  },
+  architecture: {
+    upcomingEvent: `Jane Doe Studio to Present Pavilion Concept at the Venice Architecture Biennale
+
+The temporary structure explores lightweight timber construction and passive cooling.
+
+VENICE, ITALY – 12 MARCH 2026. Jane Doe Studio will present a temporary pavilion at this year's Venice Architecture Biennale, exploring lightweight timber construction and passive cooling strategies.
+
+The structure is built entirely from prefabricated timber components designed to be disassembled and reused after the exhibition closes.
+
+The pavilion will be open to visitors throughout the Biennale's run.`,
+    awardWin: `Jane Doe Studio Wins National Award for Cultural Center Design
+
+The studio was recognized for its design of a new community cultural center.
+
+CHICAGO, IL – 12 MARCH 2026. Jane Doe Studio has won a national design award for its recently completed cultural center, recognized for its integration of public space and sustainable construction.
+
+The jury praised the building's material honesty and its role in revitalizing the surrounding neighborhood.
+
+This is the studio's first national award in the cultural buildings category.`,
+    projectCompletion: `Jane Doe Studio Completes Restaurant Design
+
+The 4,000-square-foot restaurant reimagines a former warehouse in the city's arts district.
+
+CHICAGO, IL – 12 MARCH 2026. Jane Doe Studio has completed the design of a new 4,000-square-foot restaurant occupying a converted warehouse in the city's arts district.
+
+The design retains the building's original brick and steel structure, introducing a new mezzanine level and an open kitchen at the heart of the dining room.
+
+The restaurant is scheduled to open to the public later this year.`,
+    commissionWin: `Jane Doe Studio Selected to Design New Public Library
+
+The studio will lead design of a new branch library and community space.
+
+CHICAGO, IL – 12 MARCH 2026. Jane Doe Studio has been selected to design a new public library branch, following a competitive selection process.
+
+The project will include a community meeting hall, a children's reading room, and a rooftop terrace open to the public.
+
+Design work is expected to begin later this year, with construction to follow.`,
+    bookLaunch: `Jane Doe Studio Announces Debut Monograph on a Decade of Practice
+
+The book documents the studio's civic and cultural work over the past ten years.
+
+CHICAGO, IL – 12 MARCH 2026. Jane Doe Studio is pleased to announce the release of its debut monograph, documenting a decade of civic and cultural projects.
+
+The book includes process drawings, construction photography, and essays on the studio's design approach.
+
+It will be available through select retailers and the studio's website.`,
+    renderingsUnveiled: `Jane Doe Studio Unveils Renderings for a New Community Center
+
+The design centers on a flexible public hall wrapped in a perforated brick facade.
+
+CHICAGO, IL – 12 MARCH 2026. Jane Doe Studio has released renderings for a new community center, anchored by a flexible public hall and a perforated brick facade.
+
+The building is organized around a central courtyard designed to host markets, performances, and neighborhood events.
+
+Construction is expected to begin later this year.`,
+    productLaunch: `Jane Doe Studio Launches Modular Building System
+
+The system is designed to accelerate the construction of small-scale civic and community buildings.
+
+CHICAGO, IL – 12 MARCH 2026. Jane Doe Studio has launched a modular building system designed to accelerate the construction of small-scale civic and community buildings.
+
+The kit-of-parts system uses prefabricated timber panels that can be assembled on site in a matter of weeks.
+
+The system is available now for public agencies and nonprofit partners.`
+  }
+};
+
 // Field schema is shared across categories per subtype (same core details needed);
 // only the assembled sentence phrasing differs per category (see TEMPLATES below).
 const SUBTYPE_DEFS = {
@@ -1408,7 +1544,19 @@ function buildOutputHTML(){
       }
     }
   } else if(!state.aiNotice){
-    inner += `<p class="empty-note">Fill in as many fields as you'd like on the left, then click "✨ Generate" — the tool will write it here from scratch.</p>`;
+    const sample = (SAMPLE_RELEASES[state.category] || {})[state.subtype];
+    if(sample){
+      inner += `<div class="hint-banner">The below text is a sample. Click Generate to get your own unique draft!</div>`;
+      const paras = sample.split(/\n\s*\n/).map(s=>s.trim()).filter(Boolean);
+      paras.forEach((p, idx)=>{
+        if(idx===0) inner += `<div class="doc-headline">${esc(p)}</div>`;
+        else if(idx===1) inner += `<div class="doc-summary">${esc(p)}</div>`;
+        else if(idx===2) inner += `<p>${renderParaWithDateline(p)}</p>`;
+        else inner += `<p>${esc(p)}</p>`;
+      });
+    } else {
+      inner += `<p class="empty-note">Fill in as many fields as you'd like on the left, then click "✨ Generate" — the tool will write it here from scratch.</p>`;
+    }
   }
   return `<div class="doc">${inner}</div>`;
 }
