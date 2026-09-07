@@ -2266,22 +2266,22 @@ The pavilion was constructed using largely prefabricated components to minimize 
 // deterministically produces the sample titles above (e.g. "Chelsea Home").
 const SAMPLE_STORY_FACTS = {
   interiorDesign: {
-    Residence: { projectName:'The Canyon View Residence', location:'Los Angeles, CA', clientNames:'the Whitman family', size:'4,200 sq ft', designerFirm:'Jane Doe Studio', photography:'Laure Joliet' },
-    Restaurant: { projectName:'Amaro', location:'Chicago, IL', size:'2,800 sq ft', designerFirm:'Jane Doe Studio', photography:'Stephen Kent Johnson' },
-    'Healthcare Facility': { projectName:'Meridian Wellness Clinic', location:'Austin, TX', size:'6,000 sq ft', designerFirm:'Jane Doe Studio', photography:'Nick Glimenakis' },
-    'Leisure Centre': { projectName:'Brightwater Community Leisure Centre', location:'Portland, OR', size:'22,000 sq ft', designerFirm:'Jane Doe Studio', photography:'Kate Sears' },
-    'Education Facility': { projectName:'Ridgeview Humanities Building', location:'Greenwich, CT', size:'18,500 sq ft', designerFirm:'Jane Doe Studio', photography:'Read McKendree' },
-    Masterplan: { projectName:'Harbor Row Mixed-Use Development', location:'Baltimore, MD', size:'340,000 sq ft', designerFirm:'Jane Doe Studio', photography:'Chris Mottalini' },
-    Other: { projectName:'The Windmere Club Lounge', location:'New York, NY', size:'1,600 sq ft', designerFirm:'Jane Doe Studio', photography:'Genevieve Garruppo' }
+    Residence: { projectName:'The Canyon View Residence', location:'Los Angeles, CA', clientNames:'the Whitman family', size:'4,200 sq ft', completionDate:'January 2026', designerFirm:'Jane Doe Studio', photography:'Laure Joliet' },
+    Restaurant: { projectName:'Amaro', location:'Chicago, IL', size:'2,800 sq ft', completionDate:'Spring 2026', designerFirm:'Jane Doe Studio', photography:'Stephen Kent Johnson' },
+    'Healthcare Facility': { projectName:'Meridian Wellness Clinic', location:'Austin, TX', size:'6,000 sq ft', completionDate:'Winter 2026', designerFirm:'Jane Doe Studio', photography:'Nick Glimenakis' },
+    'Leisure Centre': { projectName:'Brightwater Community Leisure Centre', location:'Portland, OR', size:'22,000 sq ft', completionDate:'Summer 2026', designerFirm:'Jane Doe Studio', photography:'Kate Sears' },
+    'Education Facility': { projectName:'Ridgeview Humanities Building', location:'Greenwich, CT', size:'18,500 sq ft', completionDate:'Fall 2026', designerFirm:'Jane Doe Studio', photography:'Read McKendree' },
+    Masterplan: { projectName:'Harbor Row Mixed-Use Development', location:'Baltimore, MD', size:'340,000 sq ft', completionDate:'Phase 1, 2027', designerFirm:'Jane Doe Studio', photography:'Chris Mottalini' },
+    Other: { projectName:'The Windmere Club Lounge', location:'New York, NY', size:'1,600 sq ft', completionDate:'Spring 2026', designerFirm:'Jane Doe Studio', photography:'Genevieve Garruppo' }
   },
   architecture: {
-    Residence: { projectName:'Chelsea', location:'Ojai, CA', size:'5,100 sq ft', architectureFirm:'Jane Doe Studio', builder:'Hendricks Construction', photography:'Iwan Baan' },
-    Restaurant: { projectName:'Chelsea', location:'Portland, OR', clientNames:'Chelsea Restaurant Group', size:'4,000 sq ft', architectureFirm:'Jane Doe Studio', builder:'Marsh & Cole Builders', photography:'Iwan Baan' },
-    'Healthcare Facility': { projectName:'Chelsea', location:'Tulsa, OK', clientNames:'Chelsea Community Health Network', size:'14,000 sq ft', architectureFirm:'Jane Doe Studio', builder:'Redline Construction Group', photography:'Hufton+Crow' },
-    'Leisure Centre': { projectName:'Chelsea', location:'Manchester, UK', clientNames:'Manchester City Council', size:'28,000 sq ft', architectureFirm:'Jane Doe Studio', builder:'Bowmer & Kirkland', photography:'Hufton+Crow' },
-    'Education Facility': { projectName:'Chelsea', location:'Providence, RI', clientNames:'The Kingsley School', size:'31,000 sq ft', architectureFirm:'Jane Doe Studio', builder:'Dimeo Construction', photography:'Iwan Baan' },
-    Masterplan: { projectName:'Chelsea', location:'Nashville, TN', clientNames:'Riverfront Development Partners', size:'1.2 million sq ft', architectureFirm:'Jane Doe Studio', photography:'Iwan Baan' },
-    Other: { projectName:'Chelsea', location:'Sacramento, CA', clientNames:'Sacramento Regional Conservancy', size:'850 sq ft', architectureFirm:'Jane Doe Studio', builder:'Anders Timber Works', photography:'Bruce Damonte' }
+    Residence: { projectName:'Chelsea', location:'Ojai, CA', size:'5,100 sq ft', completionDate:'January 2026', architectureFirm:'Jane Doe Studio', builder:'Hendricks Construction', photography:'Iwan Baan' },
+    Restaurant: { projectName:'Chelsea', location:'Portland, OR', clientNames:'Chelsea Restaurant Group', size:'4,000 sq ft', completionDate:'Spring 2026', architectureFirm:'Jane Doe Studio', builder:'Marsh & Cole Builders', photography:'Iwan Baan' },
+    'Healthcare Facility': { projectName:'Chelsea', location:'Tulsa, OK', clientNames:'Chelsea Community Health Network', size:'14,000 sq ft', completionDate:'Winter 2026', architectureFirm:'Jane Doe Studio', builder:'Redline Construction Group', photography:'Hufton+Crow' },
+    'Leisure Centre': { projectName:'Chelsea', location:'Manchester, UK', clientNames:'Manchester City Council', size:'28,000 sq ft', completionDate:'Summer 2026', architectureFirm:'Jane Doe Studio', builder:'Bowmer & Kirkland', photography:'Hufton+Crow' },
+    'Education Facility': { projectName:'Chelsea', location:'Providence, RI', clientNames:'The Kingsley School', size:'31,000 sq ft', completionDate:'Fall 2026', architectureFirm:'Jane Doe Studio', builder:'Dimeo Construction', photography:'Iwan Baan' },
+    Masterplan: { projectName:'Chelsea', location:'Nashville, TN', clientNames:'Riverfront Development Partners', size:'1.2 million sq ft', completionDate:'Phase 1, 2027', architectureFirm:'Jane Doe Studio', photography:'Iwan Baan' },
+    Other: { projectName:'Chelsea', location:'Sacramento, CA', clientNames:'Sacramento Regional Conservancy', size:'850 sq ft', completionDate:'Spring 2026', architectureFirm:'Jane Doe Studio', builder:'Anders Timber Works', photography:'Bruce Damonte' }
   }
 };
 
@@ -2315,18 +2315,17 @@ const STORY_FIELDS = [
   { id:'photography', label:'Photography credit', placeholder:'', creditsOnly:true, factsBoxField:true },
   { id:'location', label:'Location', placeholder:'Neighborhood, City', factsBoxField:true },
   { id:'clientNames', label:'Client', placeholder:'Leave blank to keep them unnamed', hideForArchitectureResidence:true, factsBoxField:true },
-  { id:'homeowners', label:'Homeowners', placeholder:'Describe the homeowners – their family unit, what they do, and any details that might be helpful. You can also choose to include their names.', type:'textarea', residenceOnly:true, architectureOnly:true },
+  { id:'clientNeeds', label:'Client needs', placeholder:'What did the client ask for?', type:'textarea', architectureOnly:true },
   { id:'clientStory', label:'Client story / background', placeholder:"Who are they, and what shaped the brief? e.g. their profession, how they found the property, their personal style or priorities.", type:'textarea' },
   { id:'size', label:'Square footage / size', placeholder:'', factsBoxField:true },
   { id:'floorCount', label:'Floor count', placeholder:'' },
   { id:'bedrooms', label:'Bedrooms', placeholder:'', residenceOnly:true },
   { id:'bathrooms', label:'Bathrooms', placeholder:'', residenceOnly:true },
-  { id:'completionDate', label:'Completion date', placeholder:'e.g. Spring 2026, or a project timeline/range' },
+  { id:'completionDate', label:'Completion date', placeholder:'e.g. Spring 2026, or a project timeline/range', factsBoxField:true },
   { id:'keyFacts', label:'Key facts', placeholder:'', type:'textarea', architectureOnly:true },
   { id:'context', label:'Context', placeholder:'', type:'textarea', architectureOnly:true },
   { id:'designConcept', label:'Design concept / inspiration', placeholder:'', type:'textarea' },
   { id:'designApproach', label:'Overall design approach', placeholder:'', type:'textarea', interiorOnly:true },
-  { id:'designPortfolio', label:'Design portfolio', placeholder:'Copy and paste information for relevant related projects the firm has completed or that are ongoing.', type:'textarea', architectureOnly:true },
   { id:'materials', label:'Key materials & palette', placeholder:'', type:'textarea' },
   { id:'brandsAndArt', label:'Brands, artists & notable pieces', placeholder:"List any brands or artists featured in the project, e.g. sofa by Roche Bobois, painting by Jane Doe", type:'textarea', interiorOnly:true },
   { id:'pressKitUrl', label:'Press kit link (URL)', placeholder:'https://', architectureOnly:true, renderAtEnd:true, creditsOnly:true, factsBoxField:true },
@@ -2338,6 +2337,7 @@ const STORY_CREDIT_FIELDS = [
   { id:'location', creditLabel:'Location' },
   { id:'clientNames', creditLabel:'Client' },
   { id:'size', creditLabel:'Size' },
+  { id:'completionDate', creditLabel:'Completion date' },
   { id:'architectureFirm', creditLabel:'Architecture firm' },
   { id:'designerFirm', creditLabel:'Interior design firm' },
   { id:'builder', creditLabel:'Contracting' },
@@ -2887,7 +2887,7 @@ function renderStoryForm(){
 
   html += `<div class="hint-banner">This blue section appears as its own block at the end of the story, placed exactly as entered.</div>`;
   html += `<div class="block-card facts-box">`;
-  ['projectName','location','clientNames','size','architectureFirm','designerFirm','builder','photography','aboutDesigner','pressKitUrl'].forEach(fid=>{
+  ['projectName','location','clientNames','size','completionDate','architectureFirm','designerFirm','builder','photography','aboutDesigner','pressKitUrl'].forEach(fid=>{
     const f = STORY_FIELDS.find(sf=>sf.id===fid);
     if(f && shouldShowStoryField(f)) html += renderStoryCoreField(f);
   });
@@ -3427,7 +3427,7 @@ Rules:
 - Open the body's first sentence with a clear, concrete, declarative statement that establishes the actual subject — the firm, the client, or the space — the way the EXAMPLES do (e.g. naming the designer/firm and what they brought to the project, or naming the home and its location). Never open with a vague relative or temporal phrase whose reference isn't yet established, like "Before this," "Prior to the renovation," or "Before the redesign," — state directly what the project is and where before moving into any backstory.
 - Keep paragraphs SHORT: roughly 250-500 characters each (about 2-4 sentences) — noticeably shorter than a typical press-release paragraph. Break into a new paragraph whenever the focus shifts — a new room, a new material, a new beat of the client story — rather than letting one paragraph run long. The result should read as more, shorter paragraphs with frequent line breaks throughout, never a handful of dense ones.
 - Wrap every specific brand, maker, or artist name in double asterisks, e.g. "a sofa by **Roche Bobois**" — including the literal [BRAND] and [ARTIST] placeholder tokens, e.g. "a chair by **[BRAND]**". Bold only the name itself, never the surrounding words (correct: "a sofa by **Roche Bobois**"; wrong: "**a sofa by Roche Bobois**"). This is the one exception to "no markdown formatting" below.
-- Do NOT write your own "PROJECT FACTS" block (Project name, Location, Client, Size, Architecture firm, Interior design firm, Contracting, Photography) or "About the designer" section, even though some of those facts are given to you below — they're appended separately after your response, verbatim. Writing your own would create a duplicate.
+- Do NOT write your own "PROJECT FACTS" block (Project name, Location, Client, Size, Completion date, Architecture firm, Interior design firm, Contracting, Photography) or "About the designer" section, even though some of those facts are given to you below — they're appended separately after your response, verbatim. Writing your own would create a duplicate.
 - Do NOT include any quoted speech or attributed statements (e.g. "says [Name], [Title]") anywhere in the story — this genre is written entirely in third-person narrative voice, never with a first-person quote from the designer, architect, or client.
 - If something in FACTS is missing or blank, simply don't mention it — never invent a placeholder.
 - You may also receive loose NOTES from the user — weave any relevant facts from the notes into the appropriate place, corrected and in full sentences. Ignore anything that's just the user thinking out loud.
