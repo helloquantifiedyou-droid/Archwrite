@@ -26,6 +26,21 @@
   gtag('config', 'AW-18427939262');
   gtag('config', 'G-775G7GHJCJ');
 </script>
+<!-- Event snippet for Submit lead form conversion page -->
+<script>
+function gtag_report_conversion(url) {
+  var callback = function () {
+    if (typeof(url) != 'undefined') {
+      window.location = url;
+    }
+  };
+  gtag('event', 'conversion', {
+      'send_to': 'AW-18427939262/WOJPCPacnfAcEL6TkNNE',
+      'event_callback': callback
+  });
+  return false;
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Droid+Sans:wght@400;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1838,6 +1853,9 @@ async function callClaudeAPI(mode){
     release_type: state.subtype,
     is_regenerate: isRevision
   });
+  // Google Ads lead conversion — only for the actual Generate/Regenerate
+  // action, not Apply Edits (which revises an existing draft, not a new lead).
+  if(!isEditMode && typeof gtag_report_conversion === 'function') gtag_report_conversion();
 
   state.aiLoading = true;
   state.aiError = '';
@@ -3272,6 +3290,9 @@ async function callStoryClaudeAPI(){
     project_type: storyState.projectType,
     is_regenerate: isRevision
   });
+  // Google Ads lead conversion — Project Story has a single Generate/Regenerate
+  // button (no separate Apply Edits), so every click counts.
+  if(typeof gtag_report_conversion === 'function') gtag_report_conversion();
 
   storyState.aiLoading = true;
   storyState.aiError = '';
