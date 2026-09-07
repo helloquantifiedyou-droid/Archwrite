@@ -698,9 +698,10 @@ function bannedSentencePatternsText(){
   return BANNED_SENTENCE_PATTERNS.map(p => `- ${p}`).join('\n');
 }
 
-// Fixed "Project Facts" block — architecture only (see def.projectFacts below),
-// rendered at the very end of the release, appended programmatically (never
-// written by the AI) the same way About/Boilerplate is.
+// Fixed "Project Facts" block — architecture, plus interior design's Project
+// Completion subtype (see projectFactsApplies() below) — rendered at the very
+// end of the release, appended programmatically (never written by the AI) the
+// same way About/Boilerplate is.
 const PROJECT_FACTS_FIELDS = [
   {id:'projName', label:'Project Name', placeholder:''},
   {id:'projClient', label:'Client', placeholder:''},
@@ -710,6 +711,24 @@ const PROJECT_FACTS_FIELDS = [
   {id:'projCollaborators', label:'Collaborators', placeholder:'', type:'textarea'},
   {id:'projPhotography', label:'Photography', placeholder:''}
 ];
+
+// Project Facts (the blue box + its output block) is architecture-only, except
+// for Project Completion, which also gets it for interior design — every place
+// that used to check `state.category === 'architecture'` for these features
+// should go through these two helpers instead, so the interior-design exception
+// stays in one place.
+function projectFactsApplies(){
+  const def = SUBTYPE_DEFS[state.subtype];
+  if(!def || !def.projectFacts) return false;
+  if(state.category === 'architecture') return true;
+  return state.category === 'interiorDesign' && state.subtype === 'projectCompletion';
+}
+function factsAdBoxApplies(){
+  const def = SUBTYPE_DEFS[state.subtype];
+  if(!def || !def.factsAdBox) return false;
+  if(state.category === 'architecture') return true;
+  return state.category === 'interiorDesign' && state.subtype === 'projectCompletion';
+}
 
 // Sample releases shown in the preview pad before the user generates anything —
 // always "Jane Doe Studio" as the company, one per category+subtype combination,
@@ -932,6 +951,20 @@ The system offers three base configurations — a single-room community hall, a 
 An initial pilot project using the system is currently under construction in rural Michigan, in partnership with a local community land trust.
 
 The system is available now for public agencies and nonprofit partners, with the studio offering design support throughout the permitting and construction process.`
+  }
+};
+
+// Fake PROJECT FACTS for the sample releases above, shown for the subtype +
+// category combinations where projectFactsApplies() would show them on real
+// generated output — architecture's Project Completion and Award Win, plus
+// interior design's Project Completion.
+const SAMPLE_PROJECT_FACTS = {
+  interiorDesign: {
+    projectCompletion: { projName:'The Hollywood Hills Residence', projLocation:'Los Angeles, CA', projClient:'Private homeowners', projSize:'4,200 sq ft', projTeam:'Jane Doe Studio (interior design)', projCollaborators:'Nordlund Lighting (fixtures)', projPhotography:'Laure Joliet' }
+  },
+  architecture: {
+    projectCompletion: { projName:'The Ironworks Restaurant', projLocation:'Chicago, IL', projClient:'Ironworks Hospitality Group', projSize:'4,000 sq ft', projTeam:'Jane Doe Studio (architecture)', projCollaborators:'Reclaimed Oak Co. (staircase fabrication)', projPhotography:'Iwan Baan' },
+    awardWin: { projName:'The Foundry Cultural Center', projLocation:'Chicago, IL', projClient:'City of Chicago Department of Cultural Affairs', projSize:'38,000 sq ft', projTeam:'Jane Doe Studio (architecture)', projCollaborators:'Foundry Construction Group (general contractor)', projPhotography:'Hufton+Crow' }
   }
 };
 
@@ -1302,7 +1335,7 @@ function renderForm(){
 
   html += `<div class="ad-banner">PLACE YOUR AD HERE<a class="ad-banner-link" href="https://www.patreon.com/16724522/join" target="_blank" rel="noopener noreferrer">Purchase</a></div>`;
 
-  const useFactsAdBox = def.factsAdBox && state.category === 'architecture';
+  const useFactsAdBox = factsAdBoxApplies();
   if(useFactsAdBox){
     html += `<div class="hint-banner">This blue section appears as its own block at the end of the release, placed exactly as entered – not written by AI.</div>`;
     html += `<div class="block-card facts-box">`;
@@ -1340,7 +1373,7 @@ function renderForm(){
 
   def.fields.forEach(f=>{
     if(f.renderAtEnd) return;
-    if(f.interiorOnly && state.category==='architecture') return;
+    if(f.interiorOnly && (state.category==='architecture' || useFactsAdBox)) return;
     if(f.architectureOnly && state.category!=='architecture') return;
     if(state.subtype==='upcomingEvent' && f.id==='conceptName'){
       html += `<div class="hint-banner">These are optional fields. If you already mentioned this information in the Notes section above, then feel free to skip.</div>`;
@@ -1659,7 +1692,7 @@ function buildOutputHTML(){
     inner += `<div id="aiOutputRegion" contenteditable="true">${editable}</div>`;
     inner += `<div class="guidance" style="margin:4px 0 0;">Click into the text above to edit it directly.</div>`;
     const def = SUBTYPE_DEFS[state.subtype];
-    if(def.projectFacts && state.category === 'architecture'){
+    if(projectFactsApplies()){
       const factLines = PROJECT_FACTS_FIELDS
         .map(f=>{ const v=(state.projectFacts[f.id]||'').trim(); return v ? `<strong>${esc(f.label)}:</strong> ${esc(v)}` : null; })
         .filter(Boolean);
@@ -1679,7 +1712,7 @@ function buildOutputHTML(){
         inner += `<p>${contactLines.map(esc).join('<br>')}</p>`;
       }
     }
-    if(def.factsAdBox && state.category === 'architecture'){
+    if(factsAdBoxApplies()){
       const pressKitUrl = (state.fields.pressKitUrl||'').trim();
       if(pressKitUrl){
         inner += `<div class="about-heading">PRESS KIT</div>`;
@@ -1697,6 +1730,18 @@ function buildOutputHTML(){
         else if(idx===2) inner += `<p>${renderParaWithDateline(p)}</p>`;
         else inner += `<p>${esc(p)}</p>`;
       });
+      if(projectFactsApplies()){
+        const sampleFacts = (SAMPLE_PROJECT_FACTS[state.category] || {})[state.subtype];
+        if(sampleFacts){
+          const factLines = PROJECT_FACTS_FIELDS
+            .map(f=>{ const v=(sampleFacts[f.id]||'').trim(); return v ? `<strong>${esc(f.label)}:</strong> ${esc(v)}` : null; })
+            .filter(Boolean);
+          if(factLines.length){
+            inner += `<div class="about-heading">PROJECT FACTS</div>`;
+            inner += `<p>${factLines.join('<br>')}</p>`;
+          }
+        }
+      }
     } else {
       inner += `<p class="empty-note">Fill in as many fields as you'd like on the left, then click "✨ Generate" — the tool will write it here from scratch.</p>`;
     }
@@ -1732,9 +1777,9 @@ function buildFactsOutline(){
   if(datelineParts || dateVal) lines.push(`Dateline: ${datelineParts}${datelineParts && dateVal ? ' – ' : ''}${dateVal}`);
   lines.push('');
 
-  const useFactsAdBox = def.factsAdBox && state.category === 'architecture';
+  const useFactsAdBox = factsAdBoxApplies();
   def.fields.forEach(f=>{
-    if(f.interiorOnly && state.category==='architecture') return;
+    if(f.interiorOnly && (state.category==='architecture' || useFactsAdBox)) return;
     if(f.architectureOnly && state.category!=='architecture') return;
     if(f.id==='contact' || f.id==='contactEmail') return;
     if(useFactsAdBox && f.id==='pressKitUrl') return;
@@ -1792,8 +1837,7 @@ function getAboutText(){
 }
 
 function getProjectFactsText(){
-  const def = SUBTYPE_DEFS[state.subtype];
-  if(!def.projectFacts || state.category !== 'architecture') return '';
+  if(!projectFactsApplies()) return '';
   const lines = PROJECT_FACTS_FIELDS
     .map(f=>{ const v=(state.projectFacts[f.id]||'').trim(); return v ? `${f.label}: ${v}` : null; })
     .filter(Boolean);
@@ -1814,8 +1858,7 @@ function getMediaContactText(){
 // Press kit link only gets appended verbatim (never written or seen by the
 // AI) for the subtypes where it lives in the blue Project Facts box.
 function getPressKitText(){
-  const def = SUBTYPE_DEFS[state.subtype];
-  if(!(def.factsAdBox && state.category === 'architecture')) return '';
+  if(!factsAdBoxApplies()) return '';
   const url = (state.fields.pressKitUrl||'').trim();
   if(!url) return '';
   return 'PRESS KIT\n\n' + url;
@@ -1841,7 +1884,7 @@ function getActiveHTML(){
     else html += `<p style="margin:0 0 12px;">${esc(p)}</p>`;
   });
   const def = SUBTYPE_DEFS[state.subtype];
-  if(def.projectFacts && state.category === 'architecture'){
+  if(projectFactsApplies()){
     const factLines = PROJECT_FACTS_FIELDS
       .map(f=>{ const v=(state.projectFacts[f.id]||'').trim(); return v ? `<b>${esc(f.label)}:</b> ${esc(v)}` : null; })
       .filter(Boolean);
@@ -1861,7 +1904,7 @@ function getActiveHTML(){
       html += `<p style="margin:0 0 12px;">${contactLines.map(esc).join('<br>')}</p>`;
     }
   }
-  if(def.factsAdBox && state.category === 'architecture'){
+  if(factsAdBoxApplies()){
     const pressKitUrl = (state.fields.pressKitUrl||'').trim();
     if(pressKitUrl){
       html += `<p style="font-weight:700;margin:16px 0 8px;">PRESS KIT</p>`;
@@ -1917,11 +1960,11 @@ async function callClaudeAPI(mode){
         ? '\n- This event has already taken place — write it as a past-tense recap of what happened (e.g. "the display was on view," "the collection was presented"), not a forward-looking announcement. Adjust the headline and any invitation-style language (visiting hours, "will be presented," etc.) accordingly.'
         : '\n- This event has not yet taken place — write it as a forward-looking announcement in future/present tense (e.g. "will be on view," "the collection will be presented," "visitors can..."), not a past-tense recap.')
     : '';
-  const projectFactsRule = (SUBTYPE_DEFS[state.subtype].projectFacts && state.category === 'architecture')
+  const projectFactsRule = projectFactsApplies()
     ? '\n- Do NOT write a "Project Facts" / project credits block (Project Name, Client, Size, Location, Project team, Collaborators), even if the examples below have one. The user\'s own entries for that block are appended separately after your response, verbatim — writing your own would create a duplicate.'
     : '';
-  const noFactsListRule = !(SUBTYPE_DEFS[state.subtype].projectFacts && state.category === 'architecture')
-    ? '\n- Do NOT end the release with a bulleted or structured "facts," "details," or "at a glance" list — write all details (dates, times, venue, address, etc.) in flowing prose within the body paragraphs instead. That structured closing-facts convention is reserved for architecture project releases only.'
+  const noFactsListRule = !projectFactsApplies()
+    ? '\n- Do NOT end the release with a bulleted or structured "facts," "details," or "at a glance" list — write all details (dates, times, venue, address, etc.) in flowing prose within the body paragraphs instead. That structured closing-facts convention is reserved for project releases with their own Project Facts block only.'
     : '';
   const mediaContactRule = SUBTYPE_DEFS[state.subtype].fields.some(f=>f.id==='contact')
     ? '\n- Do NOT write your own "Media Contact" / press contact line, even if Media contact or Media email details are given in FACTS. Those are appended separately after your response, verbatim — writing your own would create a duplicate.'
@@ -2237,6 +2280,32 @@ The lightweight steel-and-timber structure is elevated above the marsh on slende
 A perforated metal screen wraps the pavilion's upper level, filtering direct sunlight while allowing unobstructed views out toward the wetland's open water.
 
 The pavilion was constructed using largely prefabricated components to minimize construction impact on the surrounding habitat during the building process.`
+  }
+};
+
+// Fake PROJECT FACTS for the sample previews above, matching the credits block
+// real generated output gets — so the sample gives an accurate preview of the
+// full output, not just the narrative text. Architecture entries all use
+// projectName "Chelsea" since that's what, combined with the project type,
+// deterministically produces the sample titles above (e.g. "Chelsea Home").
+const SAMPLE_STORY_FACTS = {
+  interiorDesign: {
+    Residence: { projectName:'The Canyon View Residence', location:'Los Angeles, CA', clientNames:'the Whitman family', size:'4,200 sq ft', designerFirm:'Jane Doe Studio', photography:'Laure Joliet' },
+    Restaurant: { projectName:'Amaro', location:'Chicago, IL', size:'2,800 sq ft', designerFirm:'Jane Doe Studio', photography:'Stephen Kent Johnson' },
+    'Healthcare Facility': { projectName:'Meridian Wellness Clinic', location:'Austin, TX', size:'6,000 sq ft', designerFirm:'Jane Doe Studio', photography:'Nick Glimenakis' },
+    'Leisure Centre': { projectName:'Brightwater Community Leisure Centre', location:'Portland, OR', size:'22,000 sq ft', designerFirm:'Jane Doe Studio', photography:'Kate Sears' },
+    'Education Facility': { projectName:'Ridgeview Humanities Building', location:'Greenwich, CT', size:'18,500 sq ft', designerFirm:'Jane Doe Studio', photography:'Read McKendree' },
+    Masterplan: { projectName:'Harbor Row Mixed-Use Development', location:'Baltimore, MD', size:'340,000 sq ft', designerFirm:'Jane Doe Studio', photography:'Chris Mottalini' },
+    Other: { projectName:'The Windmere Club Lounge', location:'New York, NY', size:'1,600 sq ft', designerFirm:'Jane Doe Studio', photography:'Genevieve Garruppo' }
+  },
+  architecture: {
+    Residence: { projectName:'Chelsea', location:'Ojai, CA', size:'5,100 sq ft', architectureFirm:'Jane Doe Studio', builder:'Hendricks Construction', photography:'Iwan Baan' },
+    Restaurant: { projectName:'Chelsea', location:'Portland, OR', clientNames:'Chelsea Restaurant Group', size:'4,000 sq ft', architectureFirm:'Jane Doe Studio', builder:'Marsh & Cole Builders', photography:'Iwan Baan' },
+    'Healthcare Facility': { projectName:'Chelsea', location:'Tulsa, OK', clientNames:'Chelsea Community Health Network', size:'14,000 sq ft', architectureFirm:'Jane Doe Studio', builder:'Redline Construction Group', photography:'Hufton+Crow' },
+    'Leisure Centre': { projectName:'Chelsea', location:'Manchester, UK', clientNames:'Manchester City Council', size:'28,000 sq ft', architectureFirm:'Jane Doe Studio', builder:'Bowmer & Kirkland', photography:'Hufton+Crow' },
+    'Education Facility': { projectName:'Chelsea', location:'Providence, RI', clientNames:'The Kingsley School', size:'31,000 sq ft', architectureFirm:'Jane Doe Studio', builder:'Dimeo Construction', photography:'Iwan Baan' },
+    Masterplan: { projectName:'Chelsea', location:'Nashville, TN', clientNames:'Riverfront Development Partners', size:'1.2 million sq ft', architectureFirm:'Jane Doe Studio', photography:'Iwan Baan' },
+    Other: { projectName:'Chelsea', location:'Sacramento, CA', clientNames:'Sacramento Regional Conservancy', size:'850 sq ft', architectureFirm:'Jane Doe Studio', builder:'Anders Timber Works', photography:'Bruce Damonte' }
   }
 };
 
@@ -3219,6 +3288,17 @@ function buildStoryOutputHTML(){
         if(idx===0) inner += `<div class="doc-headline">${esc(p)}</div>`;
         else inner += `<p>${esc(p)}</p>`;
       });
+      const sampleFacts = (SAMPLE_STORY_FACTS[storyState.category] || {})[storyState.projectType];
+      if(sampleFacts){
+        const factLines = STORY_CREDIT_FIELDS
+          .filter(storyCreditFieldVisible)
+          .map(f=>{ const v=(sampleFacts[f.id]||'').trim(); return v ? `<strong>${esc(f.creditLabel)}:</strong> ${esc(v)}` : null; })
+          .filter(Boolean);
+        if(factLines.length){
+          inner += `<div class="about-heading">PROJECT FACTS</div>`;
+          inner += `<p>${factLines.join('<br>')}</p>`;
+        }
+      }
     } else {
       inner += `<p class="empty-note">Fill in the fields on the left, then click "✨ Generate Project Story" — the tool will write it from scratch by analyzing both your photos and notes.</p>`;
     }
