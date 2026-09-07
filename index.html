@@ -2938,7 +2938,7 @@ function renderStoryForm(){
   STORY_FIELDS.forEach(f=>{ if(f.renderAtEnd && !f.factsBoxField && shouldShowStoryField(f)) html += renderStoryCoreField(f); });
   html += `<div class="section-title">Edit instructions</div>
   <div class="field-group">
-    <textarea id="storyEditInstructions" placeholder="Don't like the result? You can request edits here and click Regenerate.">${esc(storyState.editInstructions)}</textarea>
+    <textarea id="storyEditInstructions" placeholder="Want to keep the generated draft but request some edits? You can request here and click Regenerate.">${esc(storyState.editInstructions)}</textarea>
   </div>`;
   html += `<button class="btn primary small" id="storyGenerateBtn" style="margin:4px 0 16px;" ${storyState.aiLoading?'disabled':''}>${storyState.aiOutput ? '✨ Regenerate' : '✨ Generate Project Story'}</button>`;
   html += `<div class="ad-banner">PLACE YOUR AD HERE<a class="ad-banner-link" href="https://www.patreon.com/16724522/join" target="_blank" rel="noopener noreferrer">Purchase</a></div>`;
