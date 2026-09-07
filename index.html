@@ -1737,7 +1737,6 @@ function buildOutputHTML(){
             .map(f=>{ const v=(sampleFacts[f.id]||'').trim(); return v ? `<strong>${esc(f.label)}:</strong> ${esc(v)}` : null; })
             .filter(Boolean);
           if(factLines.length){
-            inner += `<div class="about-heading">PROJECT FACTS</div>`;
             inner += `<p>${factLines.join('<br>')}</p>`;
           }
         }
@@ -3295,7 +3294,6 @@ function buildStoryOutputHTML(){
           .map(f=>{ const v=(sampleFacts[f.id]||'').trim(); return v ? `<strong>${esc(f.creditLabel)}:</strong> ${esc(v)}` : null; })
           .filter(Boolean);
         if(factLines.length){
-          inner += `<div class="about-heading">PROJECT FACTS</div>`;
           inner += `<p>${factLines.join('<br>')}</p>`;
         }
       }
