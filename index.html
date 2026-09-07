@@ -1379,9 +1379,10 @@ function renderForm(){
 
   const editInstructionsHtml = `<div class="section-title">Edit instructions</div>
   <div class="field-group">
-    <textarea id="f_editInstructions" placeholder="Don't like the result? You can request edits here and click Regenerate.">${esc(state.editInstructions)}</textarea>
+    <textarea id="f_editInstructions" placeholder="Want to make minor edits but keep the overall draft? Add your edit instructions here.">${esc(state.editInstructions)}</textarea>
   </div>`;
   const generateBtn2Html = `<button class="btn primary small" id="generateBtn2" style="margin:4px 0 16px;" ${state.aiLoading?'disabled':''}>${state.aiOutput ? '✨ Regenerate' : '✨ Generate Press Release'}</button>`;
+  const applyEditsBtnHtml = `<button class="btn primary small" id="applyEditsBtn" style="margin:4px 0 16px;" ${(state.aiLoading || !state.aiOutput)?'disabled':''}>✨ Apply Edits</button>`;
   const renderAtEndFieldsHtml = def.fields.filter(f=>f.renderAtEnd).map(f=>renderCoreField(f)).join('');
   const faqHtml = `<div class="section-title">FAQ</div>
   <div class="faq-list">
@@ -1423,15 +1424,17 @@ function renderForm(){
     </div>`;
 
     html += renderAtEndFieldsHtml;
-    html += editInstructionsHtml;
     html += generateBtn2Html;
+    html += editInstructionsHtml;
+    html += applyEditsBtnHtml;
 
     html += `<div class="ad-banner">PLACE YOUR AD HERE<a class="ad-banner-link" href="https://www.patreon.com/16724522/join" target="_blank" rel="noopener noreferrer">Purchase</a></div>`;
     html += faqHtml;
   } else {
     html += renderAtEndFieldsHtml;
-    html += editInstructionsHtml;
     html += generateBtn2Html;
+    html += editInstructionsHtml;
+    html += applyEditsBtnHtml;
 
     html += `<div class="ad-banner">PLACE YOUR AD HERE<a class="ad-banner-link" href="https://www.patreon.com/16724522/join" target="_blank" rel="noopener noreferrer">Purchase</a></div>`;
     html += faqHtml;
@@ -1443,7 +1446,9 @@ function renderForm(){
 
 function attachFormEvents(){
   const generateBtn2 = document.getElementById('generateBtn2');
-  if(generateBtn2) generateBtn2.addEventListener('click', callClaudeAPI);
+  if(generateBtn2) generateBtn2.addEventListener('click', ()=>callClaudeAPI('fresh'));
+  const applyEditsBtn = document.getElementById('applyEditsBtn');
+  if(applyEditsBtn) applyEditsBtn.addEventListener('click', ()=>callClaudeAPI('edit'));
 
   document.getElementById('categorySelect').addEventListener('change', e=>{
     state.category = e.target.value;
@@ -1792,10 +1797,21 @@ function getActiveHTML(){
   return html;
 }
 
-async function callClaudeAPI(){
+async function callClaudeAPI(mode){
+  const isEditMode = mode === 'edit';
   const editInstructions = (state.editInstructions || '').trim();
   const previousOutput = state.aiOutput;
-  const isRevision = !!(editInstructions && previousOutput);
+
+  // "Generate Press Release" always starts fresh from FACTS; "Apply Edits" is
+  // the only path that revises the existing draft, and needs both a draft and
+  // instructions to revise it with.
+  if(isEditMode && !previousOutput) return;
+  if(isEditMode && !editInstructions){
+    state.aiError = 'Add your edit instructions above, then click Apply Edits.';
+    renderPreview();
+    return;
+  }
+  const isRevision = isEditMode;
 
   trackGenerateEvent({
     tool: 'press_release',
@@ -1811,6 +1827,8 @@ async function callClaudeAPI(){
   renderPreview();
   const generateBtn2 = document.getElementById('generateBtn2');
   if(generateBtn2) generateBtn2.disabled = true;
+  const applyEditsBtn = document.getElementById('applyEditsBtn');
+  if(applyEditsBtn) applyEditsBtn.disabled = true;
 
   const factsOutline = buildFactsOutline();
   const examples = (typeof getStyleExamples === 'function' ? getStyleExamples(state.category, state.subtype) : []).join('\n\n---\n\n');
@@ -1921,6 +1939,8 @@ ${examples}`;
       generateBtn2After.disabled = false;
       generateBtn2After.textContent = state.aiOutput ? '✨ Regenerate' : '✨ Generate Press Release';
     }
+    const applyEditsBtnAfter = document.getElementById('applyEditsBtn');
+    if(applyEditsBtnAfter) applyEditsBtnAfter.disabled = !state.aiOutput;
   }
 }
 
@@ -1935,7 +1955,7 @@ function renderToolbar(){
 
   previewToolbar.innerHTML = html;
 
-  document.getElementById('generateBtn').addEventListener('click', callClaudeAPI);
+  document.getElementById('generateBtn').addEventListener('click', ()=>callClaudeAPI('fresh'));
 
   document.getElementById('copyBtn').addEventListener('click', async ()=>{
     const plain = getActiveText();
