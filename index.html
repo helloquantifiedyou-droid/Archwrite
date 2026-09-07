@@ -1304,7 +1304,7 @@ function renderForm(){
 
   const useFactsAdBox = def.factsAdBox && state.category === 'architecture';
   if(useFactsAdBox){
-    html += `<div class="hint-banner">Appears as its own block at the end of the release, placed exactly as entered – not written by AI.</div>`;
+    html += `<div class="hint-banner">This blue section appears as its own block at the end of the release, placed exactly as entered – not written by AI.</div>`;
     html += `<div class="block-card facts-box">`;
     ['projName','projLocation','projClient','projSize','projTeam','projCollaborators','projPhotography'].forEach(fid=>{
       const f = PROJECT_FACTS_FIELDS.find(pf=>pf.id===fid);
