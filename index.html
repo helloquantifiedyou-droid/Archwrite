@@ -259,6 +259,10 @@
     margin-bottom:12px;
     position:relative;
   }
+  .block-card.facts-box{
+    background:#eaf3fb;
+    border-color:#b7d4ec;
+  }
   .block-card-head{
     display:flex;
     justify-content:space-between;
@@ -688,7 +692,8 @@ const PROJECT_FACTS_FIELDS = [
   {id:'projSize', label:'Size', placeholder:''},
   {id:'projLocation', label:'Location', placeholder:''},
   {id:'projTeam', label:'Project team', placeholder:'', type:'textarea'},
-  {id:'projCollaborators', label:'Collaborators', placeholder:'', type:'textarea'}
+  {id:'projCollaborators', label:'Collaborators', placeholder:'', type:'textarea'},
+  {id:'projPhotography', label:'Photography', placeholder:''}
 ];
 
 // Sample releases shown in the preview pad before the user generates anything —
@@ -960,6 +965,8 @@ const SUBTYPE_DEFS = {
     ],
     hasQuotes: true,
     facts: [],
+    projectFacts: true,
+    factsAdBox: true,
     repeatables: [],
     hasAbout: true
   },
@@ -981,6 +988,7 @@ const SUBTYPE_DEFS = {
     hasQuotes: true,
     facts: [],
     projectFacts: true,
+    factsAdBox: true,
     repeatables: [
       {
         id:'spaces', itemLabel:'Space', addLabel:'+ Add Space',
@@ -1056,6 +1064,7 @@ const SUBTYPE_DEFS = {
     hasQuotes: true,
     facts: [],
     projectFacts: true,
+    factsAdBox: true,
     repeatables: [
       {
         id:'features', itemLabel:'Design Feature', addLabel:'+ Add Design Feature',
@@ -1278,6 +1287,24 @@ function renderForm(){
 
   html += `<div class="ad-banner">PLACE YOUR AD HERE<a class="ad-banner-link" href="https://www.patreon.com/16724522/join" target="_blank" rel="noopener noreferrer">Purchase</a></div>`;
 
+  const useFactsAdBox = def.factsAdBox && state.category === 'architecture';
+  if(useFactsAdBox){
+    html += `<div class="hint-banner">Appears as its own block at the end of the release, placed exactly as entered – not written by AI.</div>`;
+    html += `<div class="block-card facts-box">`;
+    ['projName','projLocation','projClient','projSize','projTeam','projCollaborators','projPhotography'].forEach(fid=>{
+      const f = PROJECT_FACTS_FIELDS.find(pf=>pf.id===fid);
+      const input = f.type==='textarea'
+        ? `<textarea data-projfact="${f.id}" placeholder="${esc(f.placeholder||'')}">${esc(state.projectFacts[f.id])}</textarea>`
+        : `<input type="text" data-projfact="${f.id}" value="${esc(state.projectFacts[f.id])}" placeholder="${esc(f.placeholder||'')}">`;
+      html += `<div class="field-group"><label>${esc(f.label)}</label>${input}</div>`;
+    });
+    html += `<div class="field-group">
+      <label>About your company / Boilerplate <span class="required-mark">*</span></label>
+      <textarea id="f_aboutContent" style="min-height:90px" placeholder="Paste your existing company boilerplate...">${esc(state.about.content)}</textarea>
+    </div>`;
+    html += `</div>`;
+  }
+
   html += `<div class="hint-banner">Fill in as many fields as you'd like. If you've already covered any of this information in the Notes section, there's no need to fill them here.</div>`;
 
   function renderCoreField(f){
@@ -1364,11 +1391,11 @@ function renderForm(){
     html += `</div>`;
   });
 
-  if(def.projectFacts && state.category === 'architecture'){
+  if(def.projectFacts && state.category === 'architecture' && !useFactsAdBox){
     html += `<div class="section-title">Project Facts</div>`;
     html += `<div class="guidance" style="margin:-4px 0 10px;">Appears as its own block at the end of the release, appended exactly as entered — not written by the AI.</div>`;
     html += `<div class="block-card">`;
-    PROJECT_FACTS_FIELDS.forEach(f=>{
+    PROJECT_FACTS_FIELDS.filter(f=>f.id !== 'projPhotography').forEach(f=>{
       const input = f.type==='textarea'
         ? `<textarea data-projfact="${f.id}" placeholder="${esc(f.placeholder||'')}">${esc(state.projectFacts[f.id])}</textarea>`
         : `<input type="text" data-projfact="${f.id}" value="${esc(state.projectFacts[f.id])}" placeholder="${esc(f.placeholder||'')}">`;
@@ -1416,29 +1443,21 @@ function renderForm(){
     </details>
   </div>`;
 
-  if(def.hasAbout){
+  if(def.hasAbout && !useFactsAdBox){
     html += `<div class="section-title">About / Boilerplate <span class="required-mark">*</span></div>`;
     html += `<div class="block-card">
       <div class="field-group">
         <textarea id="f_aboutContent" style="min-height:90px" placeholder="Paste your existing company boilerplate...">${esc(state.about.content)}</textarea></div>
     </div>`;
-
-    html += renderAtEndFieldsHtml;
-    html += generateBtn2Html;
-    html += editInstructionsHtml;
-    html += applyEditsBtnHtml;
-
-    html += `<div class="ad-banner">PLACE YOUR AD HERE<a class="ad-banner-link" href="https://www.patreon.com/16724522/join" target="_blank" rel="noopener noreferrer">Purchase</a></div>`;
-    html += faqHtml;
-  } else {
-    html += renderAtEndFieldsHtml;
-    html += generateBtn2Html;
-    html += editInstructionsHtml;
-    html += applyEditsBtnHtml;
-
-    html += `<div class="ad-banner">PLACE YOUR AD HERE<a class="ad-banner-link" href="https://www.patreon.com/16724522/join" target="_blank" rel="noopener noreferrer">Purchase</a></div>`;
-    html += faqHtml;
   }
+
+  html += renderAtEndFieldsHtml;
+  html += generateBtn2Html;
+  html += editInstructionsHtml;
+  html += applyEditsBtnHtml;
+
+  html += `<div class="ad-banner">PLACE YOUR AD HERE<a class="ad-banner-link" href="https://www.patreon.com/16724522/join" target="_blank" rel="noopener noreferrer">Purchase</a></div>`;
+  html += faqHtml;
 
   formPane.innerHTML = html;
   attachFormEvents();
