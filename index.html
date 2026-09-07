@@ -679,7 +679,8 @@ const BANNED_WORDS = [
   'gamechanger', 'commanding', 'reads as part', 'reads as', 'the result', 'the result is', 'compete for attention', 'restrained vocabulary',
   'labyrinth', 'enigma', 'nestled', 'remnant', 'indelible', 'metamorphosis',
   'a testament to', 'sounds unheard', 'sights unseen', 'shows up', 'woven', 'sensibility',
-  'afterthought', 'announced', 'announcing', 'deliberately', 'actually', 'literal', 'literally'
+  'afterthought', 'announced', 'announcing', 'deliberately', 'actually', 'literal', 'literally',
+  'felt', 'feels', 'reads'
 ];
 
 // Sentence-level patterns, shared between the press release and project story
@@ -771,7 +772,7 @@ The National Design Awards, now in its eighteenth year, recognizes residential a
 
 The renovation reimagines a 1960s hillside home for a growing family.
 
-LOS ANGELES, CA – 12 MARCH 2026. Jane Doe Studio has completed the interior renovation of a 4,200-square-foot hillside residence in Los Angeles, originally built in 1962.
+LOS ANGELES, CA – 12 MARCH 2026. Jane Doe Studio has completed the interior renovation of the Hollywood Hills Residence, a 4,200-square-foot hillside home in Los Angeles originally built in 1962.
 
 Working closely with the homeowners — a couple relocating from New York with their two children — the studio opened the home's compartmentalized floor plan into a series of connected living spaces, pairing warm wood tones with custom furnishings throughout.
 
@@ -880,7 +881,7 @@ The award will be presented at a ceremony later this year, with the project also
 
 The 4,000-square-foot restaurant reimagines a former warehouse in the city's arts district.
 
-CHICAGO, IL – 12 MARCH 2026. Jane Doe Studio has completed the design of a new 4,000-square-foot restaurant occupying a converted warehouse in the city's arts district.
+CHICAGO, IL – 12 MARCH 2026. Jane Doe Studio has completed the design of The Ironworks Restaurant, a new 4,000-square-foot restaurant occupying a converted warehouse in the city's arts district.
 
 The design retains the building's original brick and steel structure, introducing a new mezzanine level and an open kitchen at the heart of the dining room, visible from nearly every seat in the house.
 
@@ -1971,6 +1972,9 @@ async function callClaudeAPI(mode){
   const similarProjectsRule = (state.subtype === 'commissionWin' && (state.fields.similarProjects||'').trim())
     ? '\n- The "Similar upcoming or past projects" fact describes OTHER, separate projects included only for context — not the project being announced in this release. Never apply their dates, names, or completion status to the main project; keep any mention of them clearly attributed to those other projects, not blended into facts about the one you\'re announcing.'
     : '';
+  const projectNameOpeningRule = (state.subtype === 'projectCompletion' && (state.projectFacts.projName||'').trim())
+    ? '\n- The "Project Name" fact must appear by name in the first body paragraph (the dateline-opening paragraph) — do not refer to the project only generically (e.g. "the residence," "the restaurant") and save the name for later or for the Project Facts block. Name it explicitly, early, the way a real project-completion release would.'
+    : '';
   const revisionRule = isRevision
     ? '\n- This is a revision of the CURRENT DRAFT given below (found right before FACTS): preserve its wording, structure, and included facts except where the REQUESTED CHANGES require a change. Do not regenerate from scratch or rewrite parts that weren\'t asked about.'
     : '';
@@ -2010,8 +2014,9 @@ The language must never be poetic or subjective. No lyrical or evocative descrip
 Rules:
 - Output structure, as separate paragraphs separated by a blank line and in this exact order: (1) the headline alone; (2) the one-sentence summary alone; (3) the dateline-opening body paragraph; (4) the remaining body paragraphs, quotes, and closing facts. Do not merge or skip (1) or (2) — they must each be their own paragraph.
 - Every fact, name, date, number, material, dimension, and quote in FACTS is real. Use them accurately, and do not invent or infer facts, quotes, materials, dimensions, sensory details, or any other details not present in FACTS or NOTES — not even small, plausible-sounding ones added for color or to sound more complete.${eventStatusNote}
+- Never invent a quote. Only include a quote if one is explicitly given as a Quote line in FACTS below — do not fabricate a spokesperson quote, do not put invented words in a named person's mouth, and do not manufacture a quote just because a release "usually" has one. If no Quote is given, write the release with no quote in it at all.
 - If something in FACTS is missing, thin, or blank, simply don't mention it or write around it briefly — never invent a placeholder or a made-up specific to fill the gap. A short, accurate release beats a longer one padded with invented detail.
-- Do NOT write an "About [Company]" / boilerplate section, even if the examples below have one. The user's own pre-approved boilerplate is appended separately after your response, verbatim — writing your own would create a duplicate.${projectFactsRule}${noFactsListRule}${mediaContactRule}${similarProjectsRule}
+- Do NOT write an "About [Company]" / boilerplate section, even if the examples below have one. The user's own pre-approved boilerplate is appended separately after your response, verbatim — writing your own would create a duplicate.${projectFactsRule}${noFactsListRule}${mediaContactRule}${similarProjectsRule}${projectNameOpeningRule}
 - You may also receive loose NOTES from the user — a stream-of-consciousness, bullet points, or rough fragments, possibly with typos or bad grammar. Weave any relevant facts or details from the notes into the appropriate place in the release, corrected and in full sentences. Ignore anything in the notes that is just the user thinking out loud rather than a fact to include.
 - Before finalizing, check every sentence against FACTS and NOTES: if a claim, number, name, or descriptive detail can't be traced back to something actually given, cut it or rewrite the sentence without it.
 - There is no back-and-forth here — this is a single, one-shot request with no way for the user to reply. If REQUESTED CHANGES or NOTES are ambiguous, incomplete, or seem cut off, do NOT stop to ask a clarifying question — make the most reasonable interpretation and proceed with the release.
@@ -2125,8 +2130,6 @@ The original 1962 floor plan was heavily compartmentalized, with a warren of sma
 
 In the living room, a custom sofa upholstered in Larkspur Textiles boucle anchors a seating arrangement built around a reclaimed walnut coffee table designed in-house. A pair of vintage cane-back chairs, sourced from a Palm Springs estate sale, sit opposite.
 
-"The clients wanted the house to feel like it had always belonged to them, even though everything in it is new," says Jane Doe, founder of Jane Doe Studio. "We leaned into materials that age well — plaster, wood, stone — so the house has room to soften over time."
-
 The kitchen was fully reconfigured around a Calacatta Viola marble island, paired with custom white oak cabinetry and brass fixtures by Nordlund Lighting chosen to warm the room's otherwise cool material palette.
 
 A new bank of steel-framed windows in the primary suite replaces what had been a solid wall, opening the room to the canyon beyond and flooding it with afternoon light.
@@ -2140,8 +2143,6 @@ The studio's solution centers on a material palette of white oak, hand-glazed te
 
 A curved banquette upholstered in a rust-colored mohair runs nearly the full length of one wall, punctuated by a series of arched mirrors that visually widen the space.
 
-"Long, narrow rooms get a bad reputation, but they can actually feel really intimate if you lean into it instead of fighting it," says Jane Doe, founder of Jane Doe Studio. "We wanted every table to feel like the best seat in the house."
-
 At the rear of the restaurant, an open kitchen finished in the same terracotta tile as the dining room lets guests watch the pass without feeling like they're in the way of service.
 
 Custom pendant lighting, fabricated from blown amber glass, was designed specifically for the space and drops low over each table to create pools of warm light throughout the room.`,
@@ -2150,8 +2151,6 @@ Custom pendant lighting, fabricated from blown amber glass, was designed specifi
 For a new outpatient wellness clinic, Jane Doe Studio was asked to design an environment that felt more like a spa than a medical office, without compromising on clinical functionality.
 
 The waiting area eschews the clinical palette typical of healthcare interiors in favor of warm plaster walls, oak millwork, and a living wall of ferns positioned behind the reception desk.
-
-"So much of healthcare design defaults to sterile because sterile feels safe," says Jane Doe, founder of Jane Doe Studio. "We wanted to prove you can meet every clinical requirement and still make people feel cared for the moment they walk in."
 
 Each of the clinic's eight treatment rooms features the same warm material palette, with acoustic felt paneling installed behind the walls to ensure patient privacy without resorting to institutional soundproofing aesthetics.
 
@@ -2162,8 +2161,6 @@ Jane Doe Studio's interior design for this new community leisure centre centers 
 
 Skylights positioned above the lobby's reception desk and lounge seating flood the space with daylight throughout the day, reducing the need for artificial lighting during operating hours.
 
-"Public leisure facilities so rarely get this kind of design attention," says Jane Doe, founder of Jane Doe Studio. "We wanted people to feel a little bit surprised walking in — like this was somewhere worth spending time, not just passing through."
-
 The lounge areas surrounding the pool deck are finished in a durable but warm palette of teak decking and glazed blue tile, chosen to withstand heavy daily use while avoiding the clinical feel typical of public pool facilities.
 
 A café at the center's entrance, finished in the same material palette as the lobby, serves as a gathering point for parents waiting during children's swim lessons.`,
@@ -2172,8 +2169,6 @@ A café at the center's entrance, finished in the same material palette as the l
 For a private secondary school's new humanities building, Jane Doe Studio was tasked with designing classroom and common spaces that encouraged informal collaboration alongside traditional instruction.
 
 The building's central corridor was reimagined as a series of window-seat alcoves and small breakout lounges, finished in warm oak millwork rather than the standard institutional palette of laminate and linoleum.
-
-"Students spend more time in hallways and in-between spaces than anyone really accounts for in school design," says Jane Doe, founder of Jane Doe Studio. "We wanted those moments to feel considered too, not just the classrooms."
 
 Each classroom features movable furniture systems designed to reconfigure quickly between lecture-style seating and small-group collaboration, developed in partnership with the school's faculty.
 
@@ -2184,8 +2179,6 @@ As part of a broader mixed-use masterplan, Jane Doe Studio was engaged to develo
 
 The studio's approach establishes a consistent material palette — white oak, warm plaster, and brass — that ties the development's disparate building types together while allowing each individual space its own character.
 
-"Masterplan work is a different muscle than a single project," says Jane Doe, founder of Jane Doe Studio. "You're designing a language other people will eventually build on, not just a finished room."
-
 The development's central amenity building, which houses a shared lounge, co-working space, and fitness studio, serves as the anchor for the material and lighting standards applied throughout the rest of the project.
 
 Design guidelines developed by the studio will continue to inform the interiors of future phases as the masterplan is built out over the coming years.`,
@@ -2194,8 +2187,6 @@ Design guidelines developed by the studio will continue to inform the interiors 
 For a new private members' club, Jane Doe Studio was asked to design a lounge space that felt distinct from the club's more formal dining rooms — somewhere members could linger over a drink or a quiet conversation.
 
 The lounge's material palette leans darker and moodier than the studio's typical residential work, with smoked oak paneling, brass detailing, and a custom bar finished in a deep green lacquer.
-
-"Every room in a club needs its own personality, or the whole place starts to feel the same," says Jane Doe, founder of Jane Doe Studio. "This one was designed to feel like the room you'd want to end the night in."
 
 A custom banquette wraps the room's perimeter, upholstered in a rich burgundy mohair and punctuated by brass reading lamps at each seating cluster.
 
@@ -2208,8 +2199,6 @@ Located on a steeply sloped lot outside the city, this new-construction residenc
 
 Rather than fighting the site's grade, the studio designed the home's three levels to follow the slope directly, with each level opening onto its own outdoor courtyard rather than a single unified yard.
 
-"The easy thing to do on a site like this is bulldoze it flat," says Jane Doe, founding principal of Jane Doe Studio. "We wanted the house to feel like it was always meant to be here, stepping down the hill rather than sitting on top of it."
-
 The home's material palette — board-formed concrete, cedar siding, and steel-framed glazing — was chosen to weather naturally over time, allowing the house to settle visually into its wooded surroundings.
 
 A cantilevered primary suite on the home's upper level extends several feet beyond the floor below, framing views of the valley without requiring any visible support columns.`,
@@ -2218,8 +2207,6 @@ A cantilevered primary suite on the home's upper level extends several feet beyo
 Jane Doe Studio has completed the architectural design of a new 4,000-square-foot restaurant occupying a converted warehouse in the city's arts district.
 
 The design retains the building's original brick and steel structure, introducing a new mezzanine level and an open kitchen at the heart of the dining room, visible from nearly every seat in the house.
-
-"The building had so much character already — our job was mostly to get out of its way," says Jane Doe, founding principal of Jane Doe Studio. "The new elements are deliberately quiet so the original brick and steel can still do the talking."
 
 A custom steel and reclaimed oak staircase connects the main dining room to the new mezzanine bar, added within the warehouse's existing volume without altering its exterior profile.
 
@@ -2230,8 +2217,6 @@ For a new neighborhood health clinic, Jane Doe Studio was asked to design a buil
 
 The single-story building wraps around a central courtyard, allowing every waiting area and exam room to receive natural daylight — an intentional departure from the deep, windowless floor plates typical of clinic design.
 
-"A lot of clinic design treats daylight as a luxury instead of a basic need," says Jane Doe, founding principal of Jane Doe Studio. "We built the whole plan around making sure nobody in this building is ever far from a window."
-
 The exterior facade, clad in a warm terracotta rainscreen, was designed to feel civic and dignified rather than institutional, reflecting the clinic's role as a genuine community anchor.
 
 A community room adjacent to the main entrance, separated from clinical areas by its own entrance, allows the building to host health education events outside of normal clinic hours.`,
@@ -2240,8 +2225,6 @@ A community room adjacent to the main entrance, separated from clinical areas by
 Jane Doe Studio has completed a new community leisure centre organized around an expansive timber roof structure that spans the building's pool hall without any interior columns.
 
 The exposed glue-laminated timber trusses, left visible throughout the pool hall, were chosen both for their structural efficiency and to soften the acoustics of a typically hard-surfaced, echo-prone space.
-
-"Pool buildings are usually pretty brutal acoustically and visually," says Jane Doe, founding principal of Jane Doe Studio. "The timber roof solves both problems at once — it's quieter in there, and it just feels like a nicer place to be."
 
 A glazed curtain wall along the pool hall's southern facade brings daylight deep into the space while a calculated overhang prevents excessive solar heat gain during summer months.
 
@@ -2252,8 +2235,6 @@ Jane Doe Studio has completed a new humanities building for a private secondary 
 
 The building's massing steps down in section to match the surrounding campus's existing scale, with a central atrium connecting three floors of classrooms and shared study spaces.
 
-"We didn't want a building that towered over everything else on campus," says Jane Doe, founding principal of Jane Doe Studio. "It was important that this felt like it belonged with the buildings already there, not like a statement piece."
-
 A network of exterior walkways and covered outdoor classrooms extends the building's usable space beyond its enclosed footprint, taking advantage of the region's mild climate for much of the school year.
 
 The building's facade, clad in a warm brick that matches the campus's original 1920s buildings, ties the new structure visually to the school's historic core.`,
@@ -2263,8 +2244,6 @@ Jane Doe Studio has been engaged to lead the architectural masterplan for a new 
 
 The plan organizes the development around a central pedestrian spine, lined with ground-floor retail and punctuated by a series of public plazas at key intersections.
 
-"Masterplans live or die on the public space between the buildings, not just the buildings themselves," says Jane Doe, founding principal of Jane Doe Studio. "We spent as much time designing the street as we did any single structure."
-
 A consistent material palette of brick, glass, and dark metal detailing was established to unify the development's several building types while allowing individual architects — including Jane Doe Studio itself for several key buildings — flexibility within that framework.
 
 The masterplan also includes a phased sustainability strategy, with shared stormwater infrastructure and district-scale energy systems planned across the site.`,
@@ -2273,8 +2252,6 @@ The masterplan also includes a phased sustainability strategy, with shared storm
 Jane Doe Studio has completed a small public pavilion designed to frame views over a restored wetland preserve, commissioned by a regional conservation authority.
 
 The lightweight steel-and-timber structure is elevated above the marsh on slender pilotis, minimizing its physical footprint on the sensitive wetland habitat below.
-
-"The whole point of this building is to disappear a little and let the landscape do the work," says Jane Doe, founding principal of Jane Doe Studio. "It's really just a frame for looking at something else."
 
 A perforated metal screen wraps the pavilion's upper level, filtering direct sunlight while allowing unobstructed views out toward the wetland's open water.
 
@@ -2427,10 +2404,6 @@ function makeStoryFacade(){
   const item = { id: nid() };
   STORY_FACADE_FIELDS.forEach(f=> item[f.id] = '');
   return item;
-}
-
-function makeStoryQuote(){
-  return { id: nid(), text:'', speaker:'', title:'' };
 }
 
 // Real interior design project stories the user supplied, header/credit lines
@@ -2801,7 +2774,6 @@ function freshStoryState(){
     fields,
     rooms: [makeStoryRoom()],
     facade: [],
-    quotes: [makeStoryQuote()],
     notes: '',
     editInstructions: '',
     photos: [],
@@ -2848,7 +2820,6 @@ if(savedStory){
   });
   if(!Array.isArray(storyState.rooms) || !storyState.rooms.length) storyState.rooms = [makeStoryRoom()];
   if(!Array.isArray(storyState.facade)) storyState.facade = [];
-  if(!Array.isArray(storyState.quotes) || !storyState.quotes.length) storyState.quotes = [makeStoryQuote()];
   let maxRoomN = 0;
   (storyState.rooms||[]).forEach(r=>{
     if(r && typeof r.id==='string' && r.id[0]==='b'){
@@ -2960,21 +2931,6 @@ function renderStoryForm(){
       html += `</div>`;
     });
     html += `<button class="btn small" id="addFacadeBtn">+ Add Facade</button>`;
-
-    html += `<div class="section-title">Quotes</div>`;
-    storyState.quotes.forEach((q, idx)=>{
-      html += `<div class="block-card">
-        <div class="block-card-head">
-          <span class="block-type-label">Quote ${idx+1}</span>
-          <div class="block-actions"><button class="icon-btn danger" data-delstoryquote="${q.id}" title="Remove">✕</button></div>
-        </div>
-        <div class="field-group"><label>Quote</label>
-          <textarea data-storyquotefield="text" data-id="${q.id}" placeholder="Anything you'd like to say in your voice?">${esc(q.text)}</textarea></div>
-        <div class="field-group"><label>Speaker</label><input type="text" data-storyquotefield="speaker" data-id="${q.id}" value="${esc(q.speaker)}"></div>
-        <div class="field-group"><label>Title</label><input type="text" data-storyquotefield="title" data-id="${q.id}" value="${esc(q.title)}"></div>
-      </div>`;
-    });
-    html += `<button class="btn small" id="addStoryQuoteBtn">+ Add Quote</button>`;
   }
 
   STORY_FIELDS.forEach(f=>{ if(f.renderAtEnd && !f.factsBoxField && shouldShowStoryField(f)) html += renderStoryCoreField(f); });
@@ -3076,31 +3032,6 @@ function attachStoryFormEvents(){
     el.addEventListener('click', e=>{
       const id = e.target.getAttribute('data-delfacade');
       storyState.facade = storyState.facade.filter(x=>x.id!==id);
-      renderStoryForm(); saveStoryState();
-    });
-  });
-
-  storyFormPane.querySelectorAll('[data-storyquotefield]').forEach(el=>{
-    el.addEventListener('input', e=>{
-      const id = e.target.getAttribute('data-id');
-      const field = e.target.getAttribute('data-storyquotefield');
-      const q = storyState.quotes.find(x=>x.id===id);
-      if(q) q[field] = e.target.value;
-      saveStoryState();
-    });
-  });
-
-  const addStoryQuoteBtn = document.getElementById('addStoryQuoteBtn');
-  if(addStoryQuoteBtn) addStoryQuoteBtn.addEventListener('click', ()=>{
-    storyState.quotes.push(makeStoryQuote());
-    renderStoryForm(); saveStoryState();
-  });
-
-  storyFormPane.querySelectorAll('[data-delstoryquote]').forEach(el=>{
-    el.addEventListener('click', e=>{
-      const id = e.target.getAttribute('data-delstoryquote');
-      storyState.quotes = storyState.quotes.filter(x=>x.id!==id);
-      if(!storyState.quotes.length) storyState.quotes.push(makeStoryQuote());
       renderStoryForm(); saveStoryState();
     });
   });
@@ -3443,15 +3374,7 @@ async function callStoryClaudeAPI(){
       if(parts.length) facadeLines.push(`Facade ${i+1} — ${parts.join('; ')}`);
     });
   }
-  const quoteLines = [];
-  if(storyState.category === 'architecture'){
-    storyState.quotes.forEach((q, i)=>{
-      if(!q.text.trim()) return;
-      const attribution = [q.speaker.trim(), q.title.trim()].filter(Boolean).join(', ');
-      quoteLines.push(`Quote ${i+1}: "${q.text.trim()}"${attribution ? ' — ' + attribution : ''}`);
-    });
-  }
-  const factsOutline = [lines.join('\n'), roomLines.join('\n'), facadeLines.join('\n'), quoteLines.join('\n')]
+  const factsOutline = [lines.join('\n'), roomLines.join('\n'), facadeLines.join('\n')]
     .filter(Boolean).join('\n\n');
   const examples = getStoryStyleExamples(storyState.category).join('\n\n---\n\n');
 
@@ -3505,7 +3428,7 @@ Rules:
 - Keep paragraphs SHORT: roughly 250-500 characters each (about 2-4 sentences) — noticeably shorter than a typical press-release paragraph. Break into a new paragraph whenever the focus shifts — a new room, a new material, a new beat of the client story — rather than letting one paragraph run long. The result should read as more, shorter paragraphs with frequent line breaks throughout, never a handful of dense ones.
 - Wrap every specific brand, maker, or artist name in double asterisks, e.g. "a sofa by **Roche Bobois**" — including the literal [BRAND] and [ARTIST] placeholder tokens, e.g. "a chair by **[BRAND]**". Bold only the name itself, never the surrounding words (correct: "a sofa by **Roche Bobois**"; wrong: "**a sofa by Roche Bobois**"). This is the one exception to "no markdown formatting" below.
 - Do NOT write your own "PROJECT FACTS" block (Project name, Location, Client, Size, Architecture firm, Interior design firm, Contracting, Photography) or "About the designer" section, even though some of those facts are given to you below — they're appended separately after your response, verbatim. Writing your own would create a duplicate.
-- If any Quotes are given below, weave each one naturally into the narrative at a relevant point (attributed to its speaker/title, e.g. "says [Name], [Title]"), using present tense for the attribution ("says", not "said"). Never invent a quote that isn't given.
+- Do NOT include any quoted speech or attributed statements (e.g. "says [Name], [Title]") anywhere in the story — this genre is written entirely in third-person narrative voice, never with a first-person quote from the designer, architect, or client.
 - If something in FACTS is missing or blank, simply don't mention it — never invent a placeholder.
 - You may also receive loose NOTES from the user — weave any relevant facts from the notes into the appropriate place, corrected and in full sentences. Ignore anything that's just the user thinking out loud.
 - Before finalizing, check every sentence against FACTS, NOTES, and what's genuinely visible in the photos: if a claim can't be traced back to one of those, cut it or rewrite the sentence without it.
