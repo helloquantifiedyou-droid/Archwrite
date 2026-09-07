@@ -555,28 +555,59 @@ function gtag_report_conversion(url) {
     color:var(--muted);
     margin:8px 0 0;
   }
-  #mobileNotice{display:none;}
+  .mobile-view-toggle{display:none;}
   @media (max-width: 768px){
-    body > *:not(#mobileNotice){display:none !important;}
-    #mobileNotice{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      min-height:100vh;
-      padding:32px;
-      text-align:center;
-      font-family:"IBM Plex Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
-      font-size:16px;
-      line-height:1.6;
-      color:var(--ink);
-      background:var(--paper);
+    .logo-bar{padding:8px 16px;}
+    .logo-bar img{height:38px;}
+    .hero{padding:16px 16px 20px;gap:14px;}
+    .hero-title{font-size:21px;}
+    .hero-subtitle{font-size:13px;margin-bottom:0;}
+    .hero-badges, .hero-card{display:none;}
+
+    .layout{flex-direction:column;}
+    .form-pane{
+      width:100%;
+      max-width:none;
+      min-width:0;
+      border-right:none;
+      padding:16px 16px 80px;
     }
+    .preview-pane{width:100%;}
+    .preview-toolbar{padding:12px 16px;}
+    .preview-doc-scroll{padding:24px 5% 60px;}
+    .doc{padding:32px 24px 44px;}
+
+    .mobile-view-toggle{
+      display:flex;
+      gap:8px;
+      padding:10px 16px;
+      background:var(--paper);
+      border-bottom:1px solid var(--line);
+      flex-shrink:0;
+    }
+    .mvt-btn{
+      flex:1;
+      padding:10px;
+      border-radius:8px;
+      border:1px solid var(--line);
+      background:var(--panel);
+      font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+      font-weight:700;
+      font-size:13px;
+      color:var(--muted);
+      cursor:pointer;
+    }
+    .mvt-btn.active{
+      background:var(--canvas);
+      color:#fff;
+      border-color:var(--canvas);
+    }
+    .layout[data-mobileview="edit"] .preview-pane{display:none;}
+    .layout[data-mobileview="preview"] .form-pane{display:none;}
   }
 </style>
 </head>
 <body>
-
-<div id="mobileNotice">This site can currently only be accessed on desktops. Thank you for your understanding!</div>
 
 <div class="logo-bar">
   <img src="/logo.png" alt="ArchWrite">
@@ -602,7 +633,12 @@ function gtag_report_conversion(url) {
   </div>
 </div>
 
-<div class="layout" id="pressLayout">
+<div class="mobile-view-toggle" id="mobileViewToggle">
+  <button type="button" class="mvt-btn active" data-view="edit">Edit</button>
+  <button type="button" class="mvt-btn" data-view="preview">Preview</button>
+</div>
+
+<div class="layout" id="pressLayout" data-mobileview="edit">
   <div class="form-pane" id="formPane"></div>
   <div class="preview-pane" id="previewPane">
     <div class="preview-toolbar" id="previewToolbar"></div>
@@ -610,7 +646,7 @@ function gtag_report_conversion(url) {
   </div>
 </div>
 
-<div class="layout" id="storyLayout" hidden>
+<div class="layout" id="storyLayout" hidden data-mobileview="edit">
   <div class="form-pane" id="storyFormPane"></div>
   <div class="preview-pane" id="storyPreviewPane">
     <div class="preview-toolbar" id="storyPreviewToolbar"></div>
@@ -658,7 +694,28 @@ function switchTab(tabName){
   document.getElementById('storyLayout').hidden = tabName !== 'story';
   renderForm(); renderPreview(); renderToolbar();
   renderStoryForm(); renderStoryPreview(); renderStoryToolbar();
+  syncMobileToggle();
 }
+
+// Mobile only (see the max-width:768px CSS): the form and preview panes can't
+// sit side by side on a narrow screen, so below that width only one shows at
+// a time, picked by data-mobileview on whichever .layout is currently active.
+// The two Edit/Preview buttons are shared/static — they always act on
+// whichever tool (Press Release or Project Story) is currently selected.
+function activeLayoutEl(){
+  return document.getElementById(activeTab === 'press' ? 'pressLayout' : 'storyLayout');
+}
+function setMobileView(view){
+  activeLayoutEl().setAttribute('data-mobileview', view);
+  document.querySelectorAll('.mvt-btn').forEach(b=>b.classList.toggle('active', b.dataset.view===view));
+}
+function syncMobileToggle(){
+  const view = activeLayoutEl().getAttribute('data-mobileview') || 'edit';
+  document.querySelectorAll('.mvt-btn').forEach(b=>b.classList.toggle('active', b.dataset.view===view));
+}
+document.querySelectorAll('.mvt-btn').forEach(b=>{
+  b.addEventListener('click', ()=> setMobileView(b.dataset.view));
+});
 
 // ---------- CATEGORY + SUBTYPE CONFIG ----------
 const CATEGORIES = {
@@ -1945,6 +2002,7 @@ async function callClaudeAPI(mode){
   state.aiNotice = '';
   renderToolbar();
   renderPreview();
+  if(window.matchMedia('(max-width: 768px)').matches) setMobileView('preview');
   const generateBtn2 = document.getElementById('generateBtn2');
   if(generateBtn2) generateBtn2.disabled = true;
   const applyEditsBtn = document.getElementById('applyEditsBtn');
@@ -3349,6 +3407,7 @@ async function callStoryClaudeAPI(){
   storyState.aiPhotoNotice = false;
   renderStoryToolbar();
   renderStoryPreview();
+  if(window.matchMedia('(max-width: 768px)').matches) setMobileView('preview');
   const genBtn = document.getElementById('storyGenerateBtn');
   if(genBtn) genBtn.disabled = true;
 
