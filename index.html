@@ -2192,6 +2192,26 @@ The pavilion opened to the public this year and has quickly become a popular sto
 
 const PROJECT_TYPES = ['Residence','Restaurant','Healthcare Facility','Leisure Centre','Education Facility','Masterplan','Other'];
 
+// Architecture project stories use a plain "[Project Name] [Type]" title
+// (e.g. "Chelsea Home", "Chelsea Hospital") instead of an editorial headline —
+// set programmatically after generation, never left to the AI, so it's exact
+// every time. Interior design stories are unaffected and keep AI-written titles.
+const STORY_TITLE_TYPE_WORDS = {
+  Residence: 'Home',
+  Restaurant: 'Restaurant',
+  'Healthcare Facility': 'Hospital',
+  'Leisure Centre': 'Leisure Centre',
+  'Education Facility': 'School',
+  Masterplan: 'Masterplan',
+  Other: ''
+};
+function architectureStoryTitle(){
+  const projectName = (storyState.fields.projectName || '').trim();
+  if(!projectName) return null;
+  const typeWord = STORY_TITLE_TYPE_WORDS[storyState.projectType] || '';
+  return typeWord ? `${projectName} ${typeWord}` : projectName;
+}
+
 const STORY_FIELDS = [
   { id:'projectName', label:'Project name', placeholder:'', required:true },
   { id:'designerFirm', label:'Interior design firm / designer', placeholder:'' },
@@ -3399,6 +3419,14 @@ ${examples}`;
       if(hasPhotoWord.test(firstPara) && hasNegation.test(firstPara)){
         storyState.aiPhotoNotice = true;
         storyState.aiOutput = firstBreak === -1 ? '' : trimmedOut.slice(firstBreak).trim();
+      }
+    }
+    if(storyState.category === 'architecture' && storyState.aiOutput){
+      const fixedTitle = architectureStoryTitle();
+      if(fixedTitle){
+        const paras = storyState.aiOutput.split(/\n\s*\n/);
+        paras[0] = fixedTitle;
+        storyState.aiOutput = paras.join('\n\n');
       }
     }
   } catch(e){
