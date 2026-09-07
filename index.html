@@ -1741,6 +1741,16 @@ function buildFactsOutline(){
     const val = (state.fields[f.id]||'').trim();
     if(val) lines.push(`${f.label}: ${val}`);
   });
+  // The blue Project Facts box is the single entry point for these — no
+  // separate "AI-visible" copy of the same fields. Photography is excluded
+  // (a credit line, not something a release narrates), matching Media
+  // Contact/Email and Press Kit, which stay AI-invisible below.
+  if(useFactsAdBox){
+    PROJECT_FACTS_FIELDS.filter(f=>f.id !== 'projPhotography').forEach(f=>{
+      const val = (state.projectFacts[f.id]||'').trim();
+      if(val) lines.push(`${f.label}: ${val}`);
+    });
+  }
   lines.push('');
 
   if(subtypeHasQuotes(state.subtype, state.category)){
