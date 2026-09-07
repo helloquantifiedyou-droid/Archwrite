@@ -3,10 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="noindex">
+<link rel="canonical" href="https://www.archwrite.com/blog/how-to-write-an-interior-design-press-release/">
 <link rel="icon" type="image/png" href="/favicon.png">
 <title>How to Write an Interior Design Press Release | ArchWrite</title>
-<meta name="description" content="Everything interior designers need to know to write a press-ready release for a project reveal, award, or event.">
+<meta name="description" content="A complete guide to writing an interior design press release — headline, structure, distribution, and SEO — plus a free tool that writes one for you.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="How to Write an Interior Design Press Release">
+<meta property="og:description" content="A complete guide to writing an interior design press release — headline, structure, distribution, and SEO — plus a free tool that writes one for you.">
+<meta property="og:image" content="/social-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="How to Write an Interior Design Press Release">
+<meta name="twitter:description" content="A complete guide to writing an interior design press release — headline, structure, distribution, and SEO — plus a free tool that writes one for you.">
+<meta name="twitter:image" content="/social-image.png">
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18427939262"></script>
@@ -44,7 +52,7 @@
     background:var(--paper);
   }
   .logo-bar img{height:40px;width:auto;display:block;}
-  .wrap{max-width:720px;margin:0 auto;padding:48px 24px 80px;}
+  .wrap{max-width:680px;margin:0 auto;padding:48px 24px 80px;}
   .kicker{
     font-family:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
     font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;
@@ -54,20 +62,59 @@
     font-family:"Droid Sans","Helvetica Neue",Arial,sans-serif;
     font-size:32px;line-height:1.2;margin:0 0 16px;letter-spacing:-0.01em;
   }
-  .lede{font-size:16px;line-height:1.6;color:#333;margin:0 0 32px;max-width:56ch;}
-  .coming-soon{
-    background:var(--panel);border:1px solid var(--line);border-radius:10px;
-    padding:24px;margin:0 0 32px;
+  .lede{font-size:16px;line-height:1.6;color:#333;margin:0 0 36px;max-width:56ch;}
+  .article-body h2{
+    font-family:"Droid Sans","Helvetica Neue",Arial,sans-serif;
+    font-size:23px;line-height:1.3;margin:44px 0 16px;letter-spacing:-0.01em;
   }
-  .coming-soon p{
+  .article-body h3{
+    font-family:"Droid Sans","Helvetica Neue",Arial,sans-serif;
+    font-size:17px;line-height:1.3;margin:28px 0 10px;
+  }
+  .article-body p{
     font-family:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
-    margin:0 0 16px;font-size:14px;line-height:1.6;color:#444;
+    font-size:15px;line-height:1.72;color:#333;margin:0 0 18px;
   }
-  .coming-soon p:last-child{margin-bottom:0;}
+  .article-body ul{margin:0 0 18px;padding-left:22px;}
+  .article-body li{
+    font-family:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+    font-size:15px;line-height:1.65;color:#333;margin:0 0 10px;
+  }
+  .article-body strong{font-weight:700;color:var(--ink);}
+  .article-body a{color:var(--canvas);}
+  .example{
+    border-left:3px solid var(--canvas);
+    background:var(--panel);
+    padding:14px 18px;margin:0 0 18px;
+    font-family:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+    font-size:14px;line-height:1.6;color:#333;font-style:italic;
+  }
+  .example strong{font-style:normal;}
+  .example .example-label{
+    display:block;font-style:normal;font-weight:700;text-transform:uppercase;
+    font-size:11px;letter-spacing:0.05em;color:var(--canvas);margin:0 0 6px;
+  }
+  .about-example{
+    background:var(--panel);border:1px solid var(--line);border-radius:8px;
+    padding:18px 20px;margin:0 0 18px;
+  }
+  .about-example .about-heading{
+    font-family:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+    font-size:12px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;
+    color:var(--canvas);margin:0 0 8px;
+  }
+  .about-example p{margin:0;font-size:14px;}
+  .promo{
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:20px 24px;margin:28px 0;display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  }
+  .promo img{height:26px;width:auto;flex-shrink:0;}
+  .promo-text{flex:1;min-width:220px;font-family:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;font-size:14px;line-height:1.55;color:#333;}
+  .promo-text a{color:var(--canvas);font-weight:700;}
   .btn{
     display:inline-block;background:var(--canvas);color:#fff;text-decoration:none;
     padding:10px 20px;border-radius:6px;font-weight:700;font-size:13px;
-    font-family:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+    font-family:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;flex-shrink:0;
   }
   .back-link{
     display:inline-block;margin-top:24px;font-size:13px;color:var(--canvas);
@@ -89,12 +136,156 @@
 <div class="wrap">
   <div class="kicker">Blog</div>
   <h1>How to Write an Interior Design Press Release</h1>
-  <p class="lede">Everything interior designers need to know to write a press-ready release for a project reveal, award, or event.</p>
 
-  <div class="coming-soon">
-    <p>This article is coming soon.</p>
-    <p>In the meantime, try the free tool that writes your press release or project story for you — no sign-up, no credit card required.</p>
-    <a class="btn" href="/">Try the free tool &rarr;</a>
+  <div class="article-body">
+    <p>A well-written interior design press release remains one of the most effective tools a designer has for securing press coverage and building visibility and credibility.</p>
+    <p>And yet, most interior designers never write one.</p>
+    <p>It's normal. Interior designers are trained to design rooms and not to navigate the unwritten rules of the media industry. Press release format, tone, and distribution are treated as industry knowledge that, typically, no one teaches, which means many small studios opt out of press altogether.</p>
+    <p>That's too bad, because a press release is one of the more accessible ways to get noticed, no matter the size of your business.</p>
+    <p>This guide breaks down how to write and send an interior design press release, whether you're a single-owner business or part of a large design team. The goal: give you a release polished enough to publish on your own site, and clear enough to send directly to journalists and editors who might cover it.</p>
+
+    <div class="promo">
+      <img src="/logo.png" alt="ArchWrite">
+      <div class="promo-text">PS. Having difficulty writing your interior design press release? Designed specifically for the architecture and interior design industries, the free <a href="https://www.archwrite.com/">ArchWrite Press Release &amp; Project Story Writer</a> can generate one for you. Fill in as many project details as you can and let the tool do the writing — then copy the result into a document or download it as a .txt file. It's trained on a decade of press releases by a writer who has covered architecture, interior design, construction, and building materials.</div>
+    </div>
+
+    <h2>What Is a Press Release, and Why Does It Matter for Interior Designers?</h2>
+    <p>A press release is a formal announcement written for media outlets, editors, and publications. For interior designers, it's the tool used to announce a project reveal, a brand collaboration, a fair or trade show appearance, an award, or a new studio launch.</p>
+    <p>Done well, an interior design press release does three things at once:</p>
+    <ul>
+      <li><strong>Builds relationships with press:</strong> Editors are more likely to cover designers who communicate clearly and professionally.</li>
+      <li><strong>Establishes authority:</strong> It positions you as a credible voice in the industry, not just a service provider.</li>
+      <li><strong>Improves discoverability:</strong> Published online, on your own site, or picked up by a publication, a press release becomes a searchable, linkable asset that supports SEO after the news itself has passed.</li>
+    </ul>
+
+    <h2>When to Send a Press Release</h2>
+    <p>Not every update warrants a press release, but certain milestones are newsworthy, and it's worth having a release ready when they happen.</p>
+    <p>Common occasions include:</p>
+    <ul>
+      <li><strong>Winning an award:</strong> Industry recognition is inherently newsworthy and gives editors a clear reason to cover you.</li>
+      <li><strong>Winning a project commission:</strong> Landing a notable or high-profile project – before or after it's built – is a natural announcement moment.</li>
+      <li><strong>Participating in an event:</strong> Fairs, conferences, panels, or trade shows are a reliable reason to reach out, especially if you're speaking, exhibiting, or debuting something on-site.</li>
+      <li><strong>Launching a product collection:</strong> A capsule collection, furniture line, or collaboration with a brand is a concrete, tangible piece of news.</li>
+      <li><strong>Announcing a sponsorship:</strong> Whether you're the sponsor or being sponsored, a new partnership is worth formalizing in writing.</li>
+      <li><strong>Team or leadership changes:</strong> A new partner, a studio expansion, or a change in leadership signals growth and is often of interest to trade publications specifically.</li>
+    </ul>
+    <p>As a general rule: if the news marks a genuine milestone, involves a partner or brand who would also want visibility, or gives an editor a reason to feature you now rather than at some vague point in the future, it's worth writing a release.</p>
+
+    <h2>The Anatomy of a Strong Press Release</h2>
+    <p>Every effective press release follows a familiar structure. Understanding each part makes the writing process less intimidating.</p>
+
+    <h3>1. Headline</h3>
+    <p>Your headline should be clear, specific, and immediately communicate the news. Avoid vague or overly clever phrasing. A strong headline names the designer, the project or event, and the occasion in as few words as possible.</p>
+    <div class="example"><span class="example-label">Example</span>"Previewing Lilith House by Jane Doe Studio for WestEdge Design Fair"</div>
+
+    <h3>2. Dateline</h3>
+    <p>Directly beneath the headline, include the city and date the release is issued. This is a journalistic convention that signals professionalism and timeliness.</p>
+    <div class="example"><span class="example-label">Example</span>LOS ANGELES, OCTOBER 10, 2026.</div>
+
+    <h3>3. The Lead Paragraph</h3>
+    <p>The first paragraph carries the most weight. It should answer the essential questions:</p>
+    <ul>
+      <li>Who</li>
+      <li>What</li>
+      <li>Where</li>
+      <li>When</li>
+    </ul>
+    <p>All in a single, confident opening. Busy editors often read only this paragraph before deciding whether to continue, so it needs to stand on its own.</p>
+    <p>You can use bold formatting for certain sentences to single out key facts.</p>
+    <div class="example"><span class="example-label">Example</span><strong>Jane Doe, founder of the Los Angeles-based interior design firm Jane Doe Studio</strong>, is pleased to announce her participation in the <strong>2026 WestEdge Design Fair</strong>, taking place <strong>March 12–14</strong> at <strong>Santa Monica's Barker Hangar</strong>, where she will debut a fully furnished showcase booth exploring minimalist, neutral-toned residential design.</div>
+    <p>Notice how each essential fact is present and easy to isolate: the designer and studio (who), the fair and booth concept (what), the venue (where), and the exact dates (when).</p>
+
+    <h3>4. The Body</h3>
+    <p>This is where you expand on the story. For interior designers, the body typically covers:</p>
+    <ul>
+      <li>The concept or vision behind the project</li>
+      <li>Specific design details that bring the space to life (materials, architectural features, spatial choices)</li>
+      <li>Any brand partners, collaborators, or products involved</li>
+      <li>Relevant context, such as past projects or prior collaborations that establish credibility</li>
+    </ul>
+    <p>Choose details that are specific and sensory, not generic. "Rarely found original hand-wrought iron banisters" tells a far richer story than "beautiful vintage details."</p>
+
+    <h3>5. A Quote</h3>
+    <p>A short quote from the designer or someone from the team adds a human voice to the release and gives journalists a usable soundbite. Keep it concise, specific, and make sure it says something the rest of the release hasn't already said.</p>
+
+    <h3>6. Event or Availability Details</h3>
+    <p>If the release announces an event, exhibition, or reveal, include the practical logistics clearly: dates, times, and location. Bullet points work well here for easy scanning.</p>
+
+    <h3>7. Media Contact</h3>
+    <p>Always include a clear point of contact for interview requests or media inquiries. This is a small detail that signals you're prepared for press engagement.</p>
+
+    <h3>8. Boilerplate ("About" Section)</h3>
+    <p>The boilerplate is a short, standardized paragraph about you or your studio that can be reused across releases. It typically includes:</p>
+    <ul>
+      <li>Your location and area of specialization</li>
+      <li>Your founding year</li>
+      <li>Notable projects or clients</li>
+      <li>Press mentions or publications you've been featured in</li>
+      <li>Notable brand collaborations</li>
+    </ul>
+    <p>This section should read like a straightforward bio and should be free of embellishment, like this example:</p>
+    <div class="about-example">
+      <div class="about-heading">About Jane Doe Studio</div>
+      <p>Founded in 2001, Jane Doe Studio is a Los Angeles-based interior design firm specializing in luxury residential interiors, known for a refined minimalist approach built around neutral palettes and natural materials. Over more than two decades, the studio has completed high-end residences across Southern California, including a series of hillside homes in Bel Air and a widely admired oceanfront property in Malibu. Jane Doe Studio's work has been featured in Interior Design and Dezeen, and the studio's most recent brand collaboration includes a capsule furniture collection with Design Within Reach.</p>
+    </div>
+
+    <div class="promo">
+      <img src="/logo.png" alt="ArchWrite">
+      <div class="promo-text">Free <a href="https://www.archwrite.com/">ArchWrite Press Release &amp; Project Story Writer</a></div>
+    </div>
+
+    <h2>Writing Tone: Intelligent, Not Ornamental</h2>
+    <p>The best interior design press releases sound informed rather than promotional. Aim for language that is:</p>
+    <ul>
+      <li><strong>Precise:</strong> Use specific material names, dates, and design terms rather than vague superlatives.</li>
+      <li><strong>Confident:</strong> State facts plainly. Let the details carry the weight, not adjectives.</li>
+      <li><strong>Warm:</strong> A press release can have personality, but it should never read as an advertisement.</li>
+    </ul>
+    <p>A helpful test: if a sentence could apply to any designer or any project, it needs more specificity.</p>
+
+    <h2>How to Send a Press Release</h2>
+    <p>Writing the release is only half the job; it also needs to reach the right people. For interior designers, there are generally two paths, and each comes with trade-offs.</p>
+
+    <h3>1. Build Your Own Media List and Email It Directly</h3>
+    <p>This is the more boutique approach, and the one most small studios end up using. It involves compiling your own list of editors, journalists, and publications relevant to design in an Excel — local magazines, national shelter publications, trade outlets, and writers who cover your market — and emailing them your release directly, ideally with a short, personal note.</p>
+    <p>Having the press release pasted in the body is common practice, rather than attachments.</p>
+    <p>It takes more time upfront to build the list, but it tends to be more genuine, both to you and to the person receiving it. It also gives you control over exactly who sees your news, which matters if you're building relationships with specific editors over time.</p>
+
+    <h3>2. Distribute Through a Newswire Service</h3>
+    <p>A newswire (such as PR Newswire or Business Wire) will distribute your release broadly and guarantee it gets published on a set of wire-affiliated sites. This can be useful for major announcements or SEO backlinks, but it comes at a real cost — often several hundred dollars per release, and the result can be impersonal, landing your boutique studio's news in the same feed as press releases from massive brands. For most interior designers, a direct, curated email list will feel more aligned with the caliber of work being announced.</p>
+    <p>Many designers find a hybrid approach works best: build relationships with a handful of key editors and publications over time through direct email, and reserve a newswire service for the announcements that genuinely warrant wider distribution.</p>
+
+    <h2>SEO Best Practices for Press Releases</h2>
+    <p>It might feel strange to think about keywords when writing something meant for journalists rather than search engines. A press release is not a blog post, after all. But it's worth doing, because many publications publish press releases as-is on their own sites, often with little to no editing. When that happens, your release is functioning as a piece of published web content, and every SEO decision you make in the writing stage travels with it.</p>
+
+    <h3>Use Keywords Naturally</h3>
+    <p>Include your name, studio name, and relevant location terms (e.g., "Los Angeles interior designer") within the first paragraph. Search engines and readers both benefit from this early clarity.</p>
+
+    <h3>Link Strategically</h3>
+    <p>Hyperlink your name, studio, and any brand partners the first time they're mentioned. This builds backlinks to your site and to your partners', which supports SEO for everyone involved, especially if the release is republished unedited.</p>
+
+    <h3>Write a Descriptive Title</h3>
+    <p>Your headline doubles as your SEO title in most cases. Make sure it includes the who, what, and when — this is what will show up in search results.</p>
+
+    <h3>Keep Paragraphs Short</h3>
+    <p>Short paragraphs improve readability for both human readers and search engine crawlers. Aim for three to four sentences per paragraph at most.</p>
+
+    <h3>Include an "About" Section With Consistent Wording</h3>
+    <p>Because your boilerplate will likely be reused across multiple releases, consistent wording helps search engines associate that language with your name and brand over time.</p>
+
+    <h2>Common Mistakes to Avoid</h2>
+    <ul>
+      <li><strong>Burying the news.</strong> If the announcement doesn't appear until the third paragraph, most readers won't get there.</li>
+      <li><strong>Overusing adjectives.</strong> Words like "stunning," "breathtaking," or "unparalleled" weaken a release rather than strengthen it. Let the facts speak.</li>
+      <li><strong>Skipping the practical details.</strong> Dates, addresses, and contact information should never be an afterthought.</li>
+      <li><strong>Writing for yourself instead of the reader.</strong> A press release should answer what's newsworthy to an outside audience, not simply what you're proud of.</li>
+    </ul>
+
+    <div class="promo">
+      <img src="/logo.png" alt="ArchWrite">
+      <div class="promo-text">Having difficulty writing your interior design press release? Use the free <a href="https://www.archwrite.com/">ArchWrite Press Release &amp; Project Story Writer</a> to have it generated for you.</div>
+      <a class="btn" href="https://www.archwrite.com/">Try it free &rarr;</a>
+    </div>
   </div>
 
   <a class="back-link" href="/blog/">&larr; Back to the blog</a>
