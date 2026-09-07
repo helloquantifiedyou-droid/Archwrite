@@ -2289,18 +2289,16 @@ function architectureStoryTitle(){
 }
 
 const STORY_FIELDS = [
-  { id:'projectName', label:'Project name', placeholder:'', required:true },
-  { id:'designerFirm', label:'Interior design firm / designer', placeholder:'' },
-  { id:'architectureFirm', label:'Architecture firm', placeholder:'', creditsOnly:true },
-  { id:'builder', label:'Contracting', placeholder:'', creditsOnly:true, architectureOnly:true },
-  { id:'landscapeDesign', label:'Landscape design', placeholder:'', architectureOnly:true },
-  { id:'stylist', label:'Styling', placeholder:'' },
-  { id:'photography', label:'Photography credit', placeholder:'', creditsOnly:true },
-  { id:'location', label:'Location', placeholder:'Neighborhood, City' },
-  { id:'clientNames', label:'Client', placeholder:'Leave blank to keep them unnamed', hideForArchitectureResidence:true },
+  { id:'projectName', label:'Project name', placeholder:'', required:true, factsBoxField:true },
+  { id:'designerFirm', label:'Interior design firm / designer', placeholder:'', factsBoxField:true },
+  { id:'architectureFirm', label:'Architecture firm', placeholder:'', creditsOnly:true, factsBoxField:true },
+  { id:'builder', label:'Contracting', placeholder:'', creditsOnly:true, architectureOnly:true, factsBoxField:true },
+  { id:'photography', label:'Photography credit', placeholder:'', creditsOnly:true, factsBoxField:true },
+  { id:'location', label:'Location', placeholder:'Neighborhood, City', factsBoxField:true },
+  { id:'clientNames', label:'Client', placeholder:'Leave blank to keep them unnamed', hideForArchitectureResidence:true, factsBoxField:true },
   { id:'homeowners', label:'Homeowners', placeholder:'Describe the homeowners – their family unit, what they do, and any details that might be helpful. You can also choose to include their names.', type:'textarea', residenceOnly:true, architectureOnly:true },
   { id:'clientStory', label:'Client story / background', placeholder:"Who are they, and what shaped the brief? e.g. their profession, how they found the property, their personal style or priorities.", type:'textarea' },
-  { id:'size', label:'Square footage / size', placeholder:'' },
+  { id:'size', label:'Square footage / size', placeholder:'', factsBoxField:true },
   { id:'floorCount', label:'Floor count', placeholder:'' },
   { id:'bedrooms', label:'Bedrooms', placeholder:'', residenceOnly:true },
   { id:'bathrooms', label:'Bathrooms', placeholder:'', residenceOnly:true },
@@ -2312,12 +2310,15 @@ const STORY_FIELDS = [
   { id:'designPortfolio', label:'Design portfolio', placeholder:'Copy and paste information for relevant related projects the firm has completed or that are ongoing.', type:'textarea', architectureOnly:true },
   { id:'materials', label:'Key materials & palette', placeholder:'', type:'textarea' },
   { id:'brandsAndArt', label:'Brands, artists & notable pieces', placeholder:"List any brands or artists featured in the project, e.g. sofa by Roche Bobois, painting by Jane Doe", type:'textarea', interiorOnly:true },
-  { id:'pressKitUrl', label:'Press kit link (URL)', placeholder:'https://', architectureOnly:true, renderAtEnd:true },
-  { id:'aboutDesigner', label:'About the designer / firm (optional)', placeholder:'Copy and paste your boilerplate here.', type:'textarea', creditsOnly:true, renderAtEnd:true }
+  { id:'pressKitUrl', label:'Press kit link (URL)', placeholder:'https://', architectureOnly:true, renderAtEnd:true, creditsOnly:true, factsBoxField:true },
+  { id:'aboutDesigner', label:'About the designer / firm (optional)', placeholder:'Copy and paste your boilerplate here.', type:'textarea', creditsOnly:true, renderAtEnd:true, factsBoxField:true }
 ];
 
 const STORY_CREDIT_FIELDS = [
   { id:'projectName', creditLabel:'Project name' },
+  { id:'location', creditLabel:'Location' },
+  { id:'clientNames', creditLabel:'Client' },
+  { id:'size', creditLabel:'Size' },
   { id:'architectureFirm', creditLabel:'Architecture firm' },
   { id:'designerFirm', creditLabel:'Interior design firm' },
   { id:'builder', creditLabel:'Contracting' },
@@ -2871,7 +2872,15 @@ function renderStoryForm(){
 
   html += `<div class="ad-banner">PLACE YOUR AD HERE<a class="ad-banner-link" href="https://www.patreon.com/16724522/join" target="_blank" rel="noopener noreferrer">Purchase</a></div>`;
 
-  STORY_FIELDS.forEach(f=>{ if(!f.renderAtEnd && shouldShowStoryField(f)) html += renderStoryCoreField(f); });
+  html += `<div class="hint-banner">This blue section appears as its own block at the end of the story, placed exactly as entered – Project name, Location, Client, and Size also inform how the story itself is written.</div>`;
+  html += `<div class="block-card facts-box">`;
+  ['projectName','location','clientNames','size','architectureFirm','designerFirm','builder','photography','aboutDesigner','pressKitUrl'].forEach(fid=>{
+    const f = STORY_FIELDS.find(sf=>sf.id===fid);
+    if(f && shouldShowStoryField(f)) html += renderStoryCoreField(f);
+  });
+  html += `</div>`;
+
+  STORY_FIELDS.forEach(f=>{ if(!f.renderAtEnd && !f.factsBoxField && shouldShowStoryField(f)) html += renderStoryCoreField(f); });
 
   if(storyState.category !== 'architecture'){
     html += `<div class="section-title">Rooms / Spaces</div>`;
@@ -2926,7 +2935,7 @@ function renderStoryForm(){
     html += `<button class="btn small" id="addStoryQuoteBtn">+ Add Quote</button>`;
   }
 
-  STORY_FIELDS.forEach(f=>{ if(f.renderAtEnd && shouldShowStoryField(f)) html += renderStoryCoreField(f); });
+  STORY_FIELDS.forEach(f=>{ if(f.renderAtEnd && !f.factsBoxField && shouldShowStoryField(f)) html += renderStoryCoreField(f); });
   html += `<div class="section-title">Edit instructions</div>
   <div class="field-group">
     <textarea id="storyEditInstructions" placeholder="Don't like the result? You can request edits here and click Regenerate.">${esc(storyState.editInstructions)}</textarea>
@@ -3103,6 +3112,14 @@ function getStoryAboutText(){
   return `ABOUT ${name ? name.toUpperCase() : 'THE DESIGNER'}\n\n${content}`;
 }
 
+// Press kit link is excluded from the AI's facts (creditsOnly) and appended
+// verbatim here instead, mirroring the same field in the press release tool.
+function getStoryPressKitText(){
+  const url = (storyState.fields.pressKitUrl||'').trim();
+  if(!url) return '';
+  return 'PRESS KIT\n\n' + url;
+}
+
 // The AI marks brand/artist names with **double asterisks**; kept literally in
 // storyState.aiOutput (never stripped there) so bolding is re-derived fresh on
 // every render, surviving contenteditable edits without needing stored markup.
@@ -3127,7 +3144,7 @@ function getStoryActiveText(){
   if(!storyState.aiOutput) return '';
   const plainOutput = stripStoryBold(storyState.aiOutput)
     .split(/\n\s*\n/).map(p => isStorySubhead(p) ? storySubheadText(p) : p).join('\n\n');
-  const parts = [plainOutput, getStoryCreditsText(), getStoryAboutText()].filter(Boolean);
+  const parts = [plainOutput, getStoryCreditsText(), getStoryAboutText(), getStoryPressKitText()].filter(Boolean);
   return parts.join('\n\n');
 }
 
@@ -3155,6 +3172,11 @@ function getStoryActiveHTML(){
     const name = (storyState.fields.designerFirm||'').trim();
     html += `<p style="font-weight:700;margin:16px 0 8px;">ABOUT ${esc(name ? name.toUpperCase() : 'THE DESIGNER')}</p>`;
     html += `<p style="margin:0 0 12px;">${esc(aboutContent)}</p>`;
+  }
+  const pressKitUrl = (storyState.fields.pressKitUrl||'').trim();
+  if(pressKitUrl){
+    html += `<p style="font-weight:700;margin:16px 0 8px;">PRESS KIT</p>`;
+    html += `<p style="margin:0 0 12px;"><a href="${esc(pressKitUrl)}">${esc(pressKitUrl)}</a></p>`;
   }
   return html;
 }
@@ -3203,6 +3225,11 @@ function buildStoryOutputHTML(){
         const name = (storyState.fields.designerFirm||'').trim();
         inner += `<div class="about-heading">ABOUT ${esc(name ? name.toUpperCase() : 'THE DESIGNER')}</div>`;
         inner += `<p>${esc(aboutContent)}</p>`;
+      }
+      const pressKitUrl = (storyState.fields.pressKitUrl||'').trim();
+      if(pressKitUrl){
+        inner += `<div class="about-heading">PRESS KIT</div>`;
+        inner += `<p><a href="${esc(pressKitUrl)}" target="_blank" rel="noopener noreferrer">${esc(pressKitUrl)}</a></p>`;
       }
     }
   } else if(storyState.aiLoading){
@@ -3425,7 +3452,7 @@ Rules:
 - Open the body's first sentence with a clear, concrete, declarative statement that establishes the actual subject — the firm, the client, or the space — the way the EXAMPLES do (e.g. naming the designer/firm and what they brought to the project, or naming the home and its location). Never open with a vague relative or temporal phrase whose reference isn't yet established, like "Before this," "Prior to the renovation," or "Before the redesign," — state directly what the project is and where before moving into any backstory.
 - Keep paragraphs SHORT: roughly 250-500 characters each (about 2-4 sentences) — noticeably shorter than a typical press-release paragraph. Break into a new paragraph whenever the focus shifts — a new room, a new material, a new beat of the client story — rather than letting one paragraph run long. The result should read as more, shorter paragraphs with frequent line breaks throughout, never a handful of dense ones.
 - Wrap every specific brand, maker, or artist name in double asterisks, e.g. "a sofa by **Roche Bobois**" — including the literal [BRAND] and [ARTIST] placeholder tokens, e.g. "a chair by **[BRAND]**". Bold only the name itself, never the surrounding words (correct: "a sofa by **Roche Bobois**"; wrong: "**a sofa by Roche Bobois**"). This is the one exception to "no markdown formatting" below.
-- Do NOT write your own "PROJECT FACTS" block (Project name, Architecture firm, Interior design firm, Contracting, Photography) or "About the designer" section, even though some of those facts are given to you below — they're appended separately after your response, verbatim. Writing your own would create a duplicate.
+- Do NOT write your own "PROJECT FACTS" block (Project name, Location, Client, Size, Architecture firm, Interior design firm, Contracting, Photography) or "About the designer" section, even though some of those facts are given to you below — they're appended separately after your response, verbatim. Writing your own would create a duplicate.
 - If any Quotes are given below, weave each one naturally into the narrative at a relevant point (attributed to its speaker/title, e.g. "says [Name], [Title]"), using present tense for the attribution ("says", not "said"). Never invent a quote that isn't given.
 - If something in FACTS is missing or blank, simply don't mention it — never invent a placeholder.
 - You may also receive loose NOTES from the user — weave any relevant facts from the notes into the appropriate place, corrected and in full sentences. Ignore anything that's just the user thinking out loud.
