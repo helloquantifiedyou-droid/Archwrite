@@ -1317,6 +1317,10 @@ function renderForm(){
       <label>About your company / Boilerplate <span class="required-mark">*</span></label>
       <textarea id="f_aboutContent" style="min-height:90px" placeholder="Paste your existing company boilerplate...">${esc(state.about.content)}</textarea>
     </div>`;
+    ['contact','contactEmail'].forEach(fid=>{
+      const f = def.fields.find(df=>df.id===fid);
+      if(f) html += renderCoreField(f);
+    });
     html += `</div>`;
   }
 
@@ -1425,7 +1429,7 @@ function renderForm(){
   </div>`;
   const generateBtn2Html = `<button class="btn primary small" id="generateBtn2" style="margin:4px 0 16px;" ${state.aiLoading?'disabled':''}>${state.aiOutput ? '✨ Regenerate' : '✨ Generate Press Release'}</button>`;
   const applyEditsBtnHtml = `<button class="btn primary small" id="applyEditsBtn" style="margin:4px 0 16px;" ${(state.aiLoading || !state.aiOutput)?'disabled':''}>✨ Apply Edits</button>`;
-  const renderAtEndFieldsHtml = def.fields.filter(f=>f.renderAtEnd).map(f=>renderCoreField(f)).join('');
+  const renderAtEndFieldsHtml = def.fields.filter(f=>f.renderAtEnd && !(useFactsAdBox && (f.id==='contact'||f.id==='contactEmail'))).map(f=>renderCoreField(f)).join('');
   const faqHtml = `<div class="section-title">FAQ</div>
   <div class="faq-list">
     <details class="faq-item">
