@@ -1642,7 +1642,7 @@ function buildOutputHTML(){
   if(state.aiLoading){
     inner += `<p class="empty-note"><span class="spinner"></span>Writing your press release...</p>`;
   } else if(state.aiError){
-    inner += `<p class="ai-status error">Something went wrong: ${esc(state.aiError)}</p>`;
+    inner += `<p class="ai-status error">${esc(state.aiError)}</p>`;
   } else if(state.aiOutput){
     const paras = state.aiOutput.split(/\n\s*\n/).map(s=>s.trim()).filter(Boolean);
     let editable = '';
@@ -1951,9 +1951,8 @@ ${examples}`;
     });
     if(!res.ok){
       const errBody = await res.text();
-      let msg = errBody;
-      try{ msg = JSON.parse(errBody).error; }catch(e){}
-      throw new Error(`(${res.status}) ${msg}`);
+      console.error('Generation failed', res.status, errBody);
+      throw new Error('ArchWrite is currently down. Please come back later!');
     }
     const data = await res.json();
     const text = extractResponseText(data);
@@ -3169,7 +3168,7 @@ function buildStoryOutputHTML(){
   } else if(storyState.aiLoading){
     inner += `<p class="empty-note"><span class="spinner"></span>Writing…</p>`;
   } else if(storyState.aiError){
-    inner += `<p class="ai-status error">Something went wrong: ${esc(storyState.aiError)}</p>`;
+    inner += `<p class="ai-status error">${esc(storyState.aiError)}</p>`;
   } else if(!storyState.aiNotice){
     const sample = (SAMPLE_STORIES[storyState.category] || {})[storyState.projectType];
     if(sample){
@@ -3426,9 +3425,8 @@ ${examples}`;
     });
     if(!res.ok){
       const errBody = await res.text();
-      let msg = errBody;
-      try{ msg = JSON.parse(errBody).error; }catch(e){}
-      throw new Error(`(${res.status}) ${msg}`);
+      console.error('Generation failed', res.status, errBody);
+      throw new Error('ArchWrite is currently down. Please come back later!');
     }
     const data = await res.json();
     const text = extractResponseText(data);
