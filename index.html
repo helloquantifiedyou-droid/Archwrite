@@ -555,6 +555,35 @@ function gtag_report_conversion(url) {
     color:var(--muted);
     margin:8px 0 0;
   }
+  .clear-fields-btn{color:var(--danger);border-color:var(--danger);background:var(--paper);}
+  .clear-fields-btn:hover{background:#fbe9e7;}
+  .clear-confirm-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.5);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:100;
+    padding:20px;
+  }
+  .clear-confirm-overlay[hidden]{display:none;}
+  .clear-confirm-box{
+    background:var(--paper);
+    border-radius:12px;
+    padding:24px;
+    max-width:380px;
+    width:100%;
+    box-shadow:0 12px 40px rgba(0,0,0,0.25);
+  }
+  .clear-confirm-box p{
+    font-family:"IBM Plex Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size:14px;
+    line-height:1.55;
+    color:var(--ink);
+    margin:0 0 20px;
+  }
+  .clear-confirm-actions{display:flex;gap:10px;justify-content:flex-end;}
   .mobile-view-toggle{display:none;}
   @media (max-width: 768px){
     .logo-bar{padding:8px 16px;}
@@ -654,6 +683,16 @@ function gtag_report_conversion(url) {
   </div>
 </div>
 
+<div class="clear-confirm-overlay" id="clearConfirmOverlay" hidden>
+  <div class="clear-confirm-box">
+    <p>Are you sure you want to clear all fields? This cannot be undone.</p>
+    <div class="clear-confirm-actions">
+      <button type="button" class="btn" id="clearConfirmCancel">Don't clear</button>
+      <button type="button" class="btn primary" id="clearConfirmOk" style="background:var(--danger);border-color:var(--danger);">Clear</button>
+    </div>
+  </div>
+</div>
+
 <script src="examples.js"></script>
 <script>
 (function(){
@@ -715,6 +754,25 @@ function syncMobileToggle(){
 }
 document.querySelectorAll('.mvt-btn').forEach(b=>{
   b.addEventListener('click', ()=> setMobileView(b.dataset.view));
+});
+
+// Shared "Clear all fields" confirmation modal — one instance for both tools;
+// clearConfirmTarget tracks which one asked, set when its own button is
+// clicked (see attachFormEvents() and the story form's equivalent).
+let clearConfirmTarget = null;
+function showClearConfirm(target){
+  clearConfirmTarget = target;
+  document.getElementById('clearConfirmOverlay').hidden = false;
+}
+function hideClearConfirm(){
+  clearConfirmTarget = null;
+  document.getElementById('clearConfirmOverlay').hidden = true;
+}
+document.getElementById('clearConfirmCancel').addEventListener('click', hideClearConfirm);
+document.getElementById('clearConfirmOk').addEventListener('click', ()=>{
+  if(clearConfirmTarget === 'press') clearAllFields();
+  else if(clearConfirmTarget === 'story') clearAllStoryFields();
+  hideClearConfirm();
 });
 
 // ---------- CATEGORY + SUBTYPE CONFIG ----------
@@ -1231,11 +1289,12 @@ function freshSubtypeState(subtype, category){
   (def.repeatables||[]).forEach(r=>{ repeatableGroups[r.id] = [makeRepeatableItem(r)]; });
   const factsBlocks = def.facts.map(f=> ({heading:f.heading, items:[{label:'',value:''}]}));
   const about = {content:''};
+  const about2 = {label:'', content:''};
   const projectFacts = {};
   if(def.projectFacts){
     PROJECT_FACTS_FIELDS.forEach(f=> projectFacts[f.id] = '');
   }
-  return {fields, quotes, repeatableGroups, factsBlocks, about, projectFacts};
+  return {fields, quotes, repeatableGroups, factsBlocks, about, about2, about2Shown:false, projectFacts};
 }
 
 function makeRepeatableItem(repeatableDef){
@@ -1310,11 +1369,32 @@ if(savedState){
   });
   if(!state.projectFacts || typeof state.projectFacts !== 'object') state.projectFacts = {};
   if(!state.about || typeof state.about !== 'object') state.about = {content:''};
+  if(!state.about2 || typeof state.about2 !== 'object') state.about2 = {label:'', content:''};
+  if(typeof state.about2Shown !== 'boolean') state.about2Shown = !!(state.about2.content||'').trim();
   bumpUidPastSavedIds(state);
 }
 
 function computeAboutHeading(){
   return 'ABOUT ' + (state.company.trim() ? state.company.trim().toUpperCase() : 'J. DOE STUDIO');
+}
+function computeAboutHeading2(){
+  return 'ABOUT ' + (state.about2.label.trim() ? state.about2.label.trim().toUpperCase() : 'THE COLLABORATING FIRM');
+}
+// Shared markup for the optional second About/Boilerplate block, used in both
+// renderForm() spots (the blue facts-box variant and the plain section
+// variant) so they can't drift apart.
+function renderAbout2Html(){
+  if(state.about2Shown){
+    return `<div class="block-card" style="margin-top:10px;">
+      <div class="block-card-head">
+        <span class="block-type-label">Second About / Boilerplate</span>
+        <div class="block-actions"><button class="icon-btn danger" id="removeAbout2Btn" title="Remove">✕</button></div>
+      </div>
+      <div class="field-group"><label>Company / firm name</label><input type="text" id="f_about2Label" value="${esc(state.about2.label)}" placeholder="e.g. a collaborating firm"></div>
+      <div class="field-group"><label>Boilerplate</label><textarea id="f_about2Content" style="min-height:90px" placeholder="Paste a second company's boilerplate...">${esc(state.about2.content)}</textarea></div>
+    </div>`;
+  }
+  return `<button class="btn small" id="addAbout2Btn" type="button" style="margin-top:6px;">+ Add another About / Boilerplate</button>`;
 }
 
 // ---------- rendering: FORM ----------
@@ -1408,6 +1488,7 @@ function renderForm(){
       <label>About your company / Boilerplate <span class="required-mark">*</span></label>
       <textarea id="f_aboutContent" style="min-height:90px" placeholder="Paste your existing company boilerplate...">${esc(state.about.content)}</textarea>
     </div>`;
+    html += renderAbout2Html();
     ['contact','contactEmail','pressKitUrl'].forEach(fid=>{
       const f = def.fields.find(df=>df.id===fid);
       if(f) html += renderCoreField(f);
@@ -1520,6 +1601,7 @@ function renderForm(){
   </div>`;
   const generateBtn2Html = `<button class="btn primary small" id="generateBtn2" style="margin:4px 0 16px;" ${state.aiLoading?'disabled':''}>${state.aiOutput ? '✨ Regenerate' : '✨ Generate Press Release'}</button>`;
   const applyEditsBtnHtml = `<button class="btn primary small" id="applyEditsBtn" style="margin:4px 0 16px;" ${(state.aiLoading || !state.aiOutput)?'disabled':''}>✨ Apply Edits</button>`;
+  const clearFieldsBtnHtml = `<button class="btn small clear-fields-btn" id="clearFieldsBtn" type="button" style="margin:0 0 16px;">Clear all fields</button>`;
   const renderAtEndFieldsHtml = def.fields.filter(f=>f.renderAtEnd && !(useFactsAdBox && (f.id==='contact'||f.id==='contactEmail'||f.id==='pressKitUrl'))).map(f=>renderCoreField(f)).join('');
   const faqHtml = `<div class="section-title">FAQ</div>
   <div class="faq-list">
@@ -1559,12 +1641,14 @@ function renderForm(){
       <div class="field-group">
         <textarea id="f_aboutContent" style="min-height:90px" placeholder="Paste your existing company boilerplate...">${esc(state.about.content)}</textarea></div>
     </div>`;
+    html += renderAbout2Html();
   }
 
   html += renderAtEndFieldsHtml;
   html += generateBtn2Html;
   html += editInstructionsHtml;
   html += applyEditsBtnHtml;
+  html += clearFieldsBtnHtml;
 
   html += `<div class="ad-banner">PLACE YOUR AD HERE<a class="ad-banner-link" href="https://www.patreon.com/16724522/join" target="_blank" rel="noopener noreferrer">Purchase</a></div>`;
   html += faqHtml;
@@ -1573,11 +1657,37 @@ function renderForm(){
   attachFormEvents();
 }
 
+// Resets the current release type back to a blank form — same category and
+// subtype, everything else (including Company/Dateline) wiped, mirroring the
+// app's own initial-load default shape.
+function clearAllFields(){
+  const category = state.category, subtype = state.subtype;
+  state = Object.assign({
+    category,
+    subtype,
+    company: '',
+    datelineCity: '',
+    datelineState: '',
+    dateDay: '',
+    dateMonth: '',
+    dateYear: '',
+    notes: '',
+    editInstructions: '',
+    aiOutput: '',
+    aiNotice: '',
+    aiLoading: false,
+    aiError: ''
+  }, freshSubtypeState(subtype, category));
+  renderForm(); renderPreview(); renderToolbar();
+}
+
 function attachFormEvents(){
   const generateBtn2 = document.getElementById('generateBtn2');
   if(generateBtn2) generateBtn2.addEventListener('click', ()=>callClaudeAPI('fresh'));
   const applyEditsBtn = document.getElementById('applyEditsBtn');
   if(applyEditsBtn) applyEditsBtn.addEventListener('click', ()=>callClaudeAPI('edit'));
+  const clearFieldsBtn = document.getElementById('clearFieldsBtn');
+  if(clearFieldsBtn) clearFieldsBtn.addEventListener('click', ()=> showClearConfirm('press'));
 
   document.getElementById('categorySelect').addEventListener('change', e=>{
     state.category = e.target.value;
@@ -1705,6 +1815,18 @@ function attachFormEvents(){
   if(aboutContentEl){
     aboutContentEl.addEventListener('input', e=>{ state.about.content = e.target.value; renderPreview(); });
   }
+  const about2LabelEl = document.getElementById('f_about2Label');
+  if(about2LabelEl) about2LabelEl.addEventListener('input', e=>{ state.about2.label = e.target.value; renderPreview(); });
+  const about2ContentEl = document.getElementById('f_about2Content');
+  if(about2ContentEl) about2ContentEl.addEventListener('input', e=>{ state.about2.content = e.target.value; renderPreview(); });
+  const addAbout2Btn = document.getElementById('addAbout2Btn');
+  if(addAbout2Btn) addAbout2Btn.addEventListener('click', ()=>{ state.about2Shown = true; renderForm(); renderPreview(); });
+  const removeAbout2Btn = document.getElementById('removeAbout2Btn');
+  if(removeAbout2Btn) removeAbout2Btn.addEventListener('click', ()=>{
+    state.about2Shown = false;
+    state.about2 = {label:'', content:''};
+    renderForm(); renderPreview();
+  });
 
   const editInstructionsEl = document.getElementById('f_editInstructions');
   if(editInstructionsEl){
@@ -1762,6 +1884,10 @@ function buildOutputHTML(){
     if(def.hasAbout && state.about.content.trim()){
       inner += `<div class="about-heading">${esc(computeAboutHeading())}</div>`;
       inner += `<p>${esc(state.about.content.trim())}</p>`;
+    }
+    if(def.hasAbout && state.about2Shown && state.about2.content.trim()){
+      inner += `<div class="about-heading">${esc(computeAboutHeading2())}</div>`;
+      inner += `<p>${esc(state.about2.content.trim())}</p>`;
     }
     if(def.fields.some(f=>f.id==='contact')){
       const contactLines = [(state.fields.contact||'').trim(), (state.fields.contactEmail||'').trim()].filter(Boolean);
@@ -1892,6 +2018,11 @@ function getAboutText(){
   if(!def.hasAbout || !state.about.content.trim()) return '';
   return computeAboutHeading() + '\n\n' + state.about.content.trim();
 }
+function getAbout2Text(){
+  const def = SUBTYPE_DEFS[state.subtype];
+  if(!def.hasAbout || !state.about2Shown || !state.about2.content.trim()) return '';
+  return computeAboutHeading2() + '\n\n' + state.about2.content.trim();
+}
 
 function getProjectFactsText(){
   if(!projectFactsApplies()) return '';
@@ -1924,7 +2055,7 @@ function getPressKitText(){
 // ---------- AI generation ----------
 function getActiveText(){
   if(!state.aiOutput) return '';
-  const parts = [state.aiOutput, getProjectFactsText(), getAboutText(), getMediaContactText(), getPressKitText()].filter(Boolean);
+  const parts = [state.aiOutput, getProjectFactsText(), getAboutText(), getAbout2Text(), getMediaContactText(), getPressKitText()].filter(Boolean);
   return parts.join('\n\n');
 }
 
@@ -1953,6 +2084,10 @@ function getActiveHTML(){
   if(def.hasAbout && state.about.content.trim()){
     html += `<p style="font-weight:700;margin:16px 0 8px;">${esc(computeAboutHeading())}</p>`;
     html += `<p style="margin:0 0 12px;">${esc(state.about.content.trim())}</p>`;
+  }
+  if(def.hasAbout && state.about2Shown && state.about2.content.trim()){
+    html += `<p style="font-weight:700;margin:16px 0 8px;">${esc(computeAboutHeading2())}</p>`;
+    html += `<p style="margin:0 0 12px;">${esc(state.about2.content.trim())}</p>`;
   }
   if(def.fields.some(f=>f.id==='contact')){
     const contactLines = [(state.fields.contact||'').trim(), (state.fields.contactEmail||'').trim()].filter(Boolean);
@@ -2071,6 +2206,7 @@ The language must never be poetic or subjective. No lyrical or evocative descrip
 
 Rules:
 - Output structure, as separate paragraphs separated by a blank line and in this exact order: (1) the headline alone; (2) the one-sentence summary alone; (3) the dateline-opening body paragraph; (4) the remaining body paragraphs, quotes, and closing facts. Do not merge or skip (1) or (2) — they must each be their own paragraph.
+- The dateline-opening paragraph (item 3 above) must be dense and complete, not a thin teaser — pack in every key fact genuinely available for that opening beat in a single paragraph: who's involved, exactly what's being announced, the name of the event/project/collection, when it's happening, and a specific, fact-grounded description of the actual work being presented (e.g. a room's concept, a building's program). Front-load these details rather than spreading them thin across several paragraphs or saving them for later in the release.
 - Every fact, name, date, number, material, dimension, and quote in FACTS is real. Use them accurately, and do not invent or infer facts, quotes, materials, dimensions, sensory details, or any other details not present in FACTS or NOTES — not even small, plausible-sounding ones added for color or to sound more complete.${eventStatusNote}
 - Never invent a quote. Only include a quote if one is explicitly given as a Quote line in FACTS below — do not fabricate a spokesperson quote, do not put invented words in a named person's mouth, and do not manufacture a quote just because a release "usually" has one. If no Quote is given, write the release with no quote in it at all.
 - If something in FACTS is missing, thin, or blank, simply don't mention it or write around it briefly — never invent a placeholder or a made-up specific to fill the gap. A short, accurate release beats a longer one padded with invented detail.
@@ -2832,6 +2968,8 @@ function freshStoryState(){
     fields,
     rooms: [makeStoryRoom()],
     facade: [],
+    about2: {label:'', content:''},
+    about2Shown: false,
     notes: '',
     editInstructions: '',
     photos: [],
@@ -2878,6 +3016,8 @@ if(savedStory){
   });
   if(!Array.isArray(storyState.rooms) || !storyState.rooms.length) storyState.rooms = [makeStoryRoom()];
   if(!Array.isArray(storyState.facade)) storyState.facade = [];
+  if(!storyState.about2 || typeof storyState.about2 !== 'object') storyState.about2 = {label:'', content:''};
+  if(typeof storyState.about2Shown !== 'boolean') storyState.about2Shown = !!(storyState.about2.content||'').trim();
   let maxRoomN = 0;
   (storyState.rooms||[]).forEach(r=>{
     if(r && typeof r.id==='string' && r.id[0]==='b'){
@@ -2945,10 +3085,11 @@ function renderStoryForm(){
 
   html += `<div class="hint-banner">This blue section appears as its own block at the end of the story, placed exactly as entered.</div>`;
   html += `<div class="block-card facts-box">`;
-  ['projectName','location','clientNames','size','completionDate','architectureFirm','designerFirm','builder','photography','aboutDesigner','pressKitUrl'].forEach(fid=>{
+  ['projectName','location','clientNames','size','completionDate','architectureFirm','designerFirm','builder','photography','pressKitUrl','aboutDesigner'].forEach(fid=>{
     const f = STORY_FIELDS.find(sf=>sf.id===fid);
     if(f && shouldShowStoryField(f)) html += renderStoryCoreField(f);
   });
+  html += renderStoryAbout2Html();
   html += `</div>`;
 
   STORY_FIELDS.forEach(f=>{ if(!f.renderAtEnd && !f.factsBoxField && shouldShowStoryField(f)) html += renderStoryCoreField(f); });
@@ -2997,6 +3138,7 @@ function renderStoryForm(){
     <textarea id="storyEditInstructions" placeholder="Want to keep the generated draft but request some edits? You can request here and click Regenerate.">${esc(storyState.editInstructions)}</textarea>
   </div>`;
   html += `<button class="btn primary small" id="storyGenerateBtn" style="margin:4px 0 16px;" ${storyState.aiLoading?'disabled':''}>${storyState.aiOutput ? '✨ Regenerate' : '✨ Generate Project Story'}</button>`;
+  html += `<button class="btn small clear-fields-btn" id="clearStoryFieldsBtn" type="button" style="margin:0 0 16px;">Clear all fields</button>`;
   html += `<div class="ad-banner">PLACE YOUR AD HERE<a class="ad-banner-link" href="https://www.patreon.com/16724522/join" target="_blank" rel="noopener noreferrer">Purchase</a></div>`;
 
   html += `<div class="section-title">FAQ</div>
@@ -3019,7 +3161,21 @@ function renderStoryForm(){
   attachStoryFormEvents();
 }
 
+// Resets the current category/project type back to a blank form — everything
+// else (fields, rooms, facade, About blocks, photos, notes) wiped, mirroring
+// freshStoryState()'s own default shape.
+function clearAllStoryFields(){
+  const category = storyState.category, projectType = storyState.projectType;
+  storyState = freshStoryState();
+  storyState.category = category;
+  storyState.projectType = projectType;
+  refreshStoryPhotoUrls();
+  renderStoryForm(); renderStoryPreview(); renderStoryToolbar();
+}
+
 function attachStoryFormEvents(){
+  const clearStoryFieldsBtn = document.getElementById('clearStoryFieldsBtn');
+  if(clearStoryFieldsBtn) clearStoryFieldsBtn.addEventListener('click', ()=> showClearConfirm('story'));
   const catSel = document.getElementById('storyCategorySelect');
   if(catSel) catSel.addEventListener('change', e=>{
     storyState.category = e.target.value;
@@ -3043,6 +3199,19 @@ function attachStoryFormEvents(){
       storyState.fields[e.target.getAttribute('data-storyfield')] = e.target.value;
       saveStoryState();
     });
+  });
+
+  const storyAbout2LabelEl = document.getElementById('storyAbout2Label');
+  if(storyAbout2LabelEl) storyAbout2LabelEl.addEventListener('input', e=>{ storyState.about2.label = e.target.value; saveStoryState(); });
+  const storyAbout2ContentEl = document.getElementById('storyAbout2Content');
+  if(storyAbout2ContentEl) storyAbout2ContentEl.addEventListener('input', e=>{ storyState.about2.content = e.target.value; saveStoryState(); });
+  const addStoryAbout2Btn = document.getElementById('addStoryAbout2Btn');
+  if(addStoryAbout2Btn) addStoryAbout2Btn.addEventListener('click', ()=>{ storyState.about2Shown = true; renderStoryForm(); saveStoryState(); });
+  const removeStoryAbout2Btn = document.getElementById('removeStoryAbout2Btn');
+  if(removeStoryAbout2Btn) removeStoryAbout2Btn.addEventListener('click', ()=>{
+    storyState.about2Shown = false;
+    storyState.about2 = {label:'', content:''};
+    renderStoryForm(); saveStoryState();
   });
 
   storyFormPane.querySelectorAll('[data-roomfield]').forEach(el=>{
@@ -3142,6 +3311,30 @@ function getStoryAboutText(){
   const name = (storyState.fields.designerFirm||'').trim();
   return `ABOUT ${name ? name.toUpperCase() : 'THE DESIGNER'}\n\n${content}`;
 }
+function computeStoryAboutHeading2(){
+  return 'ABOUT ' + (storyState.about2.label.trim() ? storyState.about2.label.trim().toUpperCase() : 'THE COLLABORATING FIRM');
+}
+function getStoryAbout2Text(){
+  if(!storyState.about2Shown) return '';
+  const content = (storyState.about2.content||'').trim();
+  if(!content) return '';
+  return computeStoryAboutHeading2() + '\n\n' + content;
+}
+// Shared markup for the optional second About/Boilerplate block inside the
+// blue facts box — mirrors the press release tool's renderAbout2Html().
+function renderStoryAbout2Html(){
+  if(storyState.about2Shown){
+    return `<div class="block-card" style="margin-top:10px;">
+      <div class="block-card-head">
+        <span class="block-type-label">Second About / Boilerplate</span>
+        <div class="block-actions"><button class="icon-btn danger" id="removeStoryAbout2Btn" title="Remove">✕</button></div>
+      </div>
+      <div class="field-group"><label>Company / firm name</label><input type="text" id="storyAbout2Label" value="${esc(storyState.about2.label)}" placeholder="e.g. a collaborating firm"></div>
+      <div class="field-group"><label>Boilerplate</label><textarea id="storyAbout2Content" style="min-height:90px" placeholder="Paste a second company's boilerplate...">${esc(storyState.about2.content)}</textarea></div>
+    </div>`;
+  }
+  return `<button class="btn small" id="addStoryAbout2Btn" type="button" style="margin-top:10px;">+ Add another About / Boilerplate</button>`;
+}
 
 // Press kit link is excluded from the AI's facts (creditsOnly) and appended
 // verbatim here instead, mirroring the same field in the press release tool.
@@ -3175,7 +3368,7 @@ function getStoryActiveText(){
   if(!storyState.aiOutput) return '';
   const plainOutput = stripStoryBold(storyState.aiOutput)
     .split(/\n\s*\n/).map(p => isStorySubhead(p) ? storySubheadText(p) : p).join('\n\n');
-  const parts = [plainOutput, getStoryCreditsText(), getStoryAboutText(), getStoryPressKitText()].filter(Boolean);
+  const parts = [plainOutput, getStoryCreditsText(), getStoryAboutText(), getStoryAbout2Text(), getStoryPressKitText()].filter(Boolean);
   return parts.join('\n\n');
 }
 
@@ -3203,6 +3396,10 @@ function getStoryActiveHTML(){
     const name = (storyState.fields.designerFirm||'').trim();
     html += `<p style="font-weight:700;margin:16px 0 8px;">ABOUT ${esc(name ? name.toUpperCase() : 'THE DESIGNER')}</p>`;
     html += `<p style="margin:0 0 12px;">${esc(aboutContent)}</p>`;
+  }
+  if(storyState.about2Shown && storyState.about2.content.trim()){
+    html += `<p style="font-weight:700;margin:16px 0 8px;">${esc(computeStoryAboutHeading2())}</p>`;
+    html += `<p style="margin:0 0 12px;">${esc(storyState.about2.content.trim())}</p>`;
   }
   const pressKitUrl = (storyState.fields.pressKitUrl||'').trim();
   if(pressKitUrl){
@@ -3256,6 +3453,10 @@ function buildStoryOutputHTML(){
         const name = (storyState.fields.designerFirm||'').trim();
         inner += `<div class="about-heading">ABOUT ${esc(name ? name.toUpperCase() : 'THE DESIGNER')}</div>`;
         inner += `<p>${esc(aboutContent)}</p>`;
+      }
+      if(storyState.about2Shown && storyState.about2.content.trim()){
+        inner += `<div class="about-heading">${esc(computeStoryAboutHeading2())}</div>`;
+        inner += `<p>${esc(storyState.about2.content.trim())}</p>`;
       }
       const pressKitUrl = (storyState.fields.pressKitUrl||'').trim();
       if(pressKitUrl){
