@@ -1601,7 +1601,7 @@ function renderForm(){
   </div>`;
   const generateBtn2Html = `<button class="btn primary small" id="generateBtn2" style="margin:4px 0 16px;" ${state.aiLoading?'disabled':''}>${state.aiOutput ? '✨ Regenerate' : '✨ Generate Press Release'}</button>`;
   const applyEditsBtnHtml = `<button class="btn primary small" id="applyEditsBtn" style="margin:4px 0 16px;" ${(state.aiLoading || !state.aiOutput)?'disabled':''}>✨ Apply Edits</button>`;
-  const clearFieldsBtnHtml = `<button class="btn small clear-fields-btn" id="clearFieldsBtn" type="button" style="margin:0 0 16px;">Clear all fields</button>`;
+  const clearFieldsBtnHtml = `<div style="margin:0 0 16px;"><button class="btn small clear-fields-btn" id="clearFieldsBtn" type="button">Clear all fields</button></div>`;
   const renderAtEndFieldsHtml = def.fields.filter(f=>f.renderAtEnd && !(useFactsAdBox && (f.id==='contact'||f.id==='contactEmail'||f.id==='pressKitUrl'))).map(f=>renderCoreField(f)).join('');
   const faqHtml = `<div class="section-title">FAQ</div>
   <div class="faq-list">
@@ -2207,6 +2207,7 @@ The language must never be poetic or subjective. No lyrical or evocative descrip
 Rules:
 - Output structure, as separate paragraphs separated by a blank line and in this exact order: (1) the headline alone; (2) the one-sentence summary alone; (3) the dateline-opening body paragraph; (4) the remaining body paragraphs, quotes, and closing facts. Do not merge or skip (1) or (2) — they must each be their own paragraph.
 - The dateline-opening paragraph (item 3 above) must be dense and complete, not a thin teaser — pack in every key fact genuinely available for that opening beat in a single paragraph: who's involved, exactly what's being announced, the name of the event/project/collection, when it's happening, and a specific, fact-grounded description of the actual work being presented (e.g. a room's concept, a building's program). Front-load these details rather than spreading them thin across several paragraphs or saving them for later in the release.
+- Every paragraph AFTER the opening one should be short — roughly 150-300 characters (1-2 sentences) — not the opening paragraph's density. Start a new paragraph whenever the focus shifts (a new location detail, a new facet of the concept, a new fact, a new beat), rather than letting a paragraph run long. The body should read as several short paragraphs with frequent line breaks, not a handful of dense blocks.
 - Every fact, name, date, number, material, dimension, and quote in FACTS is real. Use them accurately, and do not invent or infer facts, quotes, materials, dimensions, sensory details, or any other details not present in FACTS or NOTES — not even small, plausible-sounding ones added for color or to sound more complete.${eventStatusNote}
 - Never invent a quote. Only include a quote if one is explicitly given as a Quote line in FACTS below — do not fabricate a spokesperson quote, do not put invented words in a named person's mouth, and do not manufacture a quote just because a release "usually" has one. If no Quote is given, write the release with no quote in it at all.
 - If something in FACTS is missing, thin, or blank, simply don't mention it or write around it briefly — never invent a placeholder or a made-up specific to fill the gap. A short, accurate release beats a longer one padded with invented detail.
@@ -3138,7 +3139,7 @@ function renderStoryForm(){
     <textarea id="storyEditInstructions" placeholder="Want to keep the generated draft but request some edits? You can request here and click Regenerate.">${esc(storyState.editInstructions)}</textarea>
   </div>`;
   html += `<button class="btn primary small" id="storyGenerateBtn" style="margin:4px 0 16px;" ${storyState.aiLoading?'disabled':''}>${storyState.aiOutput ? '✨ Regenerate' : '✨ Generate Project Story'}</button>`;
-  html += `<button class="btn small clear-fields-btn" id="clearStoryFieldsBtn" type="button" style="margin:0 0 16px;">Clear all fields</button>`;
+  html += `<div style="margin:0 0 16px;"><button class="btn small clear-fields-btn" id="clearStoryFieldsBtn" type="button">Clear all fields</button></div>`;
   html += `<div class="ad-banner">PLACE YOUR AD HERE<a class="ad-banner-link" href="https://www.patreon.com/16724522/join" target="_blank" rel="noopener noreferrer">Purchase</a></div>`;
 
   html += `<div class="section-title">FAQ</div>
