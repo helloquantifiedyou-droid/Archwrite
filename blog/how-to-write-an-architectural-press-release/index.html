@@ -52,7 +52,7 @@
     background:var(--paper);
   }
   .logo-bar img{height:40px;width:auto;display:block;}
-  .wrap{max-width:720px;margin:0 auto;padding:48px 24px 80px;}
+  .wrap{max-width:680px;margin:0 auto;padding:48px 24px 80px;}
   .kicker{
     font-family:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
     font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;
@@ -62,20 +62,60 @@
     font-family:"Droid Sans","Helvetica Neue",Arial,sans-serif;
     font-size:32px;line-height:1.2;margin:0 0 16px;letter-spacing:-0.01em;
   }
-  .lede{font-size:16px;line-height:1.6;color:#333;margin:0 0 32px;max-width:56ch;}
-  .coming-soon{
-    background:var(--panel);border:1px solid var(--line);border-radius:10px;
-    padding:24px;margin:0 0 32px;
+  .lede{font-size:16px;line-height:1.6;color:#333;margin:0 0 36px;max-width:56ch;}
+  .article-body h2{
+    font-family:"Droid Sans","Helvetica Neue",Arial,sans-serif;
+    font-size:23px;line-height:1.3;margin:44px 0 16px;letter-spacing:-0.01em;
   }
-  .coming-soon p{
+  .article-body h3{
+    font-family:"Droid Sans","Helvetica Neue",Arial,sans-serif;
+    font-size:17px;line-height:1.3;margin:28px 0 10px;
+  }
+  .article-body p{
     font-family:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
-    margin:0 0 16px;font-size:14px;line-height:1.6;color:#444;
+    font-size:15px;line-height:1.72;color:#333;margin:0 0 18px;
   }
-  .coming-soon p:last-child{margin-bottom:0;}
+  .article-body ul{margin:0 0 18px;padding-left:22px;}
+  .article-body li{
+    font-family:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+    font-size:15px;line-height:1.65;color:#333;margin:0 0 10px;
+  }
+  .article-body strong{font-weight:700;color:var(--ink);}
+  .article-body a{color:var(--canvas);}
+  .example{
+    border-left:3px solid var(--canvas);
+    background:var(--panel);
+    padding:14px 18px;margin:0 0 18px;
+    font-family:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+    font-size:14px;line-height:1.6;color:#333;
+  }
+  .example .example-label{
+    display:block;font-weight:700;text-transform:uppercase;
+    font-size:11px;letter-spacing:0.05em;color:var(--canvas);margin:0 0 6px;
+  }
+  .example ul{margin:0;padding-left:18px;}
+  .example li{margin:0 0 4px;font-size:14px;}
+  .about-example{
+    background:var(--panel);border:1px solid var(--line);border-radius:8px;
+    padding:18px 20px;margin:0 0 18px;
+  }
+  .about-example .about-heading{
+    font-family:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+    font-size:12px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;
+    color:var(--canvas);margin:0 0 8px;
+  }
+  .about-example p{margin:0;font-size:14px;}
+  .promo{
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:20px 24px;margin:28px 0;display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  }
+  .promo img{height:26px;width:auto;flex-shrink:0;}
+  .promo-text{flex:1;min-width:220px;font-family:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;font-size:14px;line-height:1.55;color:#333;}
+  .promo-text a{color:var(--canvas);font-weight:700;}
   .btn{
     display:inline-block;background:var(--canvas);color:#fff;text-decoration:none;
     padding:10px 20px;border-radius:6px;font-weight:700;font-size:13px;
-    font-family:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+    font-family:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;flex-shrink:0;
   }
   .back-link{
     display:inline-block;margin-top:24px;font-size:13px;color:var(--canvas);
@@ -97,12 +137,227 @@
 <div class="wrap">
   <div class="kicker">Blog</div>
   <h1>How to Write an Architectural Press Release</h1>
-  <p class="lede">A step-by-step guide to structuring a press release for a completed building, competition win, or major architecture announcement.</p>
 
-  <div class="coming-soon">
-    <p>This article is coming soon.</p>
-    <p>In the meantime, try the free tool that writes your press release or project story for you — no sign-up, no credit card required.</p>
-    <a class="btn" href="/">Try the free tool &rarr;</a>
+  <div class="article-body">
+    <p>A well-written architecture press release remains one of the most effective tools a firm has for securing press coverage and building visibility and credibility.</p>
+    <p>Yet, many architecture firms never write one, especially small businesses and single-owner businesses without marketing managers.</p>
+    <p>It's normal. Architects are trained to design spaces and buildings, not to navigate the unwritten rules of the media industry. Press release format, tone, and distribution are treated as industry knowledge that, typically, no one teaches, which means many small studios opt out of press altogether.</p>
+    <p>That's too bad, because a press release is one of the more accessible ways to get noticed, no matter the size of your practice.</p>
+    <p>This guide breaks down how to write and send an architecture press release, whether you're a solo practitioner or part of a large firm. The goal: give you a release polished enough to publish on your own site, and clear enough to send directly to journalists and editors who might cover it.</p>
+
+    <h2>What Is a Press Release, and Why Does It Matter for Architects?</h2>
+    <p>A press release is a formal announcement written for media outlets, editors, and publications. For architects, it's the tool used to announce a building completion, a competition win, a groundbreaking, a firm merger, or a new project commission.</p>
+    <p>Done well, an architecture press release does three things at once:</p>
+    <ul>
+      <li><strong>Builds relationships with press:</strong> Editors are more likely to cover firms that communicate clearly and professionally.</li>
+      <li><strong>Establishes authority:</strong> It positions you as a credible voice in the field, not just a service provider.</li>
+      <li><strong>Improves discoverability:</strong> Published online, on your own site, or picked up by a publication, a press release becomes a searchable, linkable asset that supports SEO after the news itself has passed.</li>
+    </ul>
+
+    <h2>When to Send a Press Release</h2>
+    <p>Not every update warrants a press release, but certain milestones are newsworthy, and it's worth having a release ready when they happen.</p>
+    <p>Common occasions include:</p>
+    <ul>
+      <li><strong>Completing a building:</strong> A finished project — especially one with a compelling site, program, or design story — is the most common reason architects go to press.</li>
+      <li><strong>Winning a competition:</strong> Design competitions carry inherent news value and give editors a clear reason to cover you.</li>
+      <li><strong>Breaking ground:</strong> The start of construction on a significant project is a natural announcement moment, particularly for civic, cultural, or large-scale work.</li>
+      <li><strong>Winning a commission:</strong> Landing a notable project, even years before completion, is often newsworthy on its own, especially for high-profile clients or sites.</li>
+      <li><strong>Receiving an award or citation:</strong> AIA honors, industry awards, and design citations are inherently newsworthy.</li>
+      <li><strong>Firm changes:</strong> A merger, a new partner, a rebrand, or a studio expansion signals growth and is often of interest to trade publications specifically.</li>
+      <li><strong>Participating in an exhibition or event:</strong> Fairs, biennales, conferences, or observances like World Architecture Day are a reliable reason to reach out, especially if you're speaking, exhibiting, or presenting.</li>
+    </ul>
+    <p>As a general rule: if the news marks a genuine milestone, involves a client or collaborator who would also want visibility, or gives an editor a reason to feature you now rather than at some vague point in the future, it's worth writing a release.</p>
+
+    <div class="promo">
+      <img src="/logo.png" alt="ArchWrite">
+      <div class="promo-text">PS. Having difficulty writing your architecture press release? Designed specifically for the architecture and interior design industries, the free <a href="https://www.archwrite.com/">ArchWrite Press Release &amp; Project Story Writer</a> can generate one for you. Fill in as many project details as you can and let the tool do the writing — then copy the result into a document or download it as a .txt file. It's trained on a decade of press releases by a writer who has covered architecture, interior design, construction, and building materials.</div>
+    </div>
+
+    <h2>The Six Formats: Choosing the Right Type of Release</h2>
+    <p>Not every architecture press release tells the same kind of story. The occasion determines what to emphasize, what stage of the project to show, and what tense to write in. Here's how the six most common formats differ.</p>
+
+    <h3>1. Concept Reveal</h3>
+    <p>Sent before a building exists — when a design is finalized but ground hasn't broken. This format leans entirely on renderings, vision, and intent, since there's no finished space to describe yet.</p>
+    <ul>
+      <li><strong>Emphasize:</strong> the design concept, the site strategy, renderings/visualizations, and what makes the proposal distinct</li>
+      <li><strong>Tense:</strong> future ("will feature," "is designed to")</li>
+      <li><strong>Include:</strong> a rendering or two if distributing digitally; anticipated completion date</li>
+      <li><strong>Example headline:</strong> "Jane Doe Architects Unveils Design for Riverside Cultural Center"</li>
+    </ul>
+
+    <h3>2. Project Win / Commission</h3>
+    <p>Announces that your firm has been selected for a project, often through a competition or client selection process, well before design or construction is complete.</p>
+    <ul>
+      <li><strong>Emphasize:</strong> the client, the site, the scope, and why your firm was chosen (competition win, RFP, direct commission)</li>
+      <li><strong>Tense:</strong> present/future ("has been selected to design")</li>
+      <li><strong>Include:</strong> client name, site location, expected project timeline, program (what the building will be used for)</li>
+      <li><strong>Example headline:</strong> "Jane Doe Architects Selected to Design New Austin Public Library Branch"</li>
+    </ul>
+
+    <h3>3. Project Completion</h3>
+    <p>The most common format — announcing a finished, occupiable building. This is where the release can be most detailed and sensory, since there's a real space to describe.</p>
+    <ul>
+      <li><strong>Emphasize:</strong> final materials, structural systems, sustainability features, square footage, and the full project team</li>
+      <li><strong>Tense:</strong> past ("has completed," "opened")</li>
+      <li><strong>Include:</strong> professional photography (essential for pickup), full project details list, opening date if public</li>
+      <li><strong>Example headline:</strong> "Jane Doe Architects Completes Riverside Cultural Center in Austin"</li>
+    </ul>
+
+    <h3>4. Award</h3>
+    <p>Announces a recognition: an AIA award, a design citation, a "best of" list placement. These are typically short and can be sent quickly after the news breaks.</p>
+    <ul>
+      <li><strong>Emphasize:</strong> the specific award and awarding body, the project or body of work being recognized, and what the jury or criteria cited</li>
+      <li><strong>Tense:</strong> past ("has received," "was named")</li>
+      <li><strong>Include:</strong> the award's credibility markers (jury names, past recipients, category), and a link to the awarding organization</li>
+      <li><strong>Example headline:</strong> "Jane Doe Architects Receives 2026 AIA Housing Award for Riverside Commons"</li>
+    </ul>
+
+    <h3>5. Product Collection</h3>
+    <p>For firms that also design furniture, lighting, hardware, or other objects — often in collaboration with a manufacturer. This format reads closer to a product launch than a building story.</p>
+    <ul>
+      <li><strong>Emphasize:</strong> the product line's design concept, materials, manufacturing partner, availability, and how it connects to (or departs from) your architectural work</li>
+      <li><strong>Tense:</strong> present/future ("launches," "will be available")</li>
+      <li><strong>Include:</strong> manufacturer/brand partner name (linked), price point or availability if relevant, retail or showroom details</li>
+      <li><strong>Example headline:</strong> "Jane Doe Architects Launches Modular Lighting Collection with Brand Partner"</li>
+    </ul>
+
+    <h3>6. Event Participation</h3>
+    <p>Announces that your firm is speaking, exhibiting, or otherwise participating in a conference, fair, biennale, or observance like World Architecture Day.</p>
+    <ul>
+      <li><strong>Emphasize:</strong> the event itself, your specific role (panelist, exhibitor, honoree), what you'll present or discuss, and why it's relevant to your practice</li>
+      <li><strong>Tense:</strong> future ("will participate," "will present")</li>
+      <li><strong>Include:</strong> event dates, location (or virtual details), session time if speaking, registration/attendance info</li>
+      <li><strong>Example headline:</strong> "Jane Doe Architects to Speak at World Architecture Day 2026 on Climate-Responsive Design"</li>
+    </ul>
+
+    <p>A quick way to tell formats apart: concept reveal and project win happen before anything is built; completion and award happen after; product collection is a design story that isn't about a building at all; and event participation is about visibility and ideas rather than a specific project milestone.</p>
+
+    <h2>The Anatomy of a Strong Press Release</h2>
+    <p>Every effective press release follows a familiar structure. Understanding each part makes the writing process less intimidating.</p>
+
+    <h3>1. Headline</h3>
+    <p>Your headline should be clear, specific, and immediately communicate the news. Avoid vague or overly clever phrasing. A strong headline names the firm, the project, and the occasion in as few words as possible.</p>
+    <div class="example"><span class="example-label">Example</span>"Jane Doe Architects Completes Cultural Center in New Orleans"</div>
+
+    <h3>2. Dateline</h3>
+    <p>Directly beneath the headline, include the city and date the release is issued. This is a journalistic convention that signals professionalism and timeliness.</p>
+    <div class="example"><span class="example-label">Example</span>AUSTIN, OCTOBER 10, 2026.</div>
+
+    <h3>3. The Lead Paragraph</h3>
+    <p>The first paragraph carries the most weight. It should answer the essential questions:</p>
+    <ul>
+      <li>Who</li>
+      <li>What</li>
+      <li>Where</li>
+      <li>When</li>
+    </ul>
+    <p>All in a single, confident opening. Busy editors often read only this paragraph before deciding whether to continue, so it needs to stand on its own.</p>
+    <p>You can use bold formatting for certain sentences to single out key facts.</p>
+    <div class="example"><span class="example-label">Example</span><strong>Jane Doe Architects, an Austin-based firm known for civic and cultural work,</strong> has completed the <strong>Riverside Cultural Center</strong>, a 45,000-square-foot arts venue <strong>on the banks of the Colorado River</strong>, set to open to the public on <strong>November 3, 2026</strong>.</div>
+    <p>Notice how each essential fact is present and easy to isolate: the firm (who), the completed building (what), the site (where), and the opening date (when).</p>
+
+    <h3>4. The Body</h3>
+    <p>This is where you expand on the story. For architects, the body typically covers:</p>
+    <ul>
+      <li>The concept or design intent behind the project</li>
+      <li>Specific architectural details that bring the building to life (structural systems, materials, site strategy, sustainability features)</li>
+      <li>The project team, including collaborators such as landscape architects, structural engineers, or general contractors</li>
+      <li>Relevant context, such as the client, program, square footage, or budget, and past projects that establish credibility</li>
+    </ul>
+    <p>Choose details that are specific and technical, not generic. "A cantilevered steel canopy that shields the entrance from Texas's summer sun" tells a far richer story than "a striking design feature."</p>
+
+    <h3>5. A Quote</h3>
+    <p>A short quote from the lead architect or a project partner adds a human voice to the release and gives journalists a usable soundbite. Keep it concise, specific, and make sure it says something the rest of the release hasn't already said.</p>
+
+    <h3>6. Project Details</h3>
+    <p>Include the practical facts editors and readers look for: location, size, completion date, client, and key collaborators. Bullet points work well here for easy scanning.</p>
+    <div class="example">
+      <span class="example-label">Example</span>
+      <ul>
+        <li><strong>Location:</strong> Austin, Texas</li>
+        <li><strong>Size:</strong> 45,000 square feet</li>
+        <li><strong>Completion:</strong> November 2026</li>
+        <li><strong>Client:</strong> City of Austin Parks and Recreation Department</li>
+        <li><strong>Structural Engineer:</strong> Smith &amp; Associates</li>
+        <li><strong>Landscape Architect:</strong> Green Studio</li>
+      </ul>
+    </div>
+
+    <h3>7. Media Contact</h3>
+    <p>Always include a clear point of contact for interview requests or media inquiries. This is a small detail that signals you're prepared for press engagement.</p>
+
+    <h3>8. Boilerplate ("About" Section)</h3>
+    <p>The boilerplate is a short, standardized paragraph about you or your firm that can be reused across releases. It typically includes:</p>
+    <ul>
+      <li>Your location and area of specialization</li>
+      <li>Your founding year</li>
+      <li>Notable projects or clients</li>
+      <li>Press mentions or publications you've been featured in</li>
+      <li>Notable awards or recognitions</li>
+    </ul>
+    <p>This section should read like a straightforward bio and should be free of embellishment, like this example:</p>
+    <div class="about-example">
+      <div class="about-heading">About Jane Doe Architects</div>
+      <p>Founded in 2005, Jane Doe Architects is an Austin-based firm specializing in civic and cultural buildings, known for a contextual approach that responds directly to site and climate. Over more than two decades, the firm has completed a range of public projects across Texas, including a branch library in East Austin and a performing arts pavilion in San Antonio. Jane Doe Architects' work has been featured in Architectural Record and Dezeen, and the firm was a 2024 recipient of an AIA Design Award.</p>
+    </div>
+
+    <div class="promo">
+      <img src="/logo.png" alt="ArchWrite">
+      <div class="promo-text">Free <a href="https://www.archwrite.com/">ArchWrite Press Release &amp; Project Story Writer</a></div>
+    </div>
+
+    <h2>Writing Tone: Intelligent, Not Ornamental</h2>
+    <p>The best architecture press releases sound informed rather than promotional. Aim for language that is:</p>
+    <ul>
+      <li><strong>Precise:</strong> Use specific material names, structural terms, dates, and figures rather than vague superlatives.</li>
+      <li><strong>Confident:</strong> State facts plainly. Let the details carry the weight, not adjectives.</li>
+      <li><strong>Grounded:</strong> A press release can convey design intent, but it should never read as an advertisement.</li>
+    </ul>
+    <p>A helpful test: if a sentence could apply to any firm or any building, it needs more specificity.</p>
+
+    <h2>How to Send a Press Release</h2>
+    <p>Writing the release is only half the job; it also needs to reach the right people. For architects, there are generally two paths, and each comes with trade-offs.</p>
+
+    <h3>1. Build Your Own Media List and Email It Directly</h3>
+    <p>This is the more boutique approach, and the one most small firms end up using. It involves compiling your own list of editors, journalists, and publications relevant to architecture in a spreadsheet — trade publications, regional outlets, national design magazines, and writers who cover your market or building type — and emailing them your release directly, ideally with a short, personal note.</p>
+    <p>Having the press release pasted in the body is common practice, rather than attachments.</p>
+    <p>It takes more time upfront to build the list, but it tends to be more genuine, both to you and to the person receiving it. It also gives you control over exactly who sees your news, which matters if you're building relationships with specific editors over time.</p>
+
+    <h3>2. Distribute Through a Newswire Service</h3>
+    <p>A newswire (such as PR Newswire or Business Wire) will distribute your release broadly and typically it gets published on a set of wire-affiliated sites. This can be useful for major announcements or SEO backlinks, but it comes at a real cost – often several hundred dollars per release, and the result can be impersonal, landing your firm's news in the same feed as press releases from massive developers or corporations. For most architecture practices, a direct, curated email list will feel more aligned with the caliber of work being announced and aligns with architecture-focused publications.</p>
+    <p>Many firms find a hybrid approach works best: build relationships with a handful of key editors and publications over time through direct email, and reserve a newswire service for the announcements that warrant wider distribution, such as a major civic building or a national award.</p>
+
+    <h2>SEO Best Practices for Press Releases</h2>
+    <p>It might feel strange to think about keywords when writing something meant for journalists rather than search engines. A press release is not a blog post, after all. But it's worth it, because many publications publish press releases as-is on their own sites, often with little to no editing. When that happens, your release is functioning as a piece of published web content, and every SEO decision you make in the writing stage travels with it.</p>
+
+    <h3>Use Keywords Naturally</h3>
+    <p>Include your firm's name, project name, and relevant location terms (e.g., "Austin architecture firm") within the first paragraph. Search engines and readers both benefit from this early clarity.</p>
+
+    <h3>Link Strategically</h3>
+    <p>Hyperlink your firm's name and any collaborators (engineers, landscape architects, contractors) the first time they're mentioned. This builds backlinks to your site and to your collaborators', which supports SEO for everyone involved, especially if the release is republished unedited.</p>
+
+    <h3>Write a Descriptive Title</h3>
+    <p>Your headline doubles as your SEO title in most cases. Make sure it includes the who, what, and when — this is what will show up in search results.</p>
+
+    <h3>Keep Paragraphs Short</h3>
+    <p>Short paragraphs improve readability for both human readers and search engine crawlers. Aim for three to four sentences per paragraph if possible.</p>
+
+    <h3>Include an "About" Section With Consistent Wording</h3>
+    <p>Because your boilerplate will likely be reused across multiple releases, consistent wording helps search engines associate that language with your name and brand over time.</p>
+
+    <h2>Common Mistakes to Avoid</h2>
+    <ul>
+      <li><strong>Burying the news.</strong> If the announcement doesn't appear until the third paragraph, most readers won't get there.</li>
+      <li><strong>Overusing adjectives.</strong> Words like "stunning," "iconic," or "groundbreaking" (unless literally describing a groundbreaking) weaken a release rather than strengthen it. Let the facts speak.</li>
+      <li><strong>Skipping the practical details.</strong> Square footage, completion dates, client names, and contact information should never be an afterthought.</li>
+      <li><strong>Writing for yourself instead of the reader.</strong> A press release should answer what's newsworthy to an outside audience, not simply what you're proud of.</li>
+    </ul>
+
+    <div class="promo">
+      <img src="/logo.png" alt="ArchWrite">
+      <div class="promo-text">PS. Having difficulty writing your architecture press release? Designed specifically for the architecture and interior design industries, the free <a href="https://www.archwrite.com/">ArchWrite Press Release &amp; Project Story Writer</a> can generate one for you. Fill in as many project details as you can and let the tool do the writing — then copy the result into a document or download it as a .txt file. It's trained on a decade of press releases by a writer who has covered architecture, interior design, construction, and building materials.</div>
+      <a class="btn" href="https://www.archwrite.com/">Try it free &rarr;</a>
+    </div>
   </div>
 
   <a class="back-link" href="/blog/">&larr; Back to the blog</a>
