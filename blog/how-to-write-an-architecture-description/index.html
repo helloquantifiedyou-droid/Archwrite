@@ -52,7 +52,7 @@
     background:var(--paper);
   }
   .logo-bar img{height:40px;width:auto;display:block;}
-  .wrap{max-width:720px;margin:0 auto;padding:48px 24px 80px;}
+  .wrap{max-width:680px;margin:0 auto;padding:48px 24px 80px;}
   .kicker{
     font-family:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
     font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;
@@ -62,20 +62,60 @@
     font-family:"Droid Sans","Helvetica Neue",Arial,sans-serif;
     font-size:32px;line-height:1.2;margin:0 0 16px;letter-spacing:-0.01em;
   }
-  .lede{font-size:16px;line-height:1.6;color:#333;margin:0 0 32px;max-width:56ch;}
-  .coming-soon{
-    background:var(--panel);border:1px solid var(--line);border-radius:10px;
-    padding:24px;margin:0 0 32px;
+  .lede{font-size:16px;line-height:1.6;color:#333;margin:0 0 36px;max-width:56ch;}
+  .article-body h2{
+    font-family:"Droid Sans","Helvetica Neue",Arial,sans-serif;
+    font-size:23px;line-height:1.3;margin:44px 0 16px;letter-spacing:-0.01em;
   }
-  .coming-soon p{
+  .article-body h3{
+    font-family:"Droid Sans","Helvetica Neue",Arial,sans-serif;
+    font-size:17px;line-height:1.3;margin:28px 0 10px;
+  }
+  .article-body p{
     font-family:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
-    margin:0 0 16px;font-size:14px;line-height:1.6;color:#444;
+    font-size:15px;line-height:1.72;color:#333;margin:0 0 18px;
   }
-  .coming-soon p:last-child{margin-bottom:0;}
+  .article-body ul{margin:0 0 18px;padding-left:22px;}
+  .article-body li{
+    font-family:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+    font-size:15px;line-height:1.65;color:#333;margin:0 0 10px;
+  }
+  .article-body strong{font-weight:700;color:var(--ink);}
+  .article-body a{color:var(--canvas);}
+  .example{
+    border-left:3px solid var(--canvas);
+    background:var(--panel);
+    padding:14px 18px;margin:0 0 18px;
+    font-family:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+    font-size:14px;line-height:1.6;color:#333;
+  }
+  .example .example-label{
+    display:block;font-weight:700;text-transform:uppercase;
+    font-size:11px;letter-spacing:0.05em;color:var(--canvas);margin:0 0 6px;
+  }
+  .example ul{margin:0;padding-left:18px;}
+  .example li{margin:0 0 4px;font-size:14px;}
+  .about-example{
+    background:var(--panel);border:1px solid var(--line);border-radius:8px;
+    padding:18px 20px;margin:0 0 18px;
+  }
+  .about-example .about-heading{
+    font-family:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+    font-size:12px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;
+    color:var(--canvas);margin:0 0 8px;
+  }
+  .about-example p{margin:0;font-size:14px;}
+  .promo{
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:20px 24px;margin:28px 0;display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  }
+  .promo img{height:26px;width:auto;flex-shrink:0;}
+  .promo-text{flex:1;min-width:220px;font-family:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;font-size:14px;line-height:1.55;color:#333;}
+  .promo-text a{color:var(--canvas);font-weight:700;}
   .btn{
     display:inline-block;background:var(--canvas);color:#fff;text-decoration:none;
     padding:10px 20px;border-radius:6px;font-weight:700;font-size:13px;
-    font-family:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+    font-family:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;flex-shrink:0;
   }
   .back-link{
     display:inline-block;margin-top:24px;font-size:13px;color:var(--canvas);
@@ -97,12 +137,109 @@
 <div class="wrap">
   <div class="kicker">Blog</div>
   <h1>How to Write an Architecture Description</h1>
-  <p class="lede">A practical guide to writing compelling project descriptions for completed architecture work.</p>
 
-  <div class="coming-soon">
-    <p>This article is coming soon.</p>
-    <p>In the meantime, try the free tool that writes your press release or project story for you — no sign-up, no credit card required.</p>
-    <a class="btn" href="/">Try the free tool &rarr;</a>
+  <div class="article-body">
+    <p>A well-written architecture description is the difference between a project that gets skimmed past and one that gets remembered, published, or shortlisted. It's the text that accompanies your images on your website, in an award submission, in a magazine feature, or on a competition board – and it does the work your photos can't do alone: explaining why the building looks and works the way it does.</p>
+    <p>And yet, many architects write it last, rushed, and without much thought to structure. That's a missed opportunity, because a strong description isn't just supporting text – it shapes how editors, jurors, and clients understand the work.</p>
+    <p>This guide breaks down how to write an architecture description for a completed or in-progress project, whether it's headed to your own portfolio, a publication, or an awards jury.</p>
+
+    <div class="promo">
+      <img src="/logo.png" alt="ArchWrite">
+      <div class="promo-text">PS. Having difficulty writing your architecture project description? Designed specifically for the architecture and interior design industries, the free <a href="https://www.archwrite.com/">ArchWrite Press Release &amp; Project Story Writer</a> can generate one for you. Fill in as many project details as you can and let the tool do the writing — then copy the result into a document or download it as a .txt file. It's trained on a decade of writing by a writer who has covered architecture, interior design, construction, and building materials.</div>
+    </div>
+
+    <h2>What Is an Architecture Description, and Why Does It Matter?</h2>
+    <p>An architecture description is a written narrative that explains a project: its concept, its site, its materials, and the reasoning behind its design decisions. Unlike a press release, it isn't built around a news hook – it doesn't need a "why now." It exists to make the project legible to someone who can't walk through it.</p>
+    <p>Done well, an architecture description does three things at once:</p>
+    <ul>
+      <li><strong>Translates design intent into language:</strong> Photos show what a space looks like; the description explains why it looks that way.</li>
+      <li><strong>Builds credibility with editors and jurors:</strong> A clear, well-argued narrative signals a firm that thinks as rigorously as it designs.</li>
+      <li><strong>Extends the life of the project:</strong> A strong description gets reused — in your portfolio, in submissions, in press pickups — long after the ribbon-cutting.</li>
+    </ul>
+
+    <h2>When You'll Need an Architecture Project Description</h2>
+    <p>Architecture descriptions show up in more places than most firms plan for. Common occasions include:</p>
+    <ul>
+      <li><strong>Portfolio and website entries:</strong> Every completed project on your site needs a description, and it's often the first substantial text a prospective client reads about your work.</li>
+      <li><strong>Award submissions:</strong> Juries read dozens or hundreds of entries; a sharp description is often what earns a project a second look.</li>
+      <li><strong>Publication submittals:</strong> Editors at trade and design publications typically request a description alongside photography before they'll consider covering a project.</li>
+      <li><strong>Competition boards and submissions:</strong> A concise, persuasive description often accompanies drawings and renderings in competition entries.</li>
+      <li><strong>Planning and permitting narratives:</strong> Some jurisdictions require a written design narrative as part of a planning or design-review submission.</li>
+    </ul>
+    <p>Because the same project may need a 50-word version, a 300-word version, and a 1,000-word version for different audiences, it's worth writing one thorough master description you can trim down rather than starting from scratch each time.</p>
+
+    <h2>The Anatomy of a Strong Architecture Description</h2>
+
+    <h3>1. The Opening Statement</h3>
+    <p>Your first one or two sentences should establish what the project is and its defining idea. This isn't a headline, it's a compressed thesis that tells the reader what to look for as they continue.</p>
+    <div class="example"><span class="example-label">Example</span>Set into a sloped site above the Colorado River, the <strong>Riverside Cultural Center</strong> reorganizes a conventional single-volume arts building into <strong>a sequence of terraced pavilions that step down toward the water</strong>.</div>
+
+    <h3>2. Project Facts</h3>
+    <p>Establish the essentials early: location, program, size, client, and completion date. Readers, especially editors and jurors, often look for these before reading further, so don't bury them deep in the narrative.</p>
+    <div class="example">
+      <span class="example-label">Example</span>
+      <ul>
+        <li><strong>Location:</strong> Austin, Texas</li>
+        <li><strong>Program:</strong> Cultural center with galleries, performance hall, and public plaza</li>
+        <li><strong>Size:</strong> 45,000 square feet</li>
+        <li><strong>Client:</strong> City of Austin Parks and Recreation Department</li>
+        <li><strong>Completion:</strong> 2026</li>
+      </ul>
+    </div>
+
+    <h3>3. The Concept / Design Narrative</h3>
+    <p>This is the core of the description. Explain the central idea driving the design: the organizing move, the response to a constraint, or the design question the project answers. Avoid listing features; instead, connect them to a reasoned intent.</p>
+    <div class="example"><span class="example-label">Example</span>Rather than concentrate the building's mass at the top of the site, the design distributes the program across <strong>three terraced volumes</strong>, allowing each to hold a different relationship to the river below and reducing the building's visual footprint from the opposite bank.</div>
+
+    <h3>4. Site and Context</h3>
+    <p>Describe how the project responds to its physical, cultural, or urban context — topography, climate, adjacent buildings, or neighborhood character. This section grounds the concept in a specific place rather than treating the building as if it could exist anywhere.</p>
+
+    <h3>5. Materials and Construction</h3>
+    <p>Name specific materials, structural systems, and construction methods, and explain why they were chosen — for performance, cost, craft, or narrative reasons. Precision here does more work than adjectives.</p>
+    <p>"A board-formed concrete base anchors the building to the slope, while a lighter, perforated aluminum screen wraps the upper volumes to filter southern light" tells a far richer story than "a mix of durable and elegant materials."</p>
+
+    <h3>6. Spatial Experience</h3>
+    <p>Walk the reader through the building the way a visitor would move through it — arrival, procession, key thresholds, and standout interior or exterior moments. This section is where the writing can slow down and become more sensory, since it's describing lived experience rather than design logic.</p>
+
+    <h3>7. Performance and Sustainability (if relevant)</h3>
+    <p>If the project includes notable sustainability strategies, certifications, or performance outcomes (passive cooling, daylighting, energy targets, material sourcing), include them here with specifics rather than general claims.</p>
+
+    <h3>8. Project Credits</h3>
+    <p>Close with a full credits list: architect of record, design team, structural and MEP engineers, landscape architect, contractor, and any other key collaborators. This is both a professional courtesy and, in the case of publications, often required for the piece to run.</p>
+
+    <h2>Writing Tone: Analytical, Not Promotional</h2>
+    <p>The best architecture descriptions read like reasoned arguments, not marketing copy. Aim for language that is:</p>
+    <ul>
+      <li><strong>Precise:</strong> Use exact material names, dimensions, and construction terms rather than vague praise.</li>
+      <li><strong>Causal:</strong> Connect design decisions to the problems or conditions that produced them — "because," "in response to," "to allow" — rather than presenting choices as arbitrary.</li>
+      <li><strong>Restrained:</strong> Let the reasoning and the specificity carry the weight. If a sentence just praises the design without explaining it, cut it.</li>
+    </ul>
+    <p>A useful test: if you can delete an adjective without losing any information, delete it.</p>
+
+    <h2>How Long Should It Be?</h2>
+    <p>Length depends entirely on where the description is going:</p>
+    <ul>
+      <li><strong>Website/portfolio:</strong> 150–400 words is typical — enough to establish concept, context, and key facts without overwhelming the images.</li>
+      <li><strong>Award submissions:</strong> Follow the awarding body's word limit exactly; juries read too many entries to make exceptions.</li>
+      <li><strong>Publications:</strong> Editors often prefer 300–800 words and will edit for length, so lead with your strongest material first.</li>
+      <li><strong>Competition boards:</strong> Often the shortest version — 100–200 words — since it competes for attention with drawings on the same page.</li>
+    </ul>
+    <p>Writing one comprehensive 800–1,000 word master version first, then cutting it down for each use case, is far easier than writing multiple versions from scratch.</p>
+
+    <h2>Common Mistakes to Avoid</h2>
+    <ul>
+      <li><strong>Describing images instead of decisions.</strong> "The building features large windows and clean lines" describes what's already visible in the photos. Explain why those choices were made instead.</li>
+      <li><strong>Leading with praise instead of substance.</strong> Starting with "an award-winning, striking addition to the city" delays the actual information the reader wants.</li>
+      <li><strong>Omitting the site.</strong> A description that could apply to the same building dropped anywhere loses its strongest source of specificity.</li>
+      <li><strong>Skipping credits.</strong> An incomplete credits list can disqualify a submission or delay a publication from running the piece.</li>
+      <li><strong>Overusing adjectives.</strong> Words like "stunning," "iconic," "seamless," or "genuinely" weaken a description rather than strengthen it. Let the reasoning and the facts speak.</li>
+    </ul>
+
+    <div class="promo">
+      <img src="/logo.png" alt="ArchWrite">
+      <div class="promo-text">Having difficulty writing your architecture project description? Use the free <a href="https://www.archwrite.com/">ArchWrite Press Release &amp; Project Story Writer</a> to have it generated for you.</div>
+      <a class="btn" href="https://www.archwrite.com/">Try it free &rarr;</a>
+    </div>
   </div>
 
   <a class="back-link" href="/blog/">&larr; Back to the blog</a>
